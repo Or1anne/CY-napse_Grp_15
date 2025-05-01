@@ -7,12 +7,18 @@ public class Case {
     public boolean South;
     public boolean East;
     public boolean West;
+    public boolean visited;
 
     public Case(int x, int y){
         id = number++;
-        North = false;
-        South = false;
-        East = false;
-        West = false;
+        North = true;
+        South = true;
+        East = true;
+        West = true;
+        visited = false;
+    }
+
+    public int getID(){
+        return this.id;
     }
 }

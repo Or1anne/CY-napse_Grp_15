@@ -14,23 +14,26 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Maze labyrinthe = new Maze(10, 10); // crée un labyrinthe 10x10
-        labyrinthe.generation();
-        Canvas canvas = new Canvas(400, 400); // Spécifie une taille
+        int width = 30;
+        int height = 30;
+        double cellSize = 20;
+
+        Maze labyrinthe = new Maze(width, height); // crée un labyrinthe 10x10
+        labyrinthe.KruskalGeneration();
+        Canvas canvas = new Canvas(width*cellSize+1, height*cellSize+1); // Spécifie une taille
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        drawLabyrinthe(gc, labyrinthe);
+        drawLabyrinthe(gc, labyrinthe, cellSize);
 
         //FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         BorderPane root = new BorderPane();
         root.setCenter(canvas);
-        Scene scene = new Scene(/*fxmlLoader.load()*/ root, 400, 400);
+        Scene scene = new Scene(/*fxmlLoader.load()*/ root, width*cellSize+10, height*cellSize+10);
         stage.setTitle("Labyrinthe");
         stage.setScene(scene);
         stage.show();
     }
 
-    private void drawLabyrinthe(GraphicsContext gc, Maze labyrinthe) {
-        double cellSize = 40;
+    private void drawLabyrinthe(GraphicsContext gc, Maze labyrinthe, double cellSize) {
         Case[][] grid = labyrinthe.getMaze();
 
         for (int y = 0; y < grid.length; y++) {
