@@ -2,7 +2,7 @@ package com.example.nouveau;
 
 public class Case {
     private int id;
-    private static int number;
+    public static int number;
     public boolean North;
     public boolean South;
     public boolean East;

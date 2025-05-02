@@ -5,6 +5,7 @@ public class Maze {
     private int height;
     private int width;
     private Case[][] maze;
+    private int[] father;
 
 /////////////////////////////////////////////////////////////////////
 
@@ -18,14 +19,22 @@ public class Maze {
 
             }
         }
+        Case.number = 0;
         this.maze[0][0].West = false;
         this.maze[height-1][width-1].East = false;
     }
 
+    public int getHeight(){
+        return this.height;
+    }
+    public int getWidth(){
+        return this.width;
+    }
+
 /////////////////////////////////////////////////////////////////////
 
-    public void KruskalGeneration(){
-        int[] father = new int[height*width];
+    public void KruskalGeneration(int seed){
+        father = new int[height*width];
         for(int i=0; i<father.length; i++){
             father[i] = i;
         }
@@ -41,7 +50,7 @@ public class Maze {
                 }
             }
         }
-        Collections.shuffle(walls, new Random(2)); //Il faut remplacer la seed ici
+        Collections.shuffle(walls, new Random(seed)); //Il faut remplacer la seed ici
 
         for(int[] wall: walls){
             Case c1 = this.maze[wall[0]][wall[1]];
