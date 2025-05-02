@@ -2,10 +2,9 @@ package com.example.nouveau;
 import java.util.*;
 
 public class Maze {
-    private int height;
-    private int width;
-    private Case[][] maze;
-    private int[] father;
+    private final int height;
+    private final int width;
+    private final Case[][] maze;
 
 /////////////////////////////////////////////////////////////////////
 
@@ -34,8 +33,8 @@ public class Maze {
 /////////////////////////////////////////////////////////////////////
 
     public void KruskalGeneration(int seed){
-        father = new int[this.height*this.width];
-        for(int i=0; i<father.length; i++){
+        int[] father = new int[this.height * this.width];
+        for(int i = 0; i< father.length; i++){
             father[i] = i;
         }
 

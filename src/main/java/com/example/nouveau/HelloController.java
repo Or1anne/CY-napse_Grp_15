@@ -1,28 +1,40 @@
 package com.example.nouveau;
 
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
+import java.util.HashSet;
+import java.util.Random;
+
 public class HelloController {
+
+    private double zoomFactor = 1.0;
+
     @FXML private Pane mainPane;
     @FXML private GridPane gridPane;
     @FXML private TextField widthInput;
     @FXML private TextField heightInput;
     @FXML private TextField seedInput;
-    private double zoomFactor = 1.0;
+    @FXML private ChoiceBox<String> MethodGeneration;
+    @FXML private ChoiceBox<String> MethodSolve;
 
     @FXML
     public void initialize() {
-        mainPane.widthProperty().addListener((obs, oldVal, newVal) -> GenerateMaze());
-        mainPane.heightProperty().addListener((obs, oldVal, newVal) -> GenerateMaze());
+        MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
+        MethodSolve.setItems(FXCollections.observableArrayList("Tremaux", "HandToHand", "BFS"));
+        MethodGeneration.setValue("Parfait");
     }
-
 
     @FXML
     public void GenerateMaze(){
@@ -31,14 +43,24 @@ public class HelloController {
         try {
             width = Integer.parseInt(widthInput.getText());
             height = Integer.parseInt(heightInput.getText());
+        } catch(NumberFormatException e) {
+            width = 30;
+            height = 30;
+        }
+
+        try{
             seed = Integer.parseInt(seedInput.getText());
-        } catch (NumberFormatException e) {
-            System.out.println("Erreur");
-            return;
+        }catch(NumberFormatException e){
+            seed = new Random().nextInt();
         }
 
         Maze labyrinth = new Maze(width, height);
-        labyrinth.KruskalImperfectGeneration(seed);
+        if(MethodGeneration.getValue().equals("Parfait")){
+            labyrinth.KruskalGeneration(seed);
+        }
+        else{
+            labyrinth.KruskalImperfectGeneration(seed);
+        }
 
         double maxDisplayWidth = mainPane.getWidth();
         double maxDisplayHeight = mainPane.getHeight();
@@ -94,4 +116,6 @@ public class HelloController {
         gridPane.setScaleY(zoomFactor);
         }
 
+    public void MazeNavigate(MouseEvent mouseEvent) {
+    }
 }
