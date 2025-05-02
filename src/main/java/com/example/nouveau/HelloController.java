@@ -38,8 +38,8 @@ public class HelloController {
         }
 
         Maze labyrinth = new Maze(width, height);
-        labyrinth.KruskalGeneration(seed);
-        
+        labyrinth.KruskalImperfectGeneration(seed);
+
         double maxDisplayWidth = mainPane.getWidth();
         double maxDisplayHeight = mainPane.getHeight();
         double cellWidth = maxDisplayWidth / width;

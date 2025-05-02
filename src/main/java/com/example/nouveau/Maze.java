@@ -34,14 +34,14 @@ public class Maze {
 /////////////////////////////////////////////////////////////////////
 
     public void KruskalGeneration(int seed){
-        father = new int[height*width];
+        father = new int[this.height*this.width];
         for(int i=0; i<father.length; i++){
             father[i] = i;
         }
 
         LinkedList<int[]> walls = new LinkedList<>();
-        for(int i=0; i<height; i++){
-            for(int j=0; j<width; j++){
+        for(int i=0; i<this.height; i++){
+            for(int j=0; j<this.width; j++){
                 if(i>0){
                     walls.add(new int[]{i,j,i-1,j});
                 }
@@ -79,6 +79,36 @@ public class Maze {
                 }
             }
         }
+    }
+
+    public void KruskalImperfectGeneration(int seed){
+        Random randSeed = new Random(seed);
+        for(int i=0; i<this.height; i++){
+            for(int j=0; j<this.width; j++){
+                if(j == 0 && randSeed.nextDouble() < 0.2){
+                    this.maze[i][j].West = false;
+                } else if (j == this.width-1 && randSeed.nextDouble() < 0.2) {
+                    this.maze[i][j].East = false;
+                }
+                if(i<this.height-1 && countWalls(this.maze[i][j])>1 && countWalls(this.maze[i+1][j])>1 && randSeed.nextDouble() < 0.7) {
+                    this.maze[i][j].South = false;
+                    this.maze[i+1][j].North = false;
+                }
+                if(j<this.width-1 && countWalls(this.maze[i][j])>1 && countWalls(this.maze[i][j+1])>1 && randSeed.nextDouble() < 0.7) {
+                    this.maze[i][j].East = false;
+                    this.maze[i][j+1].West = false;
+                }
+            }
+        }
+    }
+
+    private int countWalls(Case c) {
+        int count = 0;
+        if (c.North) count++;
+        if (c.South) count++;
+        if (c.East) count++;
+        if (c.West) count++;
+        return count;
     }
 
     private int find(int s, int[] father){
