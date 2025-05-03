@@ -1,7 +1,7 @@
 package com.example.nouveau;
 
 public class Case {
-    private int id;
+    private final int id;
     public static int number;
     public boolean North;
     public boolean South;

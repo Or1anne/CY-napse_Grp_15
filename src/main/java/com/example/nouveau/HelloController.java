@@ -4,8 +4,10 @@ import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -21,7 +23,7 @@ public class HelloController {
 
     private double zoomFactor = 1.0;
 
-    @FXML private Pane mainPane;
+    @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
     @FXML private TextField widthInput;
     @FXML private TextField heightInput;
@@ -38,6 +40,8 @@ public class HelloController {
 
     @FXML
     public void GenerateMaze(){
+        zoomFactor = 1.0;
+        applyZoom();
         gridPane.getChildren().clear(); //Reset le GridPane pour qu'il n'y ait aucune colonne ni ligne
         int width, height, seed;
         try {
@@ -62,21 +66,11 @@ public class HelloController {
             labyrinth.KruskalImperfectGeneration(seed);
         }
 
-        double maxDisplayWidth = mainPane.getWidth();
-        double maxDisplayHeight = mainPane.getHeight();
-        double cellWidth = maxDisplayWidth / width;
-        double cellHeight = maxDisplayHeight / height;
+        double cellWidth = mainPane.getWidth() / width;
+        double cellHeight = mainPane.getHeight() / height;
         double cellSize = Math.min(cellWidth, cellHeight);
 
-        double gridWidth = width * cellSize;
-        double gridHeight = height * cellSize;
-
-        // Définir la taille du GridPane
-        gridPane.setPrefSize(gridWidth, gridHeight);
-
-        // Centrer le GridPane
-        gridPane.setLayoutX((maxDisplayWidth - gridWidth) / 2);
-        gridPane.setLayoutY((maxDisplayHeight - gridHeight) / 2);
+        gridPane.setPrefSize(width * cellSize, height * cellSize);
 
         for(int i=0; i<labyrinth.getHeight(); i++){
             for(int j=0; j< labyrinth.getWidth(); j++){
@@ -86,7 +80,6 @@ public class HelloController {
             }
         }
     }
-
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
@@ -100,22 +93,29 @@ public class HelloController {
 
     @FXML
     void MazeZoom(ScrollEvent event) {
-        // Si la molette de la souris est tournée vers le haut (zoom avant)
         if (event.getDeltaY() > 0) {
             zoomFactor *= 1.1;  // Zoom in
         }
-        // Si la molette de la souris est tournée vers le bas (zoom arrière)
         else {
             zoomFactor /= 1.1;  // Zoom out
         }
         applyZoom();
-        event.consume();  // Empêche la propagation de l'événement
     }
     private void applyZoom() {
         gridPane.setScaleX(zoomFactor);
         gridPane.setScaleY(zoomFactor);
-        }
-
-    public void MazeNavigate(MouseEvent mouseEvent) {
     }
+
+    @FXML
+    public void MousePressed(MouseEvent mouseEvent) {
+        double mouseX = mouseEvent.getSceneX();
+        double mouseY = mouseEvent.getSceneY();
+        mainPane.setCursor(Cursor.CLOSED_HAND);
+    }
+
+    @FXML
+    public void MouseReleased(MouseEvent mouseEvent) {
+        mainPane.setCursor(Cursor.DEFAULT);
+    }
+
 }
