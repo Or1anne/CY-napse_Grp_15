@@ -20,6 +20,8 @@ public class HelloApplication extends Application {
 
         Maze labyrinthe = new Maze(width, height); // crée un labyrinthe 10x10
         labyrinthe.KruskalGeneration();
+        Resolve Resolve = new Resolve(labyrinthe);
+        ArrayList<Case> path = Resolve.Tremaux();
         Canvas canvas = new Canvas(width*cellSize+1, height*cellSize+1); // Spécifie une taille
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawLabyrinthe(gc, labyrinthe, cellSize);
@@ -47,6 +49,13 @@ public class HelloApplication extends Application {
                 if (c.West) gc.strokeLine(xPos, yPos, xPos, yPos + cellSize);
                 if (c.East) gc.strokeLine(xPos + cellSize, yPos, xPos + cellSize, yPos + cellSize);
             }
+        }
+
+        gc.setFill(javafx.scene.paint.Color.color(1, 0, 0, 0.5)); // rouge semi-transparent
+        for (Case c : path) {
+            double xPos = c.getY() * cellSize; // y = largeur
+            double yPos = c.getX() * cellSize; // x = hauteur
+            gc.fillRect(xPos + 1, yPos + 1, cellSize - 2, cellSize - 2); // petit carré rouge
         }
     }
 
