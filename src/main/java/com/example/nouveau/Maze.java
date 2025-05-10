@@ -2,8 +2,8 @@ package com.example.nouveau;
 import java.util.*;
 
 public class Maze {
-    private int height;
-    private int width;
+    private final int height;
+    private final int width;
     private Case[][] maze;
 
 /////////////////////////////////////////////////////////////////////
@@ -18,8 +18,8 @@ public class Maze {
 
             }
         }
-        this.maze[0][0].West = false;
-        this.maze[height-1][width-1].East = false;
+        this.maze[0][0].setWest(false);
+        this.maze[height-1][width-1].setEast(false);
     }
 
 /////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ public class Maze {
                 }
             }
         }
-        Collections.shuffle(walls, new Random(2)); //Il faut remplacer la seed ici
+        Collections.shuffle(walls, new Random(4)); //Il faut remplacer la seed ici
 
         for(int[] wall: walls){
             Case c1 = this.maze[wall[0]][wall[1]];
@@ -50,22 +50,22 @@ public class Maze {
             if(union(c1.getID(), c2.getID(), father)){
                 if(wall[0] == wall[2]){
                     if(wall[1] > wall[3]){
-                        c1.West = false;
-                        c2.East = false;
+                        c1.setWest(false);
+                        c2.setEast(false);
                     }
                     else{
-                        c2.West = false;
-                        c1.East = false;
+                        c2.setWest(false);
+                        c1.setEast(false);
                     }
                 }
                 else{
                     if(wall[0] > wall[2]){
-                        c1.North = false;
-                        c2.South = false;
+                        c1.setNorth(false);
+                        c2.setSouth(false);
                     }
                     else{
-                        c2.North = false;
-                        c1.South = false;
+                        c2.setNorth(false);
+                        c1.setSouth(false);
                     }
                 }
             }
