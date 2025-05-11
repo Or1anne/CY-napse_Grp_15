@@ -20,11 +20,16 @@ import javafx.scene.layout.Region;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 public class HelloController {
 
     private double zoomFactor = 1.0;
     private Maze labyrinth;
+    private Timeline pathTimeline;  // <- pour pouvoir arrêter l'animation
+
 
 
     @FXML private ScrollPane mainPane;
@@ -47,7 +52,19 @@ public class HelloController {
         zoomFactor = 1.0;
         applyZoom();
         gridPane.getChildren().clear(); //Reset le GridPane pour qu'il n'y ait aucune colonne ni ligne
+        for (javafx.scene.Node node : gridPane.getChildren()) {
+            if (node instanceof Pane pane) {
+                pane.setStyle("");
+            }
+        }
+
         int width, height, seed;
+
+        if (pathTimeline != null) {
+            pathTimeline.stop();
+            pathTimeline = null;
+        }
+
         try {
             width = Integer.parseInt(widthInput.getText());
             height = Integer.parseInt(heightInput.getText());
@@ -143,7 +160,8 @@ public class HelloController {
                 path = solver.HandOnWall(labyrinth);
                 break;
         }
-        drawPath(path);
+        //drawPath(path);
+        showPathStepByStep(path);
     }
 
     private void drawPath(List<Case> path) {
@@ -167,6 +185,28 @@ public class HelloController {
             }
         }
         return null;
+    }
+
+    public void showPathStepByStep(List<Case> path) {
+        if (pathTimeline != null) {
+            pathTimeline.stop();  // Stoppe l'ancienne animation si elle tourne
+        }
+
+        pathTimeline = new Timeline();
+        int delay = 100;
+
+        for (int i = 0; i < path.size(); i++) {
+            final int index = i;
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * delay), event -> {
+                Case c = path.get(index);
+                Pane cellPane = getPaneFromGrid(c.getY(), c.getX());
+                if (cellPane != null) {
+                    cellPane.setStyle(cellPane.getStyle() + "-fx-background-color: red;");
+                }
+            });
+            pathTimeline.getKeyFrames().add(keyFrame);
+        }
+        pathTimeline.play();
     }
 
 
