@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -17,11 +18,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 public class HelloController {
 
     private double zoomFactor = 1.0;
+    private Maze labyrinth;
+
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -34,7 +38,7 @@ public class HelloController {
     @FXML
     public void initialize() {
         MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
-        MethodSolve.setItems(FXCollections.observableArrayList("Tremaux", "HandToHand", "BFS"));
+        MethodSolve.setItems(FXCollections.observableArrayList("Tremaux", "HandOnWall", "BFS"));
         MethodGeneration.setValue("Parfait");
     }
 
@@ -58,7 +62,8 @@ public class HelloController {
             seed = new Random().nextInt();
         }
 
-        Maze labyrinth = new Maze(width, height);
+        labyrinth = new Maze(width, height);
+
         if(MethodGeneration.getValue().equals("Parfait")){
             labyrinth.KruskalGeneration(seed);
         }
@@ -80,14 +85,15 @@ public class HelloController {
             }
         }
     }
+
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
         pane.setStyle("-fx-border-color: black; -fx-border-width: " +
-                (cell.North ? "1 " : "0 ") +
-                (cell.East ? "1 " : "0 ") +
-                (cell.South ? "1 " : "0 ") +
-                (cell.West ? "1" : "0") + ";");
+                (cell.getNorth() ? "1 " : "0 ") +
+                (cell.getEast() ? "1 " : "0 ") +
+                (cell.getSouth() ? "1 " : "0 ") +
+                (cell.getWest() ? "1" : "0") + ";");
         return pane;
     }
 
@@ -117,5 +123,52 @@ public class HelloController {
     public void MouseReleased(MouseEvent mouseEvent) {
         mainPane.setCursor(Cursor.DEFAULT);
     }
+
+    @FXML
+    public void solveMaze() {
+        if (labyrinth == null) return;
+
+        Resolve solver = new Resolve();
+        List<Case> path = List.of();
+        // TODO mettre les algo correspondants
+        switch (MethodSolve.getValue()) {
+            case "Tremaux":
+                //path = solver.Tremaux(labyrinth);
+                break;
+            case "BFS":
+                //path = solver.BFS(labyrinth);
+                break;
+            case "HandToHand":
+            default:
+                path = solver.HandOnWall(labyrinth);
+                break;
+        }
+        drawPath(path);
+    }
+
+    private void drawPath(List<Case> path) {
+        if (path == null || path.isEmpty()) return;
+
+        for (Case c : path) {
+            Pane cellPane = getPaneFromGrid(c.getY(), c.getX()); // Attention : x = ligne, y = colonne
+            if (cellPane != null) {
+                cellPane.setStyle(cellPane.getStyle() + "; -fx-background-color: #ff6a00");
+            }
+        }
+    }
+
+    private Pane getPaneFromGrid(int col, int row) {
+        for (Node node : gridPane.getChildren()) {
+            Integer nodeCol = GridPane.getColumnIndex(node);
+            Integer nodeRow = GridPane.getRowIndex(node);
+
+            if ((nodeCol == null ? 0 : nodeCol) == col && (nodeRow == null ? 0 : nodeRow) == row) {
+                return (Pane) node;
+            }
+        }
+        return null;
+    }
+
+
 
 }
