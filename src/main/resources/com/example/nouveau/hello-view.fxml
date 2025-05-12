@@ -9,6 +9,7 @@
    <bottom>
        <ToolBar prefHeight="40.0" prefWidth="504.0" style="-fx-border-color: #111111;" BorderPane.alignment="CENTER">
            <Button mnemonicParsing="false" onAction="#GenerateMaze" text="Générer un Labyrinthe" />
+           <Button mnemonicParsing="false" onAction="#solveMaze" text="Résoudre le Labyrinthe" />
            <TextField fx:id="heightInput" prefHeight="26.0" prefWidth="69.0" promptText="Hauteur" />
            <TextField fx:id="widthInput" prefHeight="26.0" prefWidth="77.0" promptText="Largeur" />
            <TextField fx:id="seedInput" prefHeight="26.0" prefWidth="128.0" promptText="Graine de Génération" />
