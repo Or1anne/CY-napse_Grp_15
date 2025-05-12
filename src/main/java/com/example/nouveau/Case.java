@@ -3,6 +3,7 @@ import java.util.*;
 
 public class Case {
     private int id;
+    private int x,y;
     private static int number;
     private boolean North = true, South = true, East = true, West = true;
     private boolean visited = false;
