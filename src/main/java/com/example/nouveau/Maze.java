@@ -7,7 +7,7 @@ public class Maze {
     private final Case[][] maze;
 
     /////////////////////////////////////////////////////////////////////
-
+    //Constructeur Matrice de Case
     public Maze(int width, int height){
         this.height = height;
         this.width = width;
