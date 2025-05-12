@@ -121,22 +121,6 @@ public class HelloController {
         }
     }
 
-    private void solveMazeWithTremaux() {
-        if (currentMaze == null) return;
-
-        Resolve solver = new Resolve(currentMaze);
-        List<Case> solutionPath = solver.Tremaux();
-
-        for (Case c : solutionPath) {
-            int row = c.getX();
-            int col = c.getY();
-            Pane pane = (Pane) getNodeFromGridPane(gridPane, col, row); // GridPane (col, row)
-            if (pane != null) {
-                pane.setStyle(pane.getStyle() + "-fx-background-color: red;");
-            }
-        }
-    }
-
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
             Integer nodeCol = GridPane.getColumnIndex(node);
@@ -197,8 +181,8 @@ public class HelloController {
                 redrawMaze();
                 break;
         }
-        //drawPath(path);
-        showPathStepByStep(path);
+        drawPath(path);
+        //showPathStepByStep(path);
     }
 
     private void drawPath(List<Case> path) {
