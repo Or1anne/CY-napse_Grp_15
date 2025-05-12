@@ -59,7 +59,7 @@ public class Resolve {
         for (int[] dir : directions) {
             Case next = Labyrinthe[dir[0]][dir[1]];
 
-            if (!next.getVisited() && next.getCount() < 2) {
+            if (next.getVisited() && next.getCount() < 2) {
                 current.setVisited(true);
                 if (explore(dir[0], dir[1], path)) {
                     return true;
@@ -122,7 +122,7 @@ public class Resolve {
             }
 
 
-            if (!Labyrinthe[x][y].getVisited()) {
+            if (Labyrinthe[x][y].getVisited()) {
                 Labyrinthe[x][y].setVisited(true);
                 path.add(Labyrinthe[x][y]);
             }

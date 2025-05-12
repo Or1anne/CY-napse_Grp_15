@@ -1,8 +1,7 @@
 package com.example.nouveau;
-import java.util.*;
 
 public class Case {
-    private int id;
+    private final int id;
     private int x,y;
     private static int number;
     private boolean North = true, South = true, East = true, West = true;
@@ -22,7 +21,7 @@ public class Case {
     public boolean getSouth() { return South; }
     public boolean getWest() { return West; }
     public boolean getEast() { return East; }
-    public boolean getVisited() { return visited; }
+    public boolean getVisited() { return !visited; }
     public int getCount() { return count; }
     public int getNumber(){ return number;}
 
