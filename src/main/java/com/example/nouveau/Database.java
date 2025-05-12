@@ -87,10 +87,10 @@ public class Database {
                     CellStmt.setInt(1, mazeId);
                     CellStmt.setInt(2, j);
                     CellStmt.setInt(3, i);
-                    CellStmt.setBoolean(4, cell.North);
-                    CellStmt.setBoolean(5, cell.South);
-                    CellStmt.setBoolean(6, cell.West);
-                    CellStmt.setBoolean(7, cell.East);
+                    CellStmt.setBoolean(4, cell.getNorth());
+                    CellStmt.setBoolean(5, cell.getSouth());
+                    CellStmt.setBoolean(6, cell.getWest());
+                    CellStmt.setBoolean(7, cell.getEast());
                     CellStmt.addBatch();
                 }
             }
