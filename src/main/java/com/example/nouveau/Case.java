@@ -1,7 +1,7 @@
 package com.example.nouveau;
+import java.util.*;
 
 public class Case {
-    private int x, y;
     private int id;
     private static int number;
     private boolean North = true, South = true, East = true, West = true;
@@ -23,14 +23,22 @@ public class Case {
     public boolean getEast() { return East; }
     public boolean getVisited() { return visited; }
     public int getCount() { return count; }
+    public int getNumber(){ return number;}
 
     public void setNorth(boolean North) { this.North = North; }
     public void setSouth(boolean South) { this.South = South; }
     public void setWest(boolean West)   { this.West = West; }
     public void setEast(boolean East)   { this.East = East; }
     public void setVisited(boolean visited) { this.visited = visited; }
+    public void setX(int x){ this.x=x;}
+    public void setY(int y){ this.y=y;}
 
+    public void resetCount(int count){ this.count=count;}
     public void incrementCount() { this.count++; }
+
+    public static void resetNumber() {
+        number = 0;
+    }
 
     @Override
     public String toString() {

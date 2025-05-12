@@ -1,16 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.nouveau.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
-
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<?import javafx.scene.Group?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="502.0" prefWidth="695.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nouveau.HelloController">
+    <bottom>
+        <ToolBar prefHeight="40.0" prefWidth="504.0" style="-fx-border-color: #111111;" BorderPane.alignment="CENTER">
+            <Button mnemonicParsing="false" onAction="#GenerateMaze" text="Générer un Labyrinthe" />
+            <TextField fx:id="heightInput" prefHeight="26.0" prefWidth="69.0" promptText="Hauteur" />
+            <TextField fx:id="widthInput" prefHeight="26.0" prefWidth="77.0" promptText="Largeur" />
+            <TextField fx:id="seedInput" prefHeight="26.0" prefWidth="128.0" promptText="Graine de Génération" />
+        </ToolBar>
+    </bottom>
+    <center>
+        <ScrollPane fx:id="mainPane" pannable="true" hbarPolicy="NEVER"
+                    vbarPolicy="NEVER" fitToHeight="true" fitToWidth="true" onMousePressed="#MousePressed" BorderPane.alignment="CENTER">
+            <StackPane>
+                <Group>
+                    <GridPane fx:id="gridPane" onScroll="#MazeZoom" alignment="CENTER">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </GridPane>
+                </Group>
+            </StackPane>
+        </ScrollPane>
+    </center>
+    <right>
+        <VBox alignment="TOP_CENTER" centerShape="false" prefHeight="493.0" prefWidth="150.0">
+            <Label text="Méthode de Génération">
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </Label>
+            <ChoiceBox fx:id="MethodGeneration" prefHeight="7.0" prefWidth="130.0">
+                <VBox.margin>
+                    <Insets bottom="10.0" top="10.0" />
+                </VBox.margin>
+            </ChoiceBox>
+            <Separator prefWidth="200.0" />
+            <Label text="Résolution">
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </Label>
+            <ChoiceBox fx:id="MethodSolve" onAction="#ChooseMaze" prefHeight="26.0" prefWidth="130.0">
+                <VBox.margin>
+                    <Insets bottom="10.0" top="10.0" />
+                </VBox.margin>
+            </ChoiceBox>
+        </VBox>
+    </right>
+    <top>
+        <TitledPane animated="false" text="Labyrinthe CY-Napse" BorderPane.alignment="CENTER" />
+    </top>
+</BorderPane>
