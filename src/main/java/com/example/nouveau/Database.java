@@ -49,6 +49,7 @@ public class Database {
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Cell (" +
                     "id INT PRIMARY KEY AUTO_INCREMENT," +
                     "maze_id INT," +
+                    "cell_id INT," +
                     "x INT," +
                     "y INT," +
                     "North BOOLEAN," +
@@ -80,17 +81,18 @@ public class Database {
             }
             MazeStmt.close();
 
-            PreparedStatement CellStmt = conn.prepareStatement("INSERT INTO Cell (maze_id, x, y, North, South, West, East) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement CellStmt = conn.prepareStatement("INSERT INTO Cell (maze_id, cell_id, x, y, North, South, West, East) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             for(int i = 0; i < labyrinth.getHeight(); i++){
                 for(int j = 0; j < labyrinth.getWidth(); j++){
                     Case cell = labyrinth.getMaze()[i][j];
                     CellStmt.setInt(1, mazeId);
-                    CellStmt.setInt(2, j);
-                    CellStmt.setInt(3, i);
-                    CellStmt.setBoolean(4, cell.getNorth());
-                    CellStmt.setBoolean(5, cell.getSouth());
-                    CellStmt.setBoolean(6, cell.getWest());
-                    CellStmt.setBoolean(7, cell.getEast());
+                    CellStmt.setInt(2, cell.getID());
+                    CellStmt.setInt(3, j);
+                    CellStmt.setInt(4, i);
+                    CellStmt.setBoolean(5, cell.getNorth());
+                    CellStmt.setBoolean(6, cell.getSouth());
+                    CellStmt.setBoolean(7, cell.getWest());
+                    CellStmt.setBoolean(8, cell.getEast());
                     CellStmt.addBatch();
                 }
             }
@@ -118,21 +120,45 @@ public class Database {
         return SavedMaze;
     }
 
-    /*public Maze ChargeMaze(){
+    public Maze DataChargeMaze(String Name){
+        Maze labyrinth = null;
         try(Connection conn = connectDatabase()){
-            PreparedStatement stmtCollect = conn.prepareStatement("SELECT * FROM Maze WHERE id = ");
+            PreparedStatement stmtCollect = conn.prepareStatement("SELECT * FROM Maze WHERE name = ?");
+            stmtCollect.setString(1, Name);
             ResultSet rs = stmtCollect.executeQuery();
-            while(rs.next()){
+            if(rs.next()){
                 int width = rs.getInt("width");
                 int height = rs.getInt("height");
-                int id =
+                int id = rs.getInt("id");
+                labyrinth = new Maze(width, height);
+
+                PreparedStatement stmtCell = conn.prepareStatement("SELECT * FROM Cell WHERE maze_id = ?");
+                stmtCell.setInt(1, id);
+                ResultSet rsCell = stmtCell.executeQuery();
+                while(rsCell.next()){
+                    int x = rsCell.getInt("x");
+                    int y = rsCell.getInt("y");
+                    labyrinth.getMaze()[y][x].setNorth(rsCell.getBoolean("North"));
+                    labyrinth.getMaze()[y][x].setSouth(rsCell.getBoolean("South"));
+                    labyrinth.getMaze()[y][x].setWest(rsCell.getBoolean("West"));
+                    labyrinth.getMaze()[y][x].setEast(rsCell.getBoolean("East"));
+                    labyrinth.getMaze()[y][x].setId(rsCell.getInt("cell_id"));
+                    labyrinth.getMaze()[y][x].setX(x);
+                    labyrinth.getMaze()[y][x].setY(y);
+                }
+                stmtCell.close();
             }
-            Maze labyrinth = new Maze(width, height);
+            else{
+                System.out.println("Aucun labyrinthe trouvé");
+            }
+            stmtCollect.close();
+
         }catch(SQLException e){
             System.out.println("Erreur lors de la récupération de la BDD" + e.getMessage());
             e.printStackTrace();
         }
-    }*/
+        return labyrinth;
+    }
 
 }
 

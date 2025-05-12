@@ -2,7 +2,7 @@ package com.example.nouveau;
 
 public class Case {
     private int count = 0;
-    private final int id;
+    private int id;
     private static int number;
     private boolean North;
     private boolean South;
@@ -43,6 +43,7 @@ public class Case {
     public void setVisited(boolean visited) { this.visited = visited; }
     public void setX(int x){ this.x=x;}
     public void setY(int y){ this.y=y;}
+    public void setId(int id){this.id = id;}
 
     public void resetCount(int count){ this.count=count;}
     public void incrementCount() { this.count++; }

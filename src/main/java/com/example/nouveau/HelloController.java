@@ -113,17 +113,6 @@ public class HelloController {
         return pane;
     }
 
-    @FXML
-    public void SaveMaze(){
-        String Name;
-        try{
-            Name = MazeName.getText();
-        }catch(NumberFormatException e){
-            Name = "Labyrinthe";
-        }
-        db.SaveMaze(currentMaze, Name);
-    }
-
     private void redrawMaze(){
         if(currentMaze==null) return;
 
@@ -153,8 +142,6 @@ public class HelloController {
         return null;
     }
 
-
-
     @FXML
     void MazeZoom(ScrollEvent event) {
         if (event.getDeltaY() > 0) {
@@ -169,14 +156,12 @@ public class HelloController {
         gridPane.setScaleY(zoomFactor);
     }
 
-
     @FXML
     public void MousePressed(MouseEvent mouseEvent) {
         double mouseX = mouseEvent.getSceneX();
         double mouseY = mouseEvent.getSceneY();
         mainPane.setCursor(Cursor.CLOSED_HAND);
     }
-
     @FXML
     public void MouseReleased(MouseEvent mouseEvent) {
         mainPane.setCursor(Cursor.DEFAULT);
@@ -252,6 +237,39 @@ public class HelloController {
         }
         pathTimeline.play();
     }
+
+
+    @FXML
+    public void SaveMaze(){
+        String Name;
+        try{
+            Name = MazeName.getText();
+        }catch(NumberFormatException e){
+            Name = "Labyrinthe";
+        }
+        db.SaveMaze(currentMaze, Name);
+        SaveList.setItems(db.getMazeList());
+    }
+
+    @FXML
+    public void ChargeMaze(){
+        currentMaze = db.DataChargeMaze(SaveList.getValue());
+        gridPane.getChildren().clear();
+        double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
+        double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
+        double cellSize = Math.min(cellWidth, cellHeight);
+
+        gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
+
+        for(int i = 0; i < currentMaze.getHeight(); i++){
+            for(int j = 0; j < currentMaze.getWidth(); j++){
+                Case cell = currentMaze.getMaze()[i][j];
+                Pane pane = createCellPane(cell, cellSize);
+                gridPane.add(pane, j, i);
+            }
+        }
+    }
+
 }
 
 
