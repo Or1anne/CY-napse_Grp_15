@@ -181,8 +181,8 @@ public class HelloController {
                 redrawMaze();
                 break;
         }
-        drawPath(path);
-        //showPathStepByStep(path);
+        //drawPath(path);
+        showPathStepByStep(path);
     }
 
     private void drawPath(List<Case> path) {
