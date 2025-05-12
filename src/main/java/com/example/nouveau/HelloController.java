@@ -16,25 +16,36 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Random;
 
 public class HelloController {
 
+    public Maze labyrinth;
+    public Database db;
     private double zoomFactor = 1.0;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
     @FXML private TextField widthInput;
     @FXML private TextField heightInput;
+    @FXML private TextField MazeName;
     @FXML private TextField seedInput;
     @FXML private ChoiceBox<String> MethodGeneration;
     @FXML private ChoiceBox<String> MethodSolve;
+    @FXML private ChoiceBox<String> SaveList;
 
     @FXML
-    public void initialize() {
+    public void initialize() throws SQLException {
+        db = new Database();
+        db.createDatabase();
+        db.createTable();
         MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
         MethodSolve.setItems(FXCollections.observableArrayList("Tremaux", "HandToHand", "BFS"));
+        SaveList.setItems(db.getMazeList());
         MethodGeneration.setValue("Parfait");
     }
 
@@ -58,7 +69,7 @@ public class HelloController {
             seed = new Random().nextInt();
         }
 
-        Maze labyrinth = new Maze(width, height);
+        labyrinth = new Maze(width, height);
         if(MethodGeneration.getValue().equals("Parfait")){
             labyrinth.KruskalGeneration(seed);
         }
@@ -91,6 +102,17 @@ public class HelloController {
         return pane;
     }
 
+    @FXML
+    public void SaveMaze(){
+        String Name;
+        try{
+            Name = MazeName.getText();
+        }catch(NumberFormatException e){
+            Name = "Labyrinthe";
+        }
+        db.SaveMaze(labyrinth, Name);
+    }
+    
     @FXML
     void MazeZoom(ScrollEvent event) {
         if (event.getDeltaY() > 0) {

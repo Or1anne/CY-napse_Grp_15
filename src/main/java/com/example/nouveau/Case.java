@@ -8,6 +8,8 @@ public class Case {
     public boolean East;
     public boolean West;
     public boolean visited;
+    public int x;
+    public int y;
 
     public Case(int x, int y){
         id = number++;
@@ -15,6 +17,8 @@ public class Case {
         South = true;
         East = true;
         West = true;
+        this.x = x;
+        this.y = y;
         visited = false;
     }
 

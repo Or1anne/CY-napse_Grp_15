@@ -15,7 +15,6 @@ public class Maze {
         for(int i=0; i<height; i++){
             for(int j=0; j<width; j++){
                 maze[i][j] = new Case(i,j);
-
             }
         }
         Case.number = 0;
