@@ -101,6 +101,7 @@ public class HelloController {
                 gridPane.add(pane,j,i);
             }
         }
+        printTerminal(labyrinth);
     }
 
     private Pane createCellPane(Case cell, double cellSize) {
@@ -160,6 +161,7 @@ public class HelloController {
                 path = solver.HandOnWall(labyrinth);
                 break;
         }
+        printTerminal(labyrinth, path);
         //drawPath(path);
         showPathStepByStep(path);
     }
@@ -209,6 +211,97 @@ public class HelloController {
         pathTimeline.play();
     }
 
+    public static void printTerminal(Maze maze) {
+        int width = maze.getWidth();
+        int height = maze.getHeight();
+        Case[][] grill = maze.getMaze();
+        boolean[][] isOnPath = new boolean[height][width];
 
+        for (int x = 0; x < width; x++) {
+            System.out.print("┌───");
+        }
+        System.out.println("┐");
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y == height-1 && x == width-1){
+                    System.out.print("   ");
+                    continue;
+                }
+                System.out.print(grill[y][x].getWest() ? "│" : " ");
+
+                System.out.print("   ");
+            }
+
+            if (y == height-1){
+                System.out.println("   ");
+                break;
+            }
+            else {
+                System.out.println("│");
+            }
+
+            for (int x = 0; x < width; x++) {
+                if (y == height-1){
+                    System.out.print(grill[y][x].getWest() ? "│" : " ");
+                    System.out.print("   ");
+                    continue;
+                }
+                System.out.print(grill[y][x].getSouth() ? "├───" : "│   ");
+            }
+
+            System.out.println("│");
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("└───");
+        }
+        System.out.println("┘");
+    }
+
+    public static void printTerminal(Maze maze, List<Case> solutionPath) {
+        int width = maze.getWidth();
+        int height = maze.getHeight();
+        Case[][] grill = maze.getMaze();
+        boolean[][] isOnPath = new boolean[height][width];
+
+        for (Case c : solutionPath) {
+            isOnPath[c.getX()][c.getY()] = true;
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("┌───");
+        }
+        System.out.println("┐");
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y == height - 1 && x == width - 1) {
+                    System.out.print("   ");
+                    continue;
+                }
+
+                System.out.print(grill[y][x].getWest() ? "│" : " ");
+                System.out.print(isOnPath[y][x] ? "\u001B[31m • \u001B[0m" : "   ");
+            }
+
+            if (y == height - 1) {
+                System.out.println("   ");
+                break;
+            } else {
+                System.out.println("│");
+            }
+
+            for (int x = 0; x < width; x++) {
+                System.out.print(grill[y][x].getSouth() ? "├───" : "│   ");
+            }
+            System.out.println("│");
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("└───");
+        }
+        System.out.println("┘");
+    }
 
 }
