@@ -10,13 +10,12 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.IOException;
-import java.sql.SQLException;
 
 public class HelloApplication extends Application {
 
     @Override
-    public void start(Stage stage) throws IOException, SQLException {
-
+    public void start(Stage stage) throws IOException {
+        //Création Scene JAVAFX
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000,800);
         stage.setTitle("Labyrinthe");
@@ -24,7 +23,7 @@ public class HelloApplication extends Application {
         stage.setResizable(false);
         stage.show();
     }
-    
+
     public static void main(String[] args) {
         launch();
     }

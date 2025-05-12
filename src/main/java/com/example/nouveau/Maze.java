@@ -6,8 +6,8 @@ public class Maze {
     private final int width;
     private final Case[][] maze;
 
-/////////////////////////////////////////////////////////////////////
-
+    /////////////////////////////////////////////////////////////////////
+    //Constructeur Matrice de Case
     public Maze(int width, int height){
         this.height = height;
         this.width = width;
@@ -17,10 +17,11 @@ public class Maze {
                 maze[i][j] = new Case(i,j);
             }
         }
-        Case.number = 0;
-        this.maze[0][0].West = false;
-        this.maze[height-1][width-1].East = false;
+        Case.resetNumber();
+        this.maze[0][0].setWest(false);
+        this.maze[height-1][width-1].setEast(false);
     }
+
 
     public int getHeight(){
         return this.height;
@@ -29,7 +30,7 @@ public class Maze {
         return this.width;
     }
 
-/////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
 
     public void KruskalGeneration(int seed){
         int[] father = new int[this.height * this.width];
@@ -57,22 +58,22 @@ public class Maze {
             if(union(c1.getID(), c2.getID(), father)){
                 if(wall[0] == wall[2]){
                     if(wall[1] > wall[3]){
-                        c1.West = false;
-                        c2.East = false;
+                        c1.setWest(false);
+                        c2.setEast(false);
                     }
                     else{
-                        c2.West = false;
-                        c1.East = false;
+                        c2.setWest(false);
+                        c1.setEast(false);
                     }
                 }
                 else{
                     if(wall[0] > wall[2]){
-                        c1.North = false;
-                        c2.South = false;
+                        c1.setNorth(false);
+                        c2.setSouth(false);;
                     }
                     else{
-                        c2.North = false;
-                        c1.South = false;
+                        c2.setNorth(false);
+                        c1.setSouth(false);
                     }
                 }
             }
@@ -84,17 +85,17 @@ public class Maze {
         for(int i=0; i<this.height; i++){
             for(int j=0; j<this.width; j++){
                 if(j == 0 && randSeed.nextDouble() < 0.2){
-                    this.maze[i][j].West = false;
+                    this.maze[i][j].setWest(false);
                 } else if (j == this.width-1 && randSeed.nextDouble() < 0.2) {
-                    this.maze[i][j].East = false;
+                    this.maze[i][j].setEast(false);
                 }
                 if(i<this.height-1 && countWalls(this.maze[i][j])>1 && countWalls(this.maze[i+1][j])>1 && randSeed.nextDouble() < 0.7) {
-                    this.maze[i][j].South = false;
-                    this.maze[i+1][j].North = false;
+                    this.maze[i][j].setSouth(false);
+                    this.maze[i+1][j].setNorth(false);
                 }
                 if(j<this.width-1 && countWalls(this.maze[i][j])>1 && countWalls(this.maze[i][j+1])>1 && randSeed.nextDouble() < 0.7) {
-                    this.maze[i][j].East = false;
-                    this.maze[i][j+1].West = false;
+                    this.maze[i][j].setEast(false);
+                    this.maze[i][j+1].setWest(false);
                 }
             }
         }
@@ -102,12 +103,14 @@ public class Maze {
 
     private int countWalls(Case c) {
         int count = 0;
-        if (c.North) count++;
-        if (c.South) count++;
-        if (c.East) count++;
-        if (c.West) count++;
+        if (c.getNorth()) count++;
+        if (c.getSouth()) count++;
+        if (c.getEast()) count++;
+        if (c.getWest()) count++;
         return count;
     }
+
+
 
     private int find(int s, int[] father){
         if(father[s] != s){

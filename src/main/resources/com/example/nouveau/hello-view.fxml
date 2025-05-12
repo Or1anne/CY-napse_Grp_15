@@ -55,7 +55,7 @@
                   <Insets top="10.0" />
               </VBox.margin>
            </Label>
-           <ChoiceBox fx:id="MethodSolve" prefHeight="26.0" prefWidth="130.0">
+           <ChoiceBox fx:id="MethodSolve" onAction="#ChooseMaze" prefHeight="26.0" prefWidth="130.0">
               <VBox.margin>
                   <Insets bottom="10.0" top="10.0" />
               </VBox.margin>
