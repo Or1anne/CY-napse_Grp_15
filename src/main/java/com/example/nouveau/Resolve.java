@@ -26,6 +26,7 @@ public class Resolve {
         }
     }
 
+    //Trémaux resolution
     public List<Case> Tremaux(){
         resetCounts();
         List<Case> path = new ArrayList<>();
@@ -71,6 +72,8 @@ public class Resolve {
         return false;
     }
 
+
+    //Main Gauche sur le mur
     public List<Case> HandOnWall() {
         resetCounts();
         int x = start.getX();
