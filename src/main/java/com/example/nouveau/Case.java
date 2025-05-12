@@ -14,6 +14,7 @@ public class Case {
         this.id = number++;
     }
 
+    //getteur
     public int getX() { return x; }
     public int getY() { return y; }
     public int getID() { return id; }
@@ -25,6 +26,7 @@ public class Case {
     public int getCount() { return count; }
     public int getNumber(){ return number;}
 
+    //setteur
     public void setNorth(boolean North) { this.North = North; }
     public void setSouth(boolean South) { this.South = South; }
     public void setWest(boolean West)   { this.West = West; }
