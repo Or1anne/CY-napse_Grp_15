@@ -1,13 +1,16 @@
 package com.example.nouveau;
 
 public class Case {
-    private final int id;
-    public static int number;
-    public boolean North;
-    public boolean South;
-    public boolean East;
-    public boolean West;
-    public boolean visited;
+    private int count = 0;
+    private int id;
+    private static int number;
+    private boolean North;
+    private boolean South;
+    private boolean East;
+    private boolean West;
+    private boolean visited;
+    private int x;
+    private int y;
 
     public Case(int x, int y){
         id = number++;
@@ -15,10 +18,42 @@ public class Case {
         South = true;
         East = true;
         West = true;
+        this.x = x;
+        this.y = y;
         visited = false;
     }
 
-    public int getID(){
-        return this.id;
+    //getteur
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getID() { return id; }
+    public boolean getNorth() { return North; }
+    public boolean getSouth() { return South; }
+    public boolean getWest() { return West; }
+    public boolean getEast() { return East; }
+    public boolean getVisited() { return !visited; }
+    public int getCount() { return count; }
+    public int getNumber(){ return number;}
+
+    //setteur
+    public void setNorth(boolean North) { this.North = North; }
+    public void setSouth(boolean South) { this.South = South; }
+    public void setWest(boolean West)   { this.West = West; }
+    public void setEast(boolean East)   { this.East = East; }
+    public void setVisited(boolean visited) { this.visited = visited; }
+    public void setX(int x){ this.x=x;}
+    public void setY(int y){ this.y=y;}
+    public void setId(int id){this.id = id;}
+
+    public void resetCount(int count){ this.count=count;}
+    public void incrementCount() { this.count++; }
+
+    public static void resetNumber() {
+        number = 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Case{x=" + x + ", y=" + y + ", count=" + count + "}";
     }
 }
