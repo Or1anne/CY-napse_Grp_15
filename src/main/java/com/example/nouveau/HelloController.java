@@ -3,6 +3,8 @@ package com.example.nouveau;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
+import javafx.beans.Observable;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -13,6 +15,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.input.ZoomEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,28 +26,46 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Scanner;
+
 public class HelloController {
 
     private double zoomFactor = 1.0;
     private Maze currentMaze;
     private Timeline pathTimeline;
+    public Database db;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
     @FXML private TextField widthInput;
     @FXML private TextField heightInput;
+    @FXML private TextField MazeName;
     @FXML private TextField seedInput;
     @FXML private ChoiceBox<String> MethodGeneration;
     @FXML private ChoiceBox<String> MethodSolve;
+    @FXML private ChoiceBox<String> SaveList;
 
     @FXML
-    public void initialize() {
+    public void initialize() throws SQLException {
+        db = new Database();
+        db.createDatabase();
+        db.createTable();
         MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
         MethodSolve.setItems(FXCollections.observableArrayList( "Choisir Résolution","Tremaux", "HandToHand", "BFS"));
         MethodGeneration.setValue("Parfait");
         MethodSolve.setValue("Choisir Résolution");
-
-
+        SaveList.setValue("Choisir un labyrinthe");
+        ObservableList<String> savedMazes = db.getMazeList();
+        if (savedMazes != null && !savedMazes.isEmpty()) {
+            SaveList.setItems(savedMazes);
+        } else {
+            SaveList.setItems(FXCollections.observableArrayList("Aucun Labyrinthe Sauvegardé"));
+        }
     }
 
     @FXML
@@ -52,7 +74,6 @@ public class HelloController {
         applyZoom();
         gridPane.getChildren().clear();
         int width, height, seed;
-
         try {
             width = Integer.parseInt(widthInput.getText());
             height = Integer.parseInt(heightInput.getText());
@@ -61,35 +82,31 @@ public class HelloController {
             height = 30;
         }
 
-        try {
+        try{
             seed = Integer.parseInt(seedInput.getText());
-        } catch(NumberFormatException e) {
+        }catch(NumberFormatException e){
             seed = new Random().nextInt();
         }
 
-        Maze labyrinth = new Maze(width, height);
+        currentMaze = new Maze(width, height);
         if(MethodGeneration.getValue().equals("Parfait")){
-            labyrinth.KruskalGeneration(seed);
+            currentMaze.KruskalGeneration(seed);
         } else {
-            labyrinth.KruskalImperfectGeneration(seed);
+            currentMaze.KruskalImperfectGeneration(seed);
         }
-
-        currentMaze = labyrinth;
-
         double cellWidth = mainPane.getWidth() / width;
         double cellHeight = mainPane.getHeight() / height;
         double cellSize = Math.min(cellWidth, cellHeight);
 
         gridPane.setPrefSize(width * cellSize, height * cellSize);
 
-        for(int i = 0; i < labyrinth.getHeight(); i++){
-            for(int j = 0; j < labyrinth.getWidth(); j++){
-                Case cell = labyrinth.getMaze()[i][j];
+        for(int i = 0; i < currentMaze.getHeight(); i++){
+            for(int j = 0; j < currentMaze.getWidth(); j++){
+                Case cell = currentMaze.getMaze()[i][j];
                 Pane pane = createCellPane(cell, cellSize);
                 gridPane.add(pane, j, i);
             }
         }
-        MethodSolve.setValue("Choisir Résolution");
     }
 
     private Pane createCellPane(Case cell, double cellSize) {
@@ -132,8 +149,6 @@ public class HelloController {
         return null;
     }
 
-
-
     @FXML
     void MazeZoom(ScrollEvent event) {
         if (event.getDeltaY() > 0) {
@@ -143,7 +158,6 @@ public class HelloController {
         }
         applyZoom();
     }
-
     private void applyZoom() {
         gridPane.setScaleX(zoomFactor);
         gridPane.setScaleY(zoomFactor);
@@ -151,9 +165,10 @@ public class HelloController {
 
     @FXML
     public void MousePressed(MouseEvent mouseEvent) {
+        double mouseX = mouseEvent.getSceneX();
+        double mouseY = mouseEvent.getSceneY();
         mainPane.setCursor(Cursor.CLOSED_HAND);
     }
-
     @FXML
     public void MouseReleased(MouseEvent mouseEvent) {
         mainPane.setCursor(Cursor.DEFAULT);
@@ -172,7 +187,7 @@ public class HelloController {
                 path = solver.Tremaux();
                 break;
             case "BFS":
-                //path = solver.BFS(labyrinth);
+                path = solver.BFS();
                 break;
             case "HandToHand":
                 path = solver.HandOnWall();
@@ -229,6 +244,173 @@ public class HelloController {
         }
         pathTimeline.play();
     }
+
+    public static Maze generateMaze(int width, int height, String method, Integer seedOpt) {
+        int seed = (seedOpt != null) ? seedOpt : new Random().nextInt();
+        Maze maze = new Maze(width, height);
+        if ("Parfait".equalsIgnoreCase(method)) {
+            maze.KruskalGeneration(seed);
+        } else {
+            maze.KruskalImperfectGeneration(seed);
+        }
+        return maze;
+    }
+
+    public static void printTerminal(Maze maze) {
+        int width = maze.getWidth();
+        int height = maze.getHeight();
+        Case[][] grill = maze.getMaze();
+        boolean[][] isOnPath = new boolean[height][width];
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("┌───");
+        }
+        System.out.println("┐");
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y == height-1 && x == width-1){
+                    System.out.print("   ");
+                    continue;
+                }
+                System.out.print(grill[y][x].getWest() ? "│" : " ");
+
+                System.out.print("   ");
+            }
+
+            if (y == height-1){
+                System.out.println("   ");
+                break;
+            }
+            else {
+                System.out.println("│");
+            }
+
+            for (int x = 0; x < width; x++) {
+                if (y == height-1){
+                    System.out.print(grill[y][x].getWest() ? "│" : " ");
+                    System.out.print("   ");
+                    continue;
+                }
+                System.out.print(grill[y][x].getSouth() ? "├───" : "│   ");
+            }
+
+            System.out.println("│");
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("└───");
+        }
+        System.out.println("┘");
+    }
+
+    public static void printTerminal(Maze maze, List<Case> solutionPath) {
+        int width = maze.getWidth();
+        int height = maze.getHeight();
+        Case[][] grill = maze.getMaze();
+        boolean[][] isOnPath = new boolean[height][width];
+
+        for (Case c : solutionPath) {
+            isOnPath[c.getX()][c.getY()] = true;
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("┌───");
+        }
+        System.out.println("┐");
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y == height - 1 && x == width - 1) {
+                    System.out.print("   ");
+                    continue;
+                }
+
+                System.out.print(grill[y][x].getWest() ? "│" : " ");
+                System.out.print(isOnPath[y][x] ? "\u001B[31m • \u001B[0m" : "   ");
+            }
+
+            if (y == height - 1) {
+                System.out.println("   ");
+                break;
+            } else {
+                System.out.println("│");
+            }
+
+            for (int x = 0; x < width; x++) {
+                System.out.print(grill[y][x].getSouth() ? "├───" : "│   ");
+            }
+            System.out.println("│");
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("└───");
+        }
+        System.out.println("┘");
+    }
+
+    public static void saveMazeTerminal(Maze currentMaze, Database db, Scanner sc) {
+        List<String> existingNames = db.getMazeList();
+        String name;
+
+        while (true) {
+            System.out.print("Entrez un nom unique pour sauvegarder le labyrinthe : ");
+            name = sc.nextLine().trim();
+
+            if (name.isEmpty()) {
+                // Générer un nom par défaut unique
+                int index = 1;
+                name = "Labyrinthe";
+                while (existingNames.contains(name)) {
+                    name = "Labyrinthe_" + index++;
+                }
+                System.out.println("Aucun nom fourni. Le nom généré '" + name + "' sera utilisé.");
+                break;
+            } else if (existingNames.contains(name)) {
+                System.out.println("Ce nom est déjà utilisé. Veuillez en choisir un autre.");
+            } else {
+                break; // nom unique et non vide
+            }
+        }
+
+        db.SaveMaze(currentMaze, name);
+        System.out.println("Labyrinthe sauvegardé sous le nom : " + name);
+    }
+
+
+
+
+    @FXML
+    public void SaveMaze(){
+        String Name;
+        try{
+            Name = MazeName.getText();
+        }catch(NumberFormatException e){
+            Name = "Labyrinthe";
+        }
+        db.SaveMaze(currentMaze, Name);
+        SaveList.setItems(db.getMazeList());
+    }
+
+    @FXML
+    public void ChargeMaze(){
+        currentMaze = db.DataChargeMaze(SaveList.getValue());
+        gridPane.getChildren().clear();
+        double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
+        double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
+        double cellSize = Math.min(cellWidth, cellHeight);
+
+        gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
+
+        for(int i = 0; i < currentMaze.getHeight(); i++){
+            for(int j = 0; j < currentMaze.getWidth(); j++){
+                Case cell = currentMaze.getMaze()[i][j];
+                Pane pane = createCellPane(cell, cellSize);
+                gridPane.add(pane, j, i);
+            }
+        }
+    }
+
 }
 
 
