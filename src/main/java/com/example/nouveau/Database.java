@@ -17,14 +17,14 @@ public class Database {
         Properties IdMdp = new Properties();
         IdMdp.put("user", userName);
         IdMdp.put("password", password);
-        return DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/", IdMdp);
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/", IdMdp);
     }
 
     public Connection connectDatabase() throws SQLException {
         Properties IdMdp = new Properties();
         IdMdp.put("user", userName);
         IdMdp.put("password", password);
-        return DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/" + dbName, IdMdp);
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/" + dbName, IdMdp);
     }
 
     public void createDatabase(){
@@ -138,13 +138,13 @@ public class Database {
                 while(rsCell.next()){
                     int x = rsCell.getInt("x");
                     int y = rsCell.getInt("y");
-                    labyrinth.getMaze()[y][x].setNorth(rsCell.getBoolean("North"));
-                    labyrinth.getMaze()[y][x].setSouth(rsCell.getBoolean("South"));
-                    labyrinth.getMaze()[y][x].setWest(rsCell.getBoolean("West"));
-                    labyrinth.getMaze()[y][x].setEast(rsCell.getBoolean("East"));
                     labyrinth.getMaze()[y][x].setId(rsCell.getInt("cell_id"));
-                    labyrinth.getMaze()[y][x].setX(x);
-                    labyrinth.getMaze()[y][x].setY(y);
+                    labyrinth.getMaze()[y][x].setX(y);
+                    labyrinth.getMaze()[y][x].setY(x);
+                    labyrinth.getMaze()[y][x].setNorth(rsCell.getInt("North") == 1);
+                    labyrinth.getMaze()[y][x].setSouth(rsCell.getInt("South") == 1);
+                    labyrinth.getMaze()[y][x].setWest(rsCell.getInt("West") == 1);
+                    labyrinth.getMaze()[y][x].setEast(rsCell.getInt("East") == 1);
                 }
                 stmtCell.close();
             }

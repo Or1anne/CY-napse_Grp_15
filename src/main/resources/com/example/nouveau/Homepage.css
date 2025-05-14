@@ -1,0 +1,8 @@
+.LoadBorder {
+    -fx-background-color: linear-gradient(to bottom, #1a1a1a, #000000);
+    -fx-border-color: blme;
+    -fx-border-width: 4px;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, gold, 8, 0.6, 0, 0);
+}

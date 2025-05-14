@@ -37,7 +37,7 @@ public class HelloController {
     private double zoomFactor = 1.0;
     private Maze currentMaze;
     private Timeline pathTimeline;
-    public Database db;
+    private Database db;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -51,14 +51,10 @@ public class HelloController {
 
     @FXML
     public void initialize() throws SQLException {
-        db = new Database();
-        db.createDatabase();
-        db.createTable();
         MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
         MethodSolve.setItems(FXCollections.observableArrayList( "Choisir Résolution","Tremaux", "HandToHand", "BFS"));
         MethodGeneration.setValue("Parfait");
         MethodSolve.setValue("Choisir Résolution");
-        SaveList.setItems(db.getMazeList());
     }
 
     @FXML
@@ -218,7 +214,7 @@ public class HelloController {
 
     public void showPathStepByStep(List<Case> path) {
         if (pathTimeline != null) {
-            pathTimeline.stop();  // Stoppe l'ancienne animation si elle tourne
+            pathTimeline.stop();
         }
 
         pathTimeline = new Timeline();
@@ -270,6 +266,10 @@ public class HelloController {
         }
     }
 
+    public void setDatabase(Database db) {
+        this.db = db;
+        SaveList.setItems(db.getMazeList());
+    }
 }
 
 
