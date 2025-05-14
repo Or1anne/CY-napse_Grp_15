@@ -28,10 +28,14 @@ public class Resolve {
 
     //Trémaux resolution
     public List<Case> Tremaux(){
+        long startTIme = System.nanoTime();
         resetCounts();
         List<Case> path = new ArrayList<>();
         explore(start.getX(), start.getY(), path);
         path.removeIf(c ->(c.getCount()==2));
+        long endTime = System.nanoTime();
+        long duration = endTime-startTIme;
+        System.out.println("Temps d'exécution de Tremaux: " + duration / 1_000_000 + " millisecondes");
         return path;
     }
 
@@ -40,7 +44,7 @@ public class Resolve {
         current.incrementCount();
         path.add(current);
         nbCase++;
-        System.out.println("Exploration de la case : " + current);
+
 
         if (x == height - 1 && y == width - 1){
             System.out.println("Nb Case visité:" + nbCase);
@@ -68,7 +72,6 @@ public class Resolve {
             }
         }
         current.incrementCount();
-        System.out.println("Backtrack à la case : " + current);
         return false;
     }
 
@@ -76,6 +79,7 @@ public class Resolve {
     //Main Gauche sur le mur
     public List<Case> HandOnWall() {
         resetCounts();
+        long startTime = System.nanoTime();
         int x = start.getX();
         int y = start.getY();
         Case current = Labyrinthe[x][y];
@@ -86,8 +90,8 @@ public class Resolve {
         current.setVisited(true);  // Marquer la première case comme visitée
         path.add(current);
 
-        System.out.println("Début de l'exploration"); // Debug
-        System.out.println("[0, 0]"); // Debug
+        //System.out.println("Début de l'exploration"); // Debug
+        //System.out.println("[0, 0]"); // Debug
 
         /* System.out.println("Position actuelle: (" + x + ", " + y + ")");
         System.out.println("Direction: " + dir);
@@ -97,6 +101,7 @@ public class Resolve {
 
         // Condition pour sortir du labyrinthe
         while (!(x == height - 1 && y == width - 1)) {
+            nbCase++;
             Direction left = dir.turnLeft();
 
             if (canMove(x, y, left)) {
@@ -130,7 +135,10 @@ public class Resolve {
                 path.add(Labyrinthe[x][y]);
             }
         }
-
+        long endTime = System.nanoTime();
+        System.out.println("Nb Case visitée: "+nbCase);
+        long duration = endTime - startTime;
+        System.out.println("Temps d'exécution de Tremaux: " + duration / 1_000_000 + " millisecondes");
         System.out.println("Fin de l'exploration"); // Debug
         return path;
     }
@@ -154,6 +162,78 @@ public class Resolve {
             case SOUTH -> new int[] {x + 1, y};
             case WEST  -> new int[] {x, y - 1};
         };
+    }
+
+    //BFS resolution
+    public List<Case> BFS() {
+        resetCounts();
+        Queue<Case> queue = new LinkedList<>();
+        Map<Case, Case> parentMap = new HashMap<>();
+        Set<Case> visited = new HashSet<>();
+
+        queue.add(start);
+        visited.add(start);
+        parentMap.put(start, null);
+
+        while (!queue.isEmpty()) {
+            Case current = queue.poll();
+
+            // Si le serpent arrive à la fin
+            if (current == end) {
+                return reconstructPath(parentMap, end);
+            }
+
+            // On explore tous les voisins accessibles
+            for (Case neighbor : getAccessibleNeighbors(current)) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    parentMap.put(neighbor, current);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return Collections.emptyList(); // Aucun chemin trouvé
+    }
+
+    // On reconstruis le chemin à partir des parents
+    private List<Case> reconstructPath(Map<Case, Case> parentMap, Case end) {
+        List<Case> path = new ArrayList<>();
+        Case current = end;
+
+        while (current != null) {
+            path.add(current);
+            current = parentMap.get(current);
+        }
+
+        Collections.reverse(path);
+        return path;
+    }
+
+    // Voisins accessibles d'une case
+    private List<Case> getAccessibleNeighbors(Case current) {
+        List<Case> neighbors = new ArrayList<>();
+        int x = current.getX();
+        int y = current.getY();
+
+        // Voisin du haut
+        if (!current.getNorth() && x > 0) {
+            neighbors.add(Labyrinthe[x-1][y]);
+        }
+        // Voisin du bas
+        if (!current.getSouth() && x < height - 1) {
+            neighbors.add(Labyrinthe[x+1][y]);
+        }
+        // Voisin de gauche
+        if (!current.getWest() && y > 0) {
+            neighbors.add(Labyrinthe[x][y-1]);
+        }
+        // Voisin de droite
+        if (!current.getEast() && y < width - 1) {
+            neighbors.add(Labyrinthe[x][y+1]);
+        }
+
+        return neighbors;
     }
 }
 
