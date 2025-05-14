@@ -9,6 +9,7 @@
     <bottom>
         <ToolBar prefHeight="40.0" prefWidth="504.0" style="-fx-border-color: #111111;" BorderPane.alignment="CENTER">
             <Button mnemonicParsing="false" onAction="#GenerateMaze" text="Générer un Labyrinthe" />
+            <Button mnemonicParsing="false" onAction="#ChooseMaze" text="Résoudre le Labyrinthe" />
             <TextField fx:id="heightInput" prefHeight="26.0" prefWidth="69.0" promptText="Hauteur" />
             <TextField fx:id="widthInput" prefHeight="26.0" prefWidth="77.0" promptText="Largeur" />
             <TextField fx:id="seedInput" prefHeight="26.0" prefWidth="128.0" promptText="Graine de Génération" />
@@ -46,11 +47,32 @@
                     <Insets top="10.0" />
                 </VBox.margin>
             </Label>
-            <ChoiceBox fx:id="MethodSolve" onAction="#ChooseMaze" prefHeight="26.0" prefWidth="130.0">
+            <ChoiceBox fx:id="MethodSolve" prefHeight="26.0" prefWidth="130.0">
                 <VBox.margin>
                     <Insets bottom="10.0" top="10.0" />
                 </VBox.margin>
             </ChoiceBox>
+            <Separator prefWidth="200.0" />
+            <TextField fx:id="MazeName" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="28.0" prefWidth="141.0">
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </TextField>
+            <Button mnemonicParsing="false" onAction="#SaveMaze" text="Sauvegarder">
+                <VBox.margin>
+                    <Insets bottom="10.0" top="10.0" />
+                </VBox.margin></Button>
+            <Separator prefWidth="200.0" />
+            <ChoiceBox fx:id="SaveList" maxWidth="-Infinity" prefHeight="26.0" prefWidth="129.0">
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </ChoiceBox>
+            <Button mnemonicParsing="false" onAction="#ChargeMaze" text="Charger">
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </Button>
         </VBox>
     </right>
     <top>
