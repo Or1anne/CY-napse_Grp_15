@@ -31,6 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Scanner;
 
 public class HelloController {
 
@@ -58,7 +59,13 @@ public class HelloController {
         MethodSolve.setItems(FXCollections.observableArrayList( "Choisir Résolution","Tremaux", "HandToHand", "BFS"));
         MethodGeneration.setValue("Parfait");
         MethodSolve.setValue("Choisir Résolution");
-        SaveList.setItems(db.getMazeList());
+        SaveList.setValue("Choisir un labyrinthe");
+        ObservableList<String> savedMazes = db.getMazeList();
+        if (savedMazes != null && !savedMazes.isEmpty()) {
+            SaveList.setItems(savedMazes);
+        } else {
+            SaveList.setItems(FXCollections.observableArrayList("Aucun Labyrinthe Sauvegardé"));
+        }
     }
 
     @FXML
@@ -180,7 +187,7 @@ public class HelloController {
                 path = solver.Tremaux();
                 break;
             case "BFS":
-                //path = solver.BFS(labyrinth);
+                path = solver.BFS();
                 break;
             case "HandToHand":
                 path = solver.HandOnWall();
@@ -237,6 +244,140 @@ public class HelloController {
         }
         pathTimeline.play();
     }
+
+    public static Maze generateMaze(int width, int height, String method, Integer seedOpt) {
+        int seed = (seedOpt != null) ? seedOpt : new Random().nextInt();
+        Maze maze = new Maze(width, height);
+        if ("Parfait".equalsIgnoreCase(method)) {
+            maze.KruskalGeneration(seed);
+        } else {
+            maze.KruskalImperfectGeneration(seed);
+        }
+        return maze;
+    }
+
+    public static void printTerminal(Maze maze) {
+        int width = maze.getWidth();
+        int height = maze.getHeight();
+        Case[][] grill = maze.getMaze();
+        boolean[][] isOnPath = new boolean[height][width];
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("┌───");
+        }
+        System.out.println("┐");
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y == height-1 && x == width-1){
+                    System.out.print("   ");
+                    continue;
+                }
+                System.out.print(grill[y][x].getWest() ? "│" : " ");
+
+                System.out.print("   ");
+            }
+
+            if (y == height-1){
+                System.out.println("   ");
+                break;
+            }
+            else {
+                System.out.println("│");
+            }
+
+            for (int x = 0; x < width; x++) {
+                if (y == height-1){
+                    System.out.print(grill[y][x].getWest() ? "│" : " ");
+                    System.out.print("   ");
+                    continue;
+                }
+                System.out.print(grill[y][x].getSouth() ? "├───" : "│   ");
+            }
+
+            System.out.println("│");
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("└───");
+        }
+        System.out.println("┘");
+    }
+
+    public static void printTerminal(Maze maze, List<Case> solutionPath) {
+        int width = maze.getWidth();
+        int height = maze.getHeight();
+        Case[][] grill = maze.getMaze();
+        boolean[][] isOnPath = new boolean[height][width];
+
+        for (Case c : solutionPath) {
+            isOnPath[c.getX()][c.getY()] = true;
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("┌───");
+        }
+        System.out.println("┐");
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y == height - 1 && x == width - 1) {
+                    System.out.print("   ");
+                    continue;
+                }
+
+                System.out.print(grill[y][x].getWest() ? "│" : " ");
+                System.out.print(isOnPath[y][x] ? "\u001B[31m • \u001B[0m" : "   ");
+            }
+
+            if (y == height - 1) {
+                System.out.println("   ");
+                break;
+            } else {
+                System.out.println("│");
+            }
+
+            for (int x = 0; x < width; x++) {
+                System.out.print(grill[y][x].getSouth() ? "├───" : "│   ");
+            }
+            System.out.println("│");
+        }
+
+        for (int x = 0; x < width; x++) {
+            System.out.print("└───");
+        }
+        System.out.println("┘");
+    }
+
+    public static void saveMazeTerminal(Maze currentMaze, Database db, Scanner sc) {
+        List<String> existingNames = db.getMazeList();
+        String name;
+
+        while (true) {
+            System.out.print("Entrez un nom unique pour sauvegarder le labyrinthe : ");
+            name = sc.nextLine().trim();
+
+            if (name.isEmpty()) {
+                // Générer un nom par défaut unique
+                int index = 1;
+                name = "Labyrinthe";
+                while (existingNames.contains(name)) {
+                    name = "Labyrinthe_" + index++;
+                }
+                System.out.println("Aucun nom fourni. Le nom généré '" + name + "' sera utilisé.");
+                break;
+            } else if (existingNames.contains(name)) {
+                System.out.println("Ce nom est déjà utilisé. Veuillez en choisir un autre.");
+            } else {
+                break; // nom unique et non vide
+            }
+        }
+
+        db.SaveMaze(currentMaze, name);
+        System.out.println("Labyrinthe sauvegardé sous le nom : " + name);
+    }
+
+
 
 
     @FXML
