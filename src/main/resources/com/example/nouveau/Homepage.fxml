@@ -9,6 +9,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="Begin" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#NewGame" stylesheets="@Homepage.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nouveau.HomepageController">
@@ -18,21 +19,18 @@
             <Image url="@home-sans-cy.png" />
          </image>
          <effect>
-            <ColorAdjust brightness="-0.19" saturation="-0.51" />
+            <ColorAdjust brightness="-0.19" saturation="-0.50" />
          </effect>
       </ImageView>
-      <Label alignment="CENTER" layoutX="368.0" layoutY="88.0" prefHeight="58.0" prefWidth="226.0" text="Cy-Napse" textFill="#a84444">
+      <Label id="Title" fx:id="CyNapse" alignment="CENTER" layoutX="326.0" layoutY="89.0" prefHeight="61.0" prefWidth="324.0" text="Cy-Napse" textFill="#864141">
          <font>
-            <Font name="Impact" size="55.0" />
+            <Font name="Adventure Time Logo" size="55.0" />
          </font>
          <effect>
-            <Lighting>
+            <Lighting light="$null">
                <bumpInput>
                   <Shadow />
                </bumpInput>
-               <light>
-                  <Light.Distant />
-               </light>
             </Lighting>
          </effect>
       </Label>
@@ -51,26 +49,37 @@
             </Lighting>
          </effect>
       </Label>
-      <Button fx:id="NewLab" layoutX="233.0" layoutY="678.0" mnemonicParsing="false" onAction="#OpenMazeGeneration" style="-fx-background-color: transparent;" text="Nouveau Labyrinthe" textFill="#864141">
+      <Button fx:id="NewLab" layoutX="182.0" layoutY="656.0" mnemonicParsing="false" onMouseClicked="#OpenMazeGeneration" style="-fx-background-color: transparent;" styleClass="Button" text="Nouveau Labyrinthe" textFill="#864141">
          <font>
             <Font name="Impact" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="ChargeSave" layoutX="519.0" layoutY="678.0" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Charger une sauvegarde" textFill="#864141">
+      <Button fx:id="ChargeSave" layoutX="488.0" layoutY="656.0" mnemonicParsing="false" onAction="#AnimationSave" style="-fx-background-color: transparent;" styleClass="Button" text="Charger une sauvegarde" textFill="#864141">
          <font>
             <Font name="Impact" size="24.0" />
          </font>
       </Button>
-      <AnchorPane layoutX="135.0" layoutY="740.0" prefHeight="179.0" prefWidth="730.0" styleClass="LoadBorder">
+      <AnchorPane fx:id="BorderSave" layoutX="116.0" layoutY="723.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="193.0" prefWidth="601.0" styleClass="LoadBorder">
          <effect>
             <ColorAdjust brightness="-0.14" contrast="-0.12" />
          </effect>
          <children>
-            <ImageView fitHeight="179.0" fitWidth="730.0" layoutX="4.0" layoutY="4.0" pickOnBounds="true">
+            <ImageView fitHeight="179.0" fitWidth="730.0" layoutX="6.0" layoutY="6.0" pickOnBounds="true">
                <image>
                   <Image url="@LoadMaze.png" />
                </image>
+               <effect>
+                  <Lighting diffuseConstant="0.82" specularConstant="0.16" specularExponent="27.36" surfaceScale="6.21">
+                     <bumpInput>
+                        <Shadow />
+                     </bumpInput>
+                     <light>
+                        <Light.Distant />
+                     </light>
+                  </Lighting>
+               </effect>
             </ImageView>
+            <HBox fx:id="HBoxSave" layoutX="6.0" layoutY="7.0" prefHeight="179.0" prefWidth="730.0" />
          </children>
       </AnchorPane>
    </children>

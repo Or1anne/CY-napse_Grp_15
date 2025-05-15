@@ -45,7 +45,7 @@ public class Database {
                     "id INT PRIMARY KEY AUTO_INCREMENT," +
                     "name VARCHAR(50) UNIQUE," +
                     "height INT," +
-                    "width INT)");
+                    "width INT) ENGINE=InnoDB");
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Cell (" +
                     "id INT PRIMARY KEY AUTO_INCREMENT," +
                     "maze_id INT," +
@@ -56,7 +56,7 @@ public class Database {
                     "South BOOLEAN," +
                     "West BOOLEAN," +
                     "East BOOLEAN," +
-                    "FOREIGN KEY (maze_id) REFERENCES Maze(id))");
+                    "FOREIGN KEY (maze_id) REFERENCES Maze(id) ON DELETE CASCADE) ENGINE=InnoDB");
             stmt.close();
         }catch(SQLException e){
             System.out.println("Erreur dans la création des tables");
@@ -103,21 +103,6 @@ public class Database {
             e.printStackTrace();
         }
 
-    }
-
-    public ObservableList<String> getMazeList(){
-        ObservableList<String> SavedMaze = FXCollections.observableArrayList();
-        try(Connection conn = connectDatabase()){
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT name FROM Maze");
-            while(rs.next()){
-                SavedMaze.add(rs.getString("name"));
-            }
-            stmt.close();
-        }catch(SQLException e){
-            System.out.println("Erreur lors de la récupération de la BDD");
-        }
-        return SavedMaze;
     }
 
     public Maze DataChargeMaze(String Name){

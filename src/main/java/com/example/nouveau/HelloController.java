@@ -47,7 +47,6 @@ public class HelloController {
     @FXML private TextField seedInput;
     @FXML private ChoiceBox<String> MethodGeneration;
     @FXML private ChoiceBox<String> MethodSolve;
-    @FXML private ChoiceBox<String> SaveList;
 
     @FXML
     public void initialize() throws SQLException {
@@ -244,12 +243,10 @@ public class HelloController {
             Name = "Labyrinthe";
         }
         db.SaveMaze(currentMaze, Name);
-        SaveList.setItems(db.getMazeList());
     }
 
-    @FXML
-    public void ChargeMaze(){
-        currentMaze = db.DataChargeMaze(SaveList.getValue());
+    public void ChargeMaze(String name){
+        currentMaze = db.DataChargeMaze(name);
         gridPane.getChildren().clear();
         double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
         double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
@@ -268,7 +265,6 @@ public class HelloController {
 
     public void setDatabase(Database db) {
         this.db = db;
-        SaveList.setItems(db.getMazeList());
     }
 }
 
