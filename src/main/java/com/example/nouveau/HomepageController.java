@@ -16,12 +16,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import javax.print.attribute.standard.Media;
 import java.io.IOException;
 import java.sql.*;
 
@@ -38,8 +35,6 @@ public class HomepageController {
 
     private HelloController controller;
     private Database db;
-
-    private FadeTransition fade;
 
     @FXML
     public void initialize() {
@@ -71,7 +66,7 @@ public class HomepageController {
     }
 
     @FXML
-    void NewGame(MouseEvent event) {
+    void NewGame() {
         Begin.setOnMouseClicked(null);
         //fade.stop();
         FadeTransition finalFade = new FadeTransition(Duration.seconds(1), StartButton);
@@ -149,7 +144,7 @@ public class HomepageController {
 
 
     @FXML
-    public void AnimationSave(ActionEvent event) {
+    public void AnimationSave() {
         Image gif = new Image(getClass().getResource("ChargeScene.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
         gifView.setFitWidth(1000);
@@ -163,21 +158,7 @@ public class HomepageController {
         Begin.getChildren().add(gifView);
         Begin.getChildren().removeAll(NewLab, ChargeSave);
 
-        TranslateTransition slideRight = new TranslateTransition(Duration.seconds(0.5), gifView);
-        slideRight.setFromX(0);
-        slideRight.setToX(10);
-        TranslateTransition slideBack = new TranslateTransition(Duration.seconds(0.5), gifView);
-        slideBack.setFromX(10);
-        slideBack.setToX(0);
-
-        SequentialTransition slideSequence = new SequentialTransition(slideRight, slideBack);
-
-        FadeTransition fadeInGif = new FadeTransition(Duration.seconds(0.5), gifView);
-        fadeInGif.setFromValue(0);
-        fadeInGif.setToValue(1);
-
-        ParallelTransition showGif = new ParallelTransition(fadeInGif, slideSequence);
-        showGif.play();
+        ParallelTransition showGif = getParallelTransition(gifView);
 
         showGif.setOnFinished(e -> {
             PauseTransition pause = new PauseTransition(Duration.seconds(9));
@@ -213,6 +194,26 @@ public class HomepageController {
             pause.play();
         });
     }
+
+    private static ParallelTransition getParallelTransition(ImageView gifView) {
+        TranslateTransition slideRight = new TranslateTransition(Duration.seconds(0.5), gifView);
+        slideRight.setFromX(0);
+        slideRight.setToX(10);
+        TranslateTransition slideBack = new TranslateTransition(Duration.seconds(0.5), gifView);
+        slideBack.setFromX(10);
+        slideBack.setToX(0);
+
+        SequentialTransition slideSequence = new SequentialTransition(slideRight, slideBack);
+
+        FadeTransition fadeInGif = new FadeTransition(Duration.seconds(0.5), gifView);
+        fadeInGif.setFromValue(0);
+        fadeInGif.setToValue(1);
+
+        ParallelTransition showGif = new ParallelTransition(fadeInGif, slideSequence);
+        showGif.play();
+        return showGif;
+    }
+
     public void AnimationSaveBack(Runnable onFinished) {
         Image gif = new Image(getClass().getResource("ChargeSceneBackWard.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
