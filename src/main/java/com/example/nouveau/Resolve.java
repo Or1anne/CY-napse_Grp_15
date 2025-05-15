@@ -28,14 +28,10 @@ public class Resolve {
 
     //Trémaux resolution
     public List<Case> Tremaux(){
-        long startTIme = System.nanoTime();
         resetCounts();
         List<Case> path = new ArrayList<>();
         explore(start.getX(), start.getY(), path);
         path.removeIf(c ->(c.getCount()==2));
-        long endTime = System.nanoTime();
-        long duration = endTime-startTIme;
-        System.out.println("Temps d'exécution de Tremaux: " + duration / 1_000_000 + " millisecondes");
         return path;
     }
 
@@ -44,7 +40,7 @@ public class Resolve {
         current.incrementCount();
         path.add(current);
         nbCase++;
-
+        System.out.println("Exploration de la case : " + current);
 
         if (x == height - 1 && y == width - 1){
             System.out.println("Nb Case visité:" + nbCase);
@@ -72,6 +68,7 @@ public class Resolve {
             }
         }
         current.incrementCount();
+        System.out.println("Backtrack à la case : " + current);
         return false;
     }
 
@@ -79,7 +76,6 @@ public class Resolve {
     //Main Gauche sur le mur
     public List<Case> HandOnWall() {
         resetCounts();
-        long startTime = System.nanoTime();
         int x = start.getX();
         int y = start.getY();
         Case current = Labyrinthe[x][y];
@@ -90,8 +86,8 @@ public class Resolve {
         current.setVisited(true);  // Marquer la première case comme visitée
         path.add(current);
 
-        //System.out.println("Début de l'exploration"); // Debug
-        //System.out.println("[0, 0]"); // Debug
+        System.out.println("Début de l'exploration"); // Debug
+        System.out.println("[0, 0]"); // Debug
 
         /* System.out.println("Position actuelle: (" + x + ", " + y + ")");
         System.out.println("Direction: " + dir);
@@ -101,7 +97,6 @@ public class Resolve {
 
         // Condition pour sortir du labyrinthe
         while (!(x == height - 1 && y == width - 1)) {
-            nbCase++;
             Direction left = dir.turnLeft();
 
             if (canMove(x, y, left)) {
@@ -135,10 +130,7 @@ public class Resolve {
                 path.add(Labyrinthe[x][y]);
             }
         }
-        long endTime = System.nanoTime();
-        System.out.println("Nb Case visitée: "+nbCase);
-        long duration = endTime - startTime;
-        System.out.println("Temps d'exécution de Tremaux: " + duration / 1_000_000 + " millisecondes");
+
         System.out.println("Fin de l'exploration"); // Debug
         return path;
     }
@@ -164,7 +156,7 @@ public class Resolve {
         };
     }
 
-    //BFS resolution
+    // Résolution avec le parcours en largeur : BFS
     public List<Case> BFS() {
         resetCounts();
         Queue<Case> queue = new LinkedList<>();
@@ -235,7 +227,11 @@ public class Resolve {
 
         return neighbors;
     }
+
+
+
 }
+
 
 
 
