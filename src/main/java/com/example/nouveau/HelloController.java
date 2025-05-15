@@ -3,34 +3,20 @@ package com.example.nouveau;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
-import javafx.beans.Observable;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.input.ZoomEvent;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.util.Duration;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Random;
 
 public class HelloController {
 
@@ -49,7 +35,7 @@ public class HelloController {
     @FXML private ChoiceBox<String> MethodSolve;
 
     @FXML
-    public void initialize() throws SQLException {
+    public void initialize() {
         MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
         MethodSolve.setItems(FXCollections.observableArrayList( "Choisir Résolution","Tremaux", "HandToHand", "BFS"));
         MethodGeneration.setValue("Parfait");
@@ -152,13 +138,11 @@ public class HelloController {
     }
 
     @FXML
-    public void MousePressed(MouseEvent mouseEvent) {
-        double mouseX = mouseEvent.getSceneX();
-        double mouseY = mouseEvent.getSceneY();
+    public void MousePressed() {
         mainPane.setCursor(Cursor.CLOSED_HAND);
     }
     @FXML
-    public void MouseReleased(MouseEvent mouseEvent) {
+    public void MouseReleased() {
         mainPane.setCursor(Cursor.DEFAULT);
     }
 
