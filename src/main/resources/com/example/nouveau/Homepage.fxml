@@ -3,7 +3,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.ColorAdjust?>
-<?import javafx.scene.effect.Light.Distant?>
 <?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.image.Image?>
@@ -39,13 +38,10 @@
             <Font name="Cambria Math" size="50.0" />
          </font>
          <effect>
-            <Lighting>
+            <Lighting light="$null">
                <bumpInput>
                   <Shadow />
                </bumpInput>
-               <light>
-                  <Light.Distant />
-               </light>
             </Lighting>
          </effect>
       </Label>
@@ -69,13 +65,10 @@
                   <Image url="@LoadMaze.png" />
                </image>
                <effect>
-                  <Lighting diffuseConstant="0.82" specularConstant="0.16" specularExponent="27.36" surfaceScale="6.21">
+                  <Lighting diffuseConstant="0.82" light="$null" specularConstant="0.16" specularExponent="27.36" surfaceScale="6.21">
                      <bumpInput>
                         <Shadow />
                      </bumpInput>
-                     <light>
-                        <Light.Distant />
-                     </light>
                   </Lighting>
                </effect>
             </ImageView>
