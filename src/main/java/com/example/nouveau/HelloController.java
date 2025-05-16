@@ -13,6 +13,8 @@ import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
+
 import javafx.util.Duration;
 
 public class HelloController {

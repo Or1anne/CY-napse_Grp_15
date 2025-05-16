@@ -1,4 +1,7 @@
 package com.example.nouveau;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.sql.*;
 import java.util.Properties;
 
@@ -139,5 +142,19 @@ public class Database {
         return labyrinth;
     }
 
+    public ObservableList<String> getMazeList(){
+        ObservableList<String> SavedMaze = FXCollections.observableArrayList();
+        try(Connection conn = connectDatabase()){
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT name FROM Maze");
+            while(rs.next()){
+                SavedMaze.add(rs.getString("name"));
+            }
+            stmt.close();
+        }catch(SQLException e){
+            System.out.println("Erreur lors de la récupération de la BDD");
+        }
+        return SavedMaze;
+    }
 }
 
