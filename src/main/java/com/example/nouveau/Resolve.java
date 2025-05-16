@@ -30,7 +30,8 @@ public class Resolve {
     public List<Case> Tremaux(){
         resetCounts();
         List<Case> path = new ArrayList<>();
-        explore(start.getX(), start.getY(), path);
+        boolean found = explore(start.getX(), start.getY(), path);
+        if (!found) return null;
         path.removeIf(c ->(c.getCount()==2));
         return path;
     }
@@ -93,10 +94,16 @@ public class Resolve {
         System.out.println("Direction: " + dir);
         System.out.println("Mur à droite : " + grid[x][y].getEast());
         System.out.println("Mur à gauche : " + grid[x][y].getWest()); */
-
+        int steps = 0;
+        int maxSteps = width * height * 4;
 
         // Condition pour sortir du labyrinthe
         while (!(x == height - 1 && y == width - 1)) {
+            if (steps++ > maxSteps) {
+                System.out.println("Labyrinthe insoluble (boucle infinie détectée)");
+                return null;
+            }
+
             Direction left = dir.turnLeft();
 
             if (canMove(x, y, left)) {

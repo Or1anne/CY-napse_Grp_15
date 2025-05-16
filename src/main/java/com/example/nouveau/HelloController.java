@@ -117,6 +117,44 @@ public class HelloController {
                 (cell.getEast() ? "1 " : "0 ") +
                 (cell.getSouth() ? "1 " : "0 ") +
                 (cell.getWest() ? "1" : "0") + ";");
+
+        pane.setOnMouseClicked(event -> {
+            int x = cell.getX();
+            int y = cell.getY();
+            double clickX = event.getX();
+            double clickY = event.getY();
+
+            double margin = cellSize * 0.2;
+
+            if (clickY < margin) {
+                boolean current = cell.getNorth();
+                cell.setNorth(!current);
+                if (x > 0) {
+                    currentMaze.getMaze()[x - 1][y].setSouth(!current);
+                }
+            } else if (clickY > cellSize - margin) { 
+                boolean current = cell.getSouth();
+                cell.setSouth(!current);
+                if (x < currentMaze.getHeight() - 1) {
+                    currentMaze.getMaze()[x + 1][y].setNorth(!current);
+                }
+            } else if (clickX < margin) {
+                boolean current = cell.getWest();
+                cell.setWest(!current);
+                if (y > 0) {
+                    currentMaze.getMaze()[x][y - 1].setEast(!current);
+                }
+            } else if (clickX > cellSize - margin) { 
+                boolean current = cell.getEast();
+                cell.setEast(!current);
+                if (y < currentMaze.getWidth() - 1) {
+                    currentMaze.getMaze()[x][y + 1].setWest(!current);
+                }
+            }
+
+            redrawMaze();
+        });
+
         return pane;
     }
 
@@ -193,8 +231,11 @@ public class HelloController {
                 path = solver.HandOnWall();
                 break;
             default:
-                redrawMaze();
-                break;
+                return;
+        }
+        if (path == null || path.isEmpty()) {
+            showError("Labyrinthe insoluble", "Aucun chemin n’a été trouvé.\nVérifie que l’entrée et la sortie sont accessibles.");
+            return;
         }
         //drawPath(path);
         showPathStepByStep(path);
@@ -410,9 +451,15 @@ public class HelloController {
             }
         }
     }
+    private void showError(String title, String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
 }
-
-
 
 

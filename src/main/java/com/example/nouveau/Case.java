@@ -51,6 +51,33 @@ public class Case {
     public static void resetNumber() {
         number = 0;
     }
+    public boolean hasWall(Direction direction) {
+    switch (direction) {
+        case NORTH: return North;
+        case SOUTH: return South;
+        case EAST:  return East;
+        case WEST:  return West;
+    }
+    return false;
+}
+
+public void removeWall(Direction direction) {
+    switch (direction) {
+        case NORTH: North = false; break;
+        case SOUTH: South = false; break;
+        case EAST:  East  = false; break;
+        case WEST:  West  = false; break;
+    }
+}
+
+public void addWall(Direction direction) {
+    switch (direction) {
+        case NORTH: North = true; break;
+        case SOUTH: South = true; break;
+        case EAST:  East  = true; break;
+        case WEST:  West  = true; break;
+    }
+}
 
     @Override
     public String toString() {
