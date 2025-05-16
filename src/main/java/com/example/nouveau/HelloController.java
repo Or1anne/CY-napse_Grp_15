@@ -224,8 +224,11 @@ public class HelloController {
                 path = solver.HandOnWall();
                 break;
             default:
-                redrawMaze();
-                break;
+                return;
+        }
+        if (path == null || path.isEmpty()) {
+            showError("Labyrinthe insoluble", "Aucun chemin n’a été trouvé.\nVérifie que l’entrée et la sortie sont accessibles.");
+            return;
         }
         //drawPath(path);
         showPathStepByStep(path);
@@ -307,6 +310,14 @@ public class HelloController {
             }
         }
     }
+    private void showError(String title, String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
 }
 
