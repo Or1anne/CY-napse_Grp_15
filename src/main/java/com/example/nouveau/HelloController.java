@@ -2,43 +2,25 @@ package com.example.nouveau;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.beans.Observable;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.input.ZoomEvent;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.util.Duration;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Scanner;
 
 public class HelloController {
 
     private double zoomFactor = 1.0;
     private Maze currentMaze;
     private Timeline pathTimeline;
-    public Database db;
+    private Database db;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -46,26 +28,11 @@ public class HelloController {
     @FXML private TextField heightInput;
     @FXML private TextField MazeName;
     @FXML private TextField seedInput;
-    @FXML private ChoiceBox<String> MethodGeneration;
-    @FXML private ChoiceBox<String> MethodSolve;
-    @FXML private ChoiceBox<String> SaveList;
+    @FXML private ToggleGroup MethodGeneration;
+    @FXML private ToggleGroup MethodSolve;
 
     @FXML
-    public void initialize() throws SQLException {
-        db = new Database();
-        db.createDatabase();
-        db.createTable();
-        MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
-        MethodSolve.setItems(FXCollections.observableArrayList( "Choisir Résolution","Tremaux", "HandToHand", "BFS"));
-        MethodGeneration.setValue("Parfait");
-        MethodSolve.setValue("Choisir Résolution");
-        SaveList.setValue("Choisir un labyrinthe");
-        ObservableList<String> savedMazes = db.getMazeList();
-        if (savedMazes != null && !savedMazes.isEmpty()) {
-            SaveList.setItems(savedMazes);
-        } else {
-            SaveList.setItems(FXCollections.observableArrayList("Aucun Labyrinthe Sauvegardé"));
-        }
+    public void initialize() {
     }
 
     @FXML
@@ -89,7 +56,8 @@ public class HelloController {
         }
 
         currentMaze = new Maze(width, height);
-        if(MethodGeneration.getValue().equals("Parfait")){
+        RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
+        if(SelectMethod.getText().equals("Parfait")){
             currentMaze.KruskalGeneration(seed);
         } else {
             currentMaze.KruskalImperfectGeneration(seed);
@@ -132,7 +100,7 @@ public class HelloController {
                 if (x > 0) {
                     currentMaze.getMaze()[x - 1][y].setSouth(!current);
                 }
-            } else if (clickY > cellSize - margin) { 
+            } else if (clickY > cellSize - margin) {
                 boolean current = cell.getSouth();
                 cell.setSouth(!current);
                 if (x < currentMaze.getHeight() - 1) {
@@ -144,7 +112,7 @@ public class HelloController {
                 if (y > 0) {
                     currentMaze.getMaze()[x][y - 1].setEast(!current);
                 }
-            } else if (clickX > cellSize - margin) { 
+            } else if (clickX > cellSize - margin) {
                 boolean current = cell.getEast();
                 cell.setEast(!current);
                 if (y < currentMaze.getWidth() - 1) {
@@ -202,13 +170,11 @@ public class HelloController {
     }
 
     @FXML
-    public void MousePressed(MouseEvent mouseEvent) {
-        double mouseX = mouseEvent.getSceneX();
-        double mouseY = mouseEvent.getSceneY();
+    public void MousePressed() {
         mainPane.setCursor(Cursor.CLOSED_HAND);
     }
     @FXML
-    public void MouseReleased(MouseEvent mouseEvent) {
+    public void MouseReleased() {
         mainPane.setCursor(Cursor.DEFAULT);
     }
 
@@ -219,15 +185,15 @@ public class HelloController {
         redrawMaze();
         Resolve solver = new Resolve(currentMaze);
         List<Case> path = new ArrayList<>();
-        // TODO mettre les algo correspondants
-        switch (MethodSolve.getValue()) {
-            case "Tremaux":
+        RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
+        switch (SolveMethod.getText()) {
+            case "Trémaux":
                 path = solver.Tremaux();
                 break;
             case "BFS":
                 path = solver.BFS();
                 break;
-            case "HandToHand":
+            case "Hand on Wall":
                 path = solver.HandOnWall();
                 break;
             default:
@@ -266,7 +232,7 @@ public class HelloController {
 
     public void showPathStepByStep(List<Case> path) {
         if (pathTimeline != null) {
-            pathTimeline.stop();  // Stoppe l'ancienne animation si elle tourne
+            pathTimeline.stop();
         }
 
         pathTimeline = new Timeline();
@@ -430,12 +396,10 @@ public class HelloController {
             Name = "Labyrinthe";
         }
         db.SaveMaze(currentMaze, Name);
-        SaveList.setItems(db.getMazeList());
     }
 
-    @FXML
-    public void ChargeMaze(){
-        currentMaze = db.DataChargeMaze(SaveList.getValue());
+    public void ChargeMaze(String name){
+        currentMaze = db.DataChargeMaze(name);
         gridPane.getChildren().clear();
         double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
         double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
@@ -459,7 +423,11 @@ public class HelloController {
         alert.showAndWait();
     }
 
-
+    public void setDatabase(Database db) {
+        this.db = db;
+    }
 }
+
+
 
 

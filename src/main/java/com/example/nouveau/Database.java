@@ -1,10 +1,4 @@
 package com.example.nouveau;
-
-import javafx.beans.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Properties;
 
@@ -17,14 +11,14 @@ public class Database {
         Properties IdMdp = new Properties();
         IdMdp.put("user", userName);
         IdMdp.put("password", password);
-        return DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/", IdMdp);
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/", IdMdp);
     }
 
     public Connection connectDatabase() throws SQLException {
         Properties IdMdp = new Properties();
         IdMdp.put("user", userName);
         IdMdp.put("password", password);
-        return DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/" + dbName, IdMdp);
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/" + dbName, IdMdp);
     }
 
     public void createDatabase(){
@@ -45,7 +39,7 @@ public class Database {
                     "id INT PRIMARY KEY AUTO_INCREMENT," +
                     "name VARCHAR(50) UNIQUE," +
                     "height INT," +
-                    "width INT)");
+                    "width INT) ENGINE=InnoDB");
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Cell (" +
                     "id INT PRIMARY KEY AUTO_INCREMENT," +
                     "maze_id INT," +
@@ -56,7 +50,7 @@ public class Database {
                     "South BOOLEAN," +
                     "West BOOLEAN," +
                     "East BOOLEAN," +
-                    "FOREIGN KEY (maze_id) REFERENCES Maze(id))");
+                    "FOREIGN KEY (maze_id) REFERENCES Maze(id) ON DELETE CASCADE) ENGINE=InnoDB");
             stmt.close();
         }catch(SQLException e){
             System.out.println("Erreur dans la création des tables");
@@ -105,21 +99,6 @@ public class Database {
 
     }
 
-    public ObservableList<String> getMazeList(){
-        ObservableList<String> SavedMaze = FXCollections.observableArrayList();
-        try(Connection conn = connectDatabase()){
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT name FROM Maze");
-            while(rs.next()){
-                SavedMaze.add(rs.getString("name"));
-            }
-            stmt.close();
-        }catch(SQLException e){
-            System.out.println("Erreur lors de la récupération de la BDD");
-        }
-        return SavedMaze;
-    }
-
     public Maze DataChargeMaze(String Name){
         Maze labyrinth = null;
         try(Connection conn = connectDatabase()){
@@ -138,13 +117,13 @@ public class Database {
                 while(rsCell.next()){
                     int x = rsCell.getInt("x");
                     int y = rsCell.getInt("y");
-                    labyrinth.getMaze()[y][x].setNorth(rsCell.getBoolean("North"));
-                    labyrinth.getMaze()[y][x].setSouth(rsCell.getBoolean("South"));
-                    labyrinth.getMaze()[y][x].setWest(rsCell.getBoolean("West"));
-                    labyrinth.getMaze()[y][x].setEast(rsCell.getBoolean("East"));
                     labyrinth.getMaze()[y][x].setId(rsCell.getInt("cell_id"));
-                    labyrinth.getMaze()[y][x].setX(x);
-                    labyrinth.getMaze()[y][x].setY(y);
+                    labyrinth.getMaze()[y][x].setX(y);
+                    labyrinth.getMaze()[y][x].setY(x);
+                    labyrinth.getMaze()[y][x].setNorth(rsCell.getInt("North") == 1);
+                    labyrinth.getMaze()[y][x].setSouth(rsCell.getInt("South") == 1);
+                    labyrinth.getMaze()[y][x].setWest(rsCell.getInt("West") == 1);
+                    labyrinth.getMaze()[y][x].setEast(rsCell.getInt("East") == 1);
                 }
                 stmtCell.close();
             }

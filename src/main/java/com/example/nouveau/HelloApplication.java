@@ -17,7 +17,7 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         //Création Scene JAVAFX
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1000,800);
+        Scene scene = new Scene(fxmlLoader.load(), 1000,600);
         stage.setTitle("Labyrinthe");
         stage.setScene(scene);
         stage.setResizable(false);
