@@ -2,13 +2,10 @@ package com.example.nouveau;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -31,15 +28,11 @@ public class HelloController {
     @FXML private TextField heightInput;
     @FXML private TextField MazeName;
     @FXML private TextField seedInput;
-    @FXML private ChoiceBox<String> MethodGeneration;
-    @FXML private ChoiceBox<String> MethodSolve;
+    @FXML private ToggleGroup MethodGeneration;
+    @FXML private ToggleGroup MethodSolve;
 
     @FXML
     public void initialize() {
-        MethodGeneration.setItems(FXCollections.observableArrayList("Parfait", "Imparfait"));
-        MethodSolve.setItems(FXCollections.observableArrayList( "Choisir Résolution","Tremaux", "HandToHand", "BFS"));
-        MethodGeneration.setValue("Parfait");
-        MethodSolve.setValue("Choisir Résolution");
     }
 
     @FXML
@@ -63,7 +56,8 @@ public class HelloController {
         }
 
         currentMaze = new Maze(width, height);
-        if(MethodGeneration.getValue().equals("Parfait")){
+        RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
+        if(SelectMethod.getText().equals("Parfait")){
             currentMaze.KruskalGeneration(seed);
         } else {
             currentMaze.KruskalImperfectGeneration(seed);
@@ -153,15 +147,15 @@ public class HelloController {
         redrawMaze();
         Resolve solver = new Resolve(currentMaze);
         List<Case> path = new ArrayList<>();
-        // TODO mettre les algo correspondants
-        switch (MethodSolve.getValue()) {
-            case "Tremaux":
+        RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
+        switch (SolveMethod.getText()) {
+            case "Trémaux":
                 path = solver.Tremaux();
                 break;
             case "BFS":
                 //path = solver.BFS(labyrinth);
                 break;
-            case "HandToHand":
+            case "Hand on Wall":
                 path = solver.HandOnWall();
                 break;
             default:
