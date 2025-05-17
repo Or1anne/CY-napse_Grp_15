@@ -6,10 +6,15 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
+
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,6 +28,12 @@ public class HelloController {
     private Maze currentMaze;
     private Timeline pathTimeline;
     private Database db;
+    private Image wallHorizontal = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_horizontal.png"));
+    private Image wallVertical = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_vertical.png"));
+    private Image wallCorner = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_corner.png"));
+    private double wallThicknessRatio = 0.25;
+
+
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -82,11 +93,53 @@ public class HelloController {
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
+
+        // Mur en image (pierre)
+        pane.getChildren().clear();
+
+        double wallThickness = Math.max(2, cellSize * wallThicknessRatio);
+
+        if(cell.getNorth()) {
+            ImageView northWall = new ImageView(wallHorizontal);
+            northWall.setFitWidth(cellSize);
+            northWall.setFitHeight(wallThickness);
+            northWall.setLayoutX(0);
+            northWall.setLayoutY(0);
+            pane.getChildren().add(northWall);
+        }
+        if(cell.getSouth()) {
+            ImageView southWall = new ImageView(wallHorizontal);
+            southWall.setFitWidth(cellSize);
+            southWall.setFitHeight(wallThickness);
+            southWall.setLayoutX(0);
+            southWall.setLayoutY(cellSize - 5);
+            pane.getChildren().add(southWall);
+        }
+        if(cell.getWest()) {
+            ImageView westWall = new ImageView(wallVertical);
+            westWall.setFitWidth(wallThickness);
+            westWall.setFitHeight(cellSize);
+            westWall.setLayoutX(0);
+            westWall.setLayoutY(0);
+            pane.getChildren().add(westWall);
+        }
+        if(cell.getEast()) {
+            ImageView eastWall = new ImageView(wallVertical);
+            eastWall.setFitWidth(wallThickness);
+            eastWall.setFitHeight(cellSize);
+            eastWall.setLayoutX(cellSize - 5);
+            eastWall.setLayoutY(0);
+            pane.getChildren().add(eastWall);
+        }
+
+
+        /* Mur en trait
         pane.setStyle("-fx-border-color: black; -fx-border-width: " +
                 (cell.getNorth() ? "1 " : "0 ") +
                 (cell.getEast() ? "1 " : "0 ") +
                 (cell.getSouth() ? "1 " : "0 ") +
                 (cell.getWest() ? "1" : "0") + ";");
+                */
 
         pane.setOnMouseClicked(event -> {
             int x = cell.getX();
@@ -136,11 +189,54 @@ public class HelloController {
                 Case cell = currentMaze.getMaze()[i][j];
                 Pane pane =(Pane) getNodeFromGridPane(gridPane,j,i);
                 if(pane!=null){
+
+                    //Mur en image (pierre)
+                    pane.getChildren().clear();
+
+                    double wallThickness = Math.max(2, pane.getPrefWidth() * wallThicknessRatio);
+
+
+                    if(cell.getNorth()) {
+                        ImageView northWall = new ImageView(wallHorizontal);
+                        northWall.setFitWidth(pane.getPrefWidth());
+                        northWall.setFitHeight(wallThickness);
+                        northWall.setLayoutX(0);
+                        northWall.setLayoutY(0);
+                        pane.getChildren().add(northWall);
+                    }
+                    if(cell.getSouth()) {
+                        ImageView southWall = new ImageView(wallHorizontal);
+                        southWall.setFitWidth(pane.getPrefWidth());
+                        southWall.setFitHeight(wallThickness);
+                        southWall.setLayoutX(0);
+                        southWall.setLayoutY(pane.getPrefHeight() - 5);
+                        pane.getChildren().add(southWall);
+                    }
+                    if(cell.getWest()) {
+                        ImageView westWall = new ImageView(wallVertical);
+                        westWall.setFitWidth(wallThickness);
+                        westWall.setFitHeight(pane.getPrefHeight());
+                        westWall.setLayoutX(0);
+                        westWall.setLayoutY(0);
+                        pane.getChildren().add(westWall);
+                    }
+                    if(cell.getEast()) {
+                        ImageView eastWall = new ImageView(wallVertical);
+                        eastWall.setFitWidth(wallThickness);
+                        eastWall.setFitHeight(pane.getPrefHeight());
+                        eastWall.setLayoutX(pane.getPrefWidth() - 5);
+                        eastWall.setLayoutY(0);
+                        pane.getChildren().add(eastWall);
+                    }
+
+                    /* Mur en trait
                     pane.setStyle("-fx-border-color: black; -fx-border-width: " +
                             (cell.getNorth() ? "1 " : "0 ") +
                             (cell.getEast() ? "1 " : "0 ") +
                             (cell.getSouth() ? "1 " : "0 ") +
                             (cell.getWest() ? "1" : "0") + ";");
+
+                     */
                 }
             }
         }
