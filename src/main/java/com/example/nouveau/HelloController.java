@@ -57,6 +57,12 @@ public class HelloController {
         try {
             width = Integer.parseInt(widthInput.getText());
             height = Integer.parseInt(heightInput.getText());
+
+            // Limites de génération 100 * 100
+            if (width < 1 || height < 1 || width > 100 || height > 100) {
+                showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
+                return;
+            }
         } catch(NumberFormatException e) {
             width = 30;
             height = 30;
@@ -90,14 +96,32 @@ public class HelloController {
         }
     }
 
+    @FXML
+    public void resetMaze() {
+        // on stoppe l'animation du serpent
+        if (pathTimeline != null) {
+            pathTimeline.stop();
+            pathTimeline = null;
+        }
+
+
+        redrawMaze();
+    }
+
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
+        pane.setStyle("-fx-background-color: white;");
 
         // Mur en image (pierre)
         pane.getChildren().clear();
 
         double wallThickness = Math.max(2, cellSize * wallThicknessRatio);
+
+        int x = cell.getX(); // ligne
+        int y = cell.getY(); // colonne
+        int width = currentMaze.getWidth();
+        int height = currentMaze.getHeight();
 
         if(cell.getNorth()) {
             ImageView northWall = new ImageView(wallHorizontal);
@@ -142,12 +166,24 @@ public class HelloController {
                 */
 
         pane.setOnMouseClicked(event -> {
-            int x = cell.getX();
-            int y = cell.getY();
+            //int x = cell.getX();
+            //int y = cell.getY();
             double clickX = event.getX();
             double clickY = event.getY();
 
             double margin = cellSize * 0.2;
+
+            // Murs extérieurs : contour
+            boolean isBorderWall = (x == 0 && clickY < margin) || // Nord extérieur
+                    (x == currentMaze.getHeight()-1 && clickY > cellSize-margin) || // Sud extérieur
+                    (y == 0 && clickX < margin) || // Ouest extérieur
+                    (y == currentMaze.getWidth()-1 && clickX > cellSize-margin); // Est extérieur
+
+            if (isBorderWall) {
+                showError("Mur extérieur", "Les murs extérieurs ne peuvent pas être modifiés");
+                return;
+            }
+
 
             if (clickY < margin) {
                 boolean current = cell.getNorth();
@@ -188,10 +224,12 @@ public class HelloController {
             for (int j=0; j<currentMaze.getWidth();j++){
                 Case cell = currentMaze.getMaze()[i][j];
                 Pane pane =(Pane) getNodeFromGridPane(gridPane,j,i);
+
                 if(pane!=null){
 
                     //Mur en image (pierre)
                     pane.getChildren().clear();
+                    pane.setStyle("-fx-background-color: white;");
 
                     double wallThickness = Math.max(2, pane.getPrefWidth() * wallThicknessRatio);
 
