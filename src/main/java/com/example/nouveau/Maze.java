@@ -136,4 +136,12 @@ public class Maze {
     public Case[][] getMaze(){
         return maze;
     }
+
+    
+    public Case getCase(int x, int y){
+        if(x>=0 && x<height && y>=0 && y<width){
+            return maze[x][y];
+        }
+        return null;
+    }
 }
