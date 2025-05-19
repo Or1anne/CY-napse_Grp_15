@@ -32,6 +32,8 @@ public class HelloController {
     private Image wallVertical = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_vertical.png"));
     private Image wallCorner = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_corner.png"));
     private double wallThicknessRatio = 0.25;
+    private boolean editMode = false;
+
 
 
 
@@ -43,6 +45,8 @@ public class HelloController {
     @FXML private TextField seedInput;
     @FXML private ToggleGroup MethodGeneration;
     @FXML private ToggleGroup MethodSolve;
+    @FXML private Button editModeButton;
+
 
     @FXML
     public void initialize() {
@@ -108,6 +112,28 @@ public class HelloController {
         redrawMaze();
     }
 
+    @FXML
+    private void toggleEditMode() {
+        editMode = !editMode;
+        if (editMode) {
+            editModeButton.setText("Mode édition : ON");
+        } else {
+            editModeButton.setText("Mode édition : OFF");
+            // Ici, on peut appeler la validation du labyrinthe
+            validateMaze();
+        }
+    }
+
+    private void validateMaze() {
+        // Par exemple, on pourrait sauvegarder automatiquement le labyrinthe ou juste afficher un message
+        System.out.println("Labyrinthe validé !");
+        // ou tu peux appeler ta méthode de sauvegarde, ou juste redessiner sans édition possible
+        redrawMaze();
+    }
+
+
+
+
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
@@ -166,6 +192,9 @@ public class HelloController {
                 */
 
         pane.setOnMouseClicked(event -> {
+            if (!editMode) {
+                return; // pas en mode édition
+            }
             //int x = cell.getX();
             //int y = cell.getY();
             double clickX = event.getX();
@@ -563,6 +592,7 @@ public class HelloController {
         this.db = db;
     }
 }
+
 
 
 
