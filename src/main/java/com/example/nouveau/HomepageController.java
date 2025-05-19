@@ -230,6 +230,7 @@ public class HomepageController {
         pause.setOnFinished(ev -> {
             Image finalFrame = new Image(getClass().getResource("home-sans-cy.png").toExternalForm());
             BGHome.setImage(finalFrame);
+
             CyNapse.setLayoutX(325);
             CyNapse.setLayoutY(90);
             Begin.getChildren().addAll(NewLab, ChargeSave);
@@ -248,8 +249,6 @@ public class HomepageController {
         });
         pause.play();
     }
-
-
 
     public void ShowSaves(){
         try(Connection conn = db.connectDatabase()){

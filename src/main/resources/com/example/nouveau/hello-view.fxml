@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
@@ -17,7 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nouveau.HelloController">
+<BorderPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nouveau.HelloController">
    <bottom>
       <HBox prefHeight="28.0" prefWidth="600.0" style="-fx-background-color: #7b939c;" BorderPane.alignment="CENTER">
          <TextField fx:id="heightInput" alignment="CENTER" prefHeight="20.0" prefWidth="70.0" promptText="Hauteur" styleClass="input">
@@ -72,7 +74,7 @@
                <Font name="System Bold" size="10.0" />
             </font>
          </Label>
-         <RadioButton mnemonicParsing="false" selected="true" styleClass="radio" text="Parfait" textAlignment="CENTER">
+         <RadioButton mnemonicParsing="false" selected="true" text="Parfait" textAlignment="CENTER">
             <font>
                <Font size="10.0" />
             </font>
@@ -82,14 +84,22 @@
             <toggleGroup>
                <ToggleGroup fx:id="MethodGeneration" />
             </toggleGroup>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
          </RadioButton>
-         <RadioButton mnemonicParsing="false" styleClass="radio" text="Imparfait" textAlignment="CENTER" toggleGroup="$MethodGeneration">
+         <RadioButton mnemonicParsing="false" prefHeight="20.0" prefWidth="85.0" text=" Imparfait" textAlignment="CENTER" toggleGroup="$MethodGeneration">
             <font>
                <Font size="10.0" />
             </font>
             <VBox.margin>
                <Insets left="10.0" right="10.0" />
             </VBox.margin>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
          </RadioButton>
          <Label text="Méthode de résolution" textAlignment="CENTER" wrapText="true">
             <font>
@@ -99,7 +109,7 @@
                <Insets bottom="10.0" left="7.0" top="20.0" />
             </VBox.margin>
          </Label>
-         <RadioButton mnemonicParsing="false" selected="true" styleClass="radio" text="Trémaux" textAlignment="CENTER">
+         <RadioButton mnemonicParsing="false" selected="true" text="Tremaux" textAlignment="CENTER">
             <font>
                <Font size="10.0" />
             </font>
@@ -109,24 +119,36 @@
             <toggleGroup>
                <ToggleGroup fx:id="MethodSolve" />
             </toggleGroup>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
          </RadioButton>
-         <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="99.0" styleClass="radio" text="Hand on wall" textAlignment="CENTER" toggleGroup="$MethodSolve">
+         <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="99.0" text="Hand on Wall" textAlignment="CENTER" toggleGroup="$MethodSolve">
             <font>
                <Font size="10.0" />
             </font>
             <VBox.margin>
                <Insets bottom="10.0" left="10.0" right="10.0" />
             </VBox.margin>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
          </RadioButton>
-         <RadioButton mnemonicParsing="false" styleClass="radio" text="BFS" textAlignment="CENTER" toggleGroup="$MethodSolve">
+         <RadioButton mnemonicParsing="false" text="BFS" textAlignment="CENTER" toggleGroup="$MethodSolve">
             <font>
                <Font size="10.0" />
             </font>
             <VBox.margin>
                <Insets left="10.0" right="10.0" />
             </VBox.margin>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
          </RadioButton>
-         <Button id="generateLab" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#SaveMaze" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER">
+         <Button id="generateLab" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER">
             <font>
                <Font size="10.0" />
             </font>
@@ -158,10 +180,10 @@
       </VBox>
    </right>
    <center>
-      <ScrollPane fx:id="mainPane" id="scroll" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" onMousePressed="#MousePressed" pannable="true" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+      <ScrollPane id="scroll" fx:id="mainPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" onMousePressed="#MousePressed" pannable="true" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
          <StackPane>
             <Group>
-               <GridPane fx:id="gridPane" id="stack" alignment="CENTER" onScroll="#MazeZoom">
+               <GridPane id="stack" fx:id="gridPane" alignment="CENTER" onScroll="#MazeZoom">
                   <padding>
                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                   </padding>
@@ -173,8 +195,12 @@
    <top>
       <ToolBar prefHeight="18.0" prefWidth="600.0" style="-fx-background-color: #285157;" BorderPane.alignment="CENTER">
          <items>
-            <Button mnemonicParsing="false" style="-fx-background-color: #285157;" text="&lt;--" textFill="WHITE" />
+            <Label onMouseClicked="#ReturnHomepage" styleClass="Button" text="Retour" />
          </items>
       </ToolBar>
    </top>
+   <stylesheets>
+      <URL value="@main.css" />
+      <URL value="@Homepage.css" />
+   </stylesheets>
 </BorderPane>

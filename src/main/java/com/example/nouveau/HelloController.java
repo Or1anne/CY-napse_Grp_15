@@ -3,18 +3,24 @@ package com.example.nouveau;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class HelloController {
@@ -23,6 +29,7 @@ public class HelloController {
     private Maze currentMaze;
     private Timeline pathTimeline;
     private Database db;
+    private HomepageController homepageController;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -189,7 +196,7 @@ public class HelloController {
         List<Case> path = new ArrayList<>();
         RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
         switch (SolveMethod.getText()) {
-            case "Trémaux":
+            case "Tremaux":
                 path = solver.Tremaux();
                 break;
             case "BFS":
@@ -427,6 +434,22 @@ public class HelloController {
 
     public void setDatabase(Database db) {
         this.db = db;
+    }
+
+    @FXML
+    public void ReturnHomepage(MouseEvent event){
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Homepage.fxml"));
+        Parent root = null;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        Scene scene = new Scene(root, 1000, 600);
+        stage.setScene(scene);
+        stage.show();
     }
 }
 
