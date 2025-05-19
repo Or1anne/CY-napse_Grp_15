@@ -29,7 +29,6 @@ public class HelloController {
     private Maze currentMaze;
     private Timeline pathTimeline;
     private Database db;
-    private HomepageController homepageController;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -181,10 +180,6 @@ public class HelloController {
     @FXML
     public void MousePressed() {
         mainPane.setCursor(Cursor.CLOSED_HAND);
-    }
-    @FXML
-    public void MouseReleased() {
-        mainPane.setCursor(Cursor.DEFAULT);
     }
 
     @FXML

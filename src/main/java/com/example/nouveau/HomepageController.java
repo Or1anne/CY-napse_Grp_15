@@ -172,9 +172,7 @@ public class HomepageController {
                 GoBack.setLayoutY(260);
                 GoBack.getStyleClass().add("Button");
                 Begin.getChildren().add(GoBack);
-                GoBack.setOnMouseClicked(mouseEvent -> {
-                    AnimationSaveBack(null);
-                });
+                GoBack.setOnMouseClicked(mouseEvent -> AnimationSaveBack(null));
 
                 BorderSave.setLayoutX(125);
                 BorderSave.setLayoutY(300);
