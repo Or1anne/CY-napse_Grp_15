@@ -83,9 +83,9 @@
                <Font name="System Bold" size="10.0" />
             </font>
          </Label>
-         <RadioButton mnemonicParsing="false" selected="true" text="Parfait" textAlignment="CENTER">
+         <RadioButton mnemonicParsing="false" selected="true" styleClass="Text" text="Parfait" textAlignment="CENTER">
             <font>
-               <Font size="10.0" />
+               <Font size="8.0" />
             </font>
             <VBox.margin>
                <Insets bottom="10.0" left="10.0" right="10.0" />
@@ -93,22 +93,14 @@
             <toggleGroup>
                <ToggleGroup fx:id="MethodGeneration" />
             </toggleGroup>
-            <styleClass>
-               <String fx:value="radio" />
-               <String fx:value="Text" />
-            </styleClass>
          </RadioButton>
-         <RadioButton mnemonicParsing="false" prefHeight="20.0" prefWidth="85.0" text=" Imparfait" textAlignment="CENTER" toggleGroup="$MethodGeneration">
+         <RadioButton mnemonicParsing="false" prefHeight="20.0" prefWidth="85.0" styleClass="Text" text=" Imparfait" textAlignment="CENTER" toggleGroup="$MethodGeneration">
             <font>
-               <Font size="10.0" />
+               <Font size="8.0" />
             </font>
             <VBox.margin>
                <Insets left="10.0" right="10.0" />
             </VBox.margin>
-            <styleClass>
-               <String fx:value="radio" />
-               <String fx:value="Text" />
-            </styleClass>
          </RadioButton>
          <Label alignment="CENTER" text="Génération pas à pas" textAlignment="CENTER" underline="true" wrapText="true">
             <font>
