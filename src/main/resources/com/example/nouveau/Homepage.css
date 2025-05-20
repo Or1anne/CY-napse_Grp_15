@@ -1,0 +1,38 @@
+@font-face {
+    src: url('AdventureTimeLogo.ttf');
+}
+
+.LoadBorder {
+    -fx-background-color: linear-gradient(to bottom, #1a1a1a, #000000);
+    -fx-border-color: rgba(8, 42, 42, 0.93);
+    -fx-border-width: 4px;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(73, 166, 140, 0.68), 10, 0.3, 0, 0);
+}
+
+.SaveBorder{
+    -fx-border-width: 4px;
+    -fx-border-radius: 8px;
+    -fx-border-color: black;
+    -fx-margin: 20px, 20px, 20px, 20px;
+    -fx-background-radius: 10px;
+    -fx-background-color: linear-gradient(to bottom, #a8a5a5, #322e2e);;
+}
+
+.Button{
+    -fx-font-family: "Adventure Time Logo";
+    -fx-text-fill: #864141;
+    -fx-font-size: 24px;
+}
+.Button:hover{
+    -fx-text-fill: #b18282;
+}
+
+#Title{
+    -fx-font-family: "Adventure Time Logo";
+}
+
+.Text{
+    -fx-font-family: "Adventure Time Logo";
+}

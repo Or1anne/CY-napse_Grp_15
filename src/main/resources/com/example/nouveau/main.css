@@ -1,0 +1,28 @@
+#generateLab{
+    -fx-background-color: #285157;
+    -fx-font-weight: bold;
+    -fx-text-fill: lightgray;
+}
+#scroll .viewport{
+    -fx-background-color: #7b939c; 
+    -fx-border-color: #7b939c;
+}
+
+#stack{
+    -fx-background-color: #7b939c; 
+}
+
+.input{
+    -fx-background-color: #7b939c; 
+    -fx-border-color: #285157;
+    -fx-border-radius: 5px;
+    -fx-prompt-text-fill: lightgray;
+    -fx-text-fill: white;
+}
+
+#title{
+    -fx-text-fill: #285157;
+    -fx-font-weight: bold;
+}
+
+
