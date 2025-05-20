@@ -75,6 +75,12 @@ public class Resolve {
 
 
     //Main Gauche sur le mur
+    /**
+     * Algorithme de résolution de labyrinthe : "Hand on Wall"
+     * Cette méthode consiste à suivre en permanence le mur situé à gauche jusqu'à atteindre la sortie.
+     *
+     * @return un tableau de cases représentant le chemin de résolution du labyrinthe
+     */
     public List<Case> HandOnWall() {
         resetCounts();
         int x = start.getX();
@@ -142,7 +148,14 @@ public class Resolve {
         return path;
     }
 
-
+    /**
+     * Vérifie si un déplacement est possible depuis une case donnée dans une direction spécifique.
+     *
+     * @param x La coordonnée verticale (ligne) de la case actuelle dans le labyrinthe.
+     * @param y La coordonnée horizontale (colonne) de la case actuelle dans le labyrinthe.
+     * @param dir La direction vers laquelle on souhaite se déplacer (NORTH, EAST, SOUTH ou WEST).
+     * @return true si le déplacement est possible, s'il n'y a pas de mur et que la case cible est dans les limites du labyrinthe, false sinon.
+     */
     public boolean canMove(int x, int y, Direction dir){
         Case c = Labyrinthe[x][y];
         return switch (dir) {
@@ -154,10 +167,18 @@ public class Resolve {
     }
 
 
+    /**
+     * Calcule la nouvelle position après un déplacement depuis une position donnée dans une direction spécifiée.
+     *
+     * @param x La coordonnée verticale (ligne) actuelle.
+     * @param y La coordonnée horizontale (colonne) actuelle.
+     * @param dir La direction dans laquelle effectuer le déplacement (NORTH, EAST, SOUTH, WEST).
+     * @return Un tableau d'entiers de taille 2 contenant la nouvelle position après déplacement : [nouveauX, nouveauY].
+     */
     public int[] move(int x, int y, Direction dir){
         return switch (dir) {
             case NORTH -> new int[] {x - 1, y};
-            case EAST  -> new int[] {x, y + 1};  // ← corrigé
+            case EAST  -> new int[] {x, y + 1};
             case SOUTH -> new int[] {x + 1, y};
             case WEST  -> new int[] {x, y - 1};
         };
