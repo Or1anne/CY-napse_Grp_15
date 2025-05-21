@@ -54,6 +54,11 @@ public class HelloController {
 
     @FXML
     public void GenerateMaze(){
+        if (editMode) {
+            showError("Mode édition", "La résolution est désactivée en mode édition.");
+            return;
+        }
+
         zoomFactor = 1.0;
         applyZoom();
         gridPane.getChildren().clear();
@@ -117,9 +122,17 @@ public class HelloController {
         editMode = !editMode;
         if (editMode) {
             editModeButton.setText("Mode édition : ON");
+            setControlsDisabled(true);
+
+            // Arrête l'animation en cours si elle existe
+            if (pathTimeline != null) {
+                pathTimeline.stop();
+                pathTimeline = null;
+            }
+
         } else {
             editModeButton.setText("Mode édition : OFF");
-            // Ici, on peut appeler la validation du labyrinthe
+            setControlsDisabled(false);
             validateMaze();
         }
     }
@@ -345,6 +358,11 @@ public class HelloController {
 
     @FXML
     public void ChooseMaze() {
+        if (editMode) {
+            showError("Mode édition", "La résolution est désactivée en mode édition.");
+            return;
+        }
+
         if (currentMaze == null) return;
 
         redrawMaze();
@@ -396,6 +414,13 @@ public class HelloController {
     }
 
     public void showPathStepByStep(List<Case> path) {
+        if (editMode){
+            if (pathTimeline != null) {
+                pathTimeline.stop();
+                pathTimeline = null;
+            }
+        }
+
         if (pathTimeline != null) {
             pathTimeline.stop();
         }
@@ -590,6 +615,14 @@ public class HelloController {
 
     public void setDatabase(Database db) {
         this.db = db;
+    }
+
+    private void setControlsDisabled(boolean disabled) {
+        widthInput.setDisable(disabled);
+        heightInput.setDisable(disabled);
+        seedInput.setDisable(disabled);
+        MethodGeneration.getToggles().forEach(toggle -> ((RadioButton)toggle).setDisable(disabled));
+        MethodSolve.getToggles().forEach(toggle -> ((RadioButton)toggle).setDisable(disabled));
     }
 }
 
