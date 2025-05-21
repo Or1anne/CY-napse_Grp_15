@@ -17,6 +17,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.*;
+
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.ArrayList;
@@ -43,24 +50,41 @@ public class HelloController {
     private Image wallVertical = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_vertical.png"));
     private Image wallCorner = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_corner.png"));
     private double wallThicknessRatio = 0.25;
+    private boolean editMode = false;
 
 
-
-    @FXML private ScrollPane mainPane;
-    @FXML private GridPane gridPane;
-    @FXML private TextField widthInput;
-    @FXML private TextField heightInput;
-    @FXML private TextField MazeName;
-    @FXML private TextField seedInput;
-    @FXML private TextField SpeedInputGeneration;
-    @FXML private ToggleGroup MethodGeneration;
-    @FXML private ToggleGroup MethodSolve;
-    @FXML private ToggleButton toggleSwitch;
-    @FXML private StackPane MazeStackPane;
-    @FXML private ToggleButton toggleSwitchResolve;
-    @FXML private TextField SpeedInputResolve;
-    @FXML private Button SaveButton;
-    @FXML private Button ModeEdition;
+    @FXML
+    private ScrollPane mainPane;
+    @FXML
+    private GridPane gridPane;
+    @FXML
+    private TextField widthInput;
+    @FXML
+    private TextField heightInput;
+    @FXML
+    private TextField MazeName;
+    @FXML
+    private TextField seedInput;
+    @FXML
+    private TextField SpeedInputGeneration;
+    @FXML
+    private ToggleGroup MethodGeneration;
+    @FXML
+    private ToggleGroup MethodSolve;
+    @FXML
+    private Button editModeButton;
+    @FXML
+    private ToggleButton toggleSwitch;
+    @FXML
+    private StackPane MazeStackPane;
+    @FXML
+    private ToggleButton toggleSwitchResolve;
+    @FXML
+    private TextField SpeedInputResolve;
+    @FXML
+    private Button SaveButton;
+    @FXML
+    private Button ModeEdition;
 
 
     @FXML
@@ -72,6 +96,7 @@ public class HelloController {
         ModeEdition.setDisable(true);
         SaveButton.setDisable(true);
     }
+
 
     @FXML
     private void handleToggle() {
@@ -102,12 +127,18 @@ public class HelloController {
     }
 
     @FXML
-    public void GenerateMaze(){
-        if(generationTimeline != null){
+    public void GenerateMaze() {
+
+        if (editMode) {
+            showError("Mode édition", "La résolution est désactivée en mode édition.");
+            return;
+        }
+
+        if (generationTimeline != null) {
             generationTimeline.stop();
             generationTimeline = null;
         }
-        if(progressBar != null){
+        if (progressBar != null) {
             MazeStackPane.getChildren().remove(progressBar);
             progressBar = null;
         }
@@ -118,6 +149,7 @@ public class HelloController {
         SaveButton.setDisable(true);
         ModeEdition.setDisable(true);
 
+
         zoomFactor = 1.0;
         applyZoom();
         gridPane.getChildren().clear();
@@ -125,21 +157,27 @@ public class HelloController {
         try {
             width = Integer.parseInt(widthInput.getText());
             height = Integer.parseInt(heightInput.getText());
-        } catch(NumberFormatException e) {
+
+            // Limites de génération 100 * 100
+            if (width < 1 || height < 1 || width > 100 || height > 100) {
+                showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
+                return;
+            }
+        } catch (NumberFormatException e) {
             width = 20;
             height = 20;
         }
 
-        try{
+        try {
             seed = Integer.parseInt(seedInput.getText());
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             seed = new Random().nextInt();
         }
 
         LinkedList<int[]> steps;
         currentMaze = new Maze(width, height);
         RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
-        if(SelectMethod.getText().equals("Parfait")){
+        if (SelectMethod.getText().equals("Parfait")) {
             steps = currentMaze.KruskalGeneration(seed);
         } else {
             steps = currentMaze.KruskalImperfectGeneration(seed);
@@ -150,14 +188,14 @@ public class HelloController {
 
         gridPane.setPrefSize(width * cellSize, height * cellSize);
 
-        for(int i = 0; i < currentMaze.getHeight(); i++){
-            for(int j = 0; j < currentMaze.getWidth(); j++){
+        for (int i = 0; i < currentMaze.getHeight(); i++) {
+            for (int j = 0; j < currentMaze.getWidth(); j++) {
                 Case cell = currentMaze.getMaze()[i][j];
                 Pane pane = createCellPane(cell, cellSize);
                 gridPane.add(pane, j, i);
             }
         }
-        if(toggleSwitch.isSelected()){
+        if (toggleSwitch.isSelected()) {
             progressBar = new ProgressBar(0);
             progressBar.setMaxWidth(width * cellSize / 2);
             progressBar.prefHeight(50);
@@ -168,10 +206,9 @@ public class HelloController {
             KeyFrame keyFrame = new KeyFrame(Duration.millis(speed), event -> {
                 if (!steps.isEmpty()) {
                     int[] wall = steps.poll();
-                    if(SelectMethod.getText().equals("Parfait")) {
+                    if (SelectMethod.getText().equals("Parfait")) {
                         currentMaze.setWallsPerfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
-                    }
-                    else{
+                    } else {
                         currentMaze.setWallsPerfectImperfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
                     }
                     redrawMaze();
@@ -186,14 +223,12 @@ public class HelloController {
                 SaveButton.setDisable(false);
                 ModeEdition.setDisable(false);
             });
-        }
-        else{
+        } else {
             while (!steps.isEmpty()) {
                 int[] wall = steps.poll();
-                if(SelectMethod.getText().equals("Parfait")) {
+                if (SelectMethod.getText().equals("Parfait")) {
                     currentMaze.setWallsPerfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
-                }
-                else{
+                } else {
                     currentMaze.setWallsPerfectImperfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
                 }
             }
@@ -203,15 +238,81 @@ public class HelloController {
         }
     }
 
+    @FXML
+    public void resetMaze() {
+        // on stoppe l'animation du serpent
+        if (pathTimeline != null) {
+            pathTimeline.stop();
+            pathTimeline = null;
+        }
+
+        // stop la génération (surtout pour le pas à pas)
+        if (generationTimeline != null) {
+            generationTimeline.stop();
+            generationTimeline = null;
+            currentMaze = null;
+            gridPane.getChildren().clear();
+        }
+
+        // supprime la bar de chargement
+        if (progressBar != null) {
+            MazeStackPane.getChildren().remove(progressBar);
+            progressBar = null;
+        }
+
+
+        redrawMaze();
+    }
+    @FXML
+    public void resetZoom() {
+        zoomFactor = 1.0;
+        applyZoom();
+    }
+
+    @FXML
+    private void toggleEditMode() {
+        editMode = !editMode;
+        if (editMode) {
+            editModeButton.setText("Mode édition : ON");
+            setControlsDisabled(true);
+
+            // Arrête l'animation en cours si elle existe
+            if (pathTimeline != null) {
+                pathTimeline.stop();
+                pathTimeline = null;
+            }
+
+        } else {
+            editModeButton.setText("Mode édition : OFF");
+            setControlsDisabled(false);
+            validateMaze();
+        }
+    }
+
+    private void validateMaze() {
+        // Par exemple, on pourrait sauvegarder automatiquement le labyrinthe ou juste afficher un message
+        System.out.println("Labyrinthe validé !");
+        // ou tu peux appeler ta méthode de sauvegarde, ou juste redessiner sans édition possible
+        redrawMaze();
+    }
+
+
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
+
+        pane.setStyle("-fx-background-color: white;");
 
 
         // Mur en image (pierre)
         /*pane.getChildren().clear();
 
         double wallThickness = Math.max(2, cellSize * wallThicknessRatio);
+
+        int x = cell.getX(); // ligne
+        int y = cell.getY(); // colonne
+        int width = currentMaze.getWidth();
+        int height = currentMaze.getHeight();
 
         if(cell.getNorth()) {
             ImageView northWall = new ImageView(wallHorizontal);
@@ -247,6 +348,7 @@ public class HelloController {
         }*/
 
 
+
         //Mur en trait
         pane.setStyle("-fx-border-color: black; -fx-border-width: " +
                 (cell.getNorth() ? "1 " : "0 ") +
@@ -255,14 +357,28 @@ public class HelloController {
                 (cell.getWest() ? "1" : "0") + ";");
 
 
-
         pane.setOnMouseClicked(event -> {
+            if (!editMode) {
+                return; // pas en mode édition
+            }
             int x = cell.getX();
             int y = cell.getY();
             double clickX = event.getX();
             double clickY = event.getY();
 
             double margin = cellSize * 0.2;
+
+            // Murs extérieurs : contour
+            boolean isBorderWall = (x == 0 && clickY < margin) || // Nord extérieur
+                    (x == currentMaze.getHeight() - 1 && clickY > cellSize - margin) || // Sud extérieur
+                    (y == 0 && clickX < margin) || // Ouest extérieur
+                    (y == currentMaze.getWidth() - 1 && clickX > cellSize - margin); // Est extérieur
+
+            if (isBorderWall) {
+                showError("Mur extérieur", "Les murs extérieurs ne peuvent pas être modifiés");
+                return;
+            }
+
 
             if (clickY < margin) {
                 boolean current = cell.getNorth();
@@ -296,20 +412,22 @@ public class HelloController {
         return pane;
     }
 
-    private void redrawMaze(){
-        if(currentMaze==null) return;
+    private void redrawMaze() {
+        if (currentMaze == null) return;
 
-        for (int i=0; i<currentMaze.getHeight(); i++){
-            for (int j=0; j<currentMaze.getWidth();j++){
+        for (int i = 0; i < currentMaze.getHeight(); i++) {
+            for (int j = 0; j < currentMaze.getWidth(); j++) {
                 Case cell = currentMaze.getMaze()[i][j];
-                Pane pane =(Pane) getNodeFromGridPane(gridPane,j,i);
-                if(pane!=null){
+                Pane pane = (Pane) getNodeFromGridPane(gridPane, j, i);
+
+                if (pane != null) {
+
+                    pane.setStyle("-fx-background-color: white;");
 
                     //Mur en image (pierre)
                     /*pane.getChildren().clear();
 
                     double wallThickness = Math.max(2, pane.getPrefWidth() * wallThicknessRatio);
-
 
                     if(cell.getNorth()) {
                         ImageView northWall = new ImageView(wallHorizontal);
@@ -344,7 +462,8 @@ public class HelloController {
                         pane.getChildren().add(eastWall);
                     }*/
 
-                    //Mur en trait
+
+                    // Mur en trait
                     pane.setStyle("-fx-border-color: black; -fx-border-width: " +
                             (cell.getNorth() ? "1 " : "0 ") +
                             (cell.getEast() ? "1 " : "0 ") +
@@ -377,6 +496,7 @@ public class HelloController {
         }
         applyZoom();
     }
+
     private void applyZoom() {
         gridPane.setScaleX(zoomFactor);
         gridPane.setScaleY(zoomFactor);
@@ -389,16 +509,21 @@ public class HelloController {
 
     @FXML
     public void ChooseMaze() {
+        if (editMode) {
+            showError("Mode édition", "La résolution est désactivée en mode édition.");
+            return;
+        }
+
         if (currentMaze == null) return;
         if (pathTimeline != null) {
             pathTimeline.stop();
             pathTimeline = null;
         }
-        if(generationTimeline != null){
+        if (generationTimeline != null) {
             generationTimeline.stop();
             generationTimeline = null;
         }
-        if(progressBar != null){
+        if (progressBar != null) {
             MazeStackPane.getChildren().remove(progressBar);
             progressBar = null;
         }
@@ -456,12 +581,25 @@ public class HelloController {
     }
 
     public void showPathStepByStep(List<Case> path) {
+
+        if (editMode) {
+            if (pathTimeline != null) {
+                pathTimeline.stop();
+                pathTimeline = null;
+            }
+        }
+
+        if (pathTimeline != null) {
+            pathTimeline.stop();
+        }
+
+
         int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty()) ? 100 : Integer.parseInt(SpeedInputResolve.getText());
         pathTimeline = new Timeline();
 
         for (int i = 0; i < path.size(); i++) {
             final int index = i;
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(i*speed), event -> {
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * speed), event -> {
                 Case c = path.get(index);
                 Pane cellPane = getPaneFromGrid(c.getY(), c.getX());
                 if (cellPane != null) {
@@ -497,7 +635,7 @@ public class HelloController {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (y == height-1 && x == width-1){
+                if (y == height - 1 && x == width - 1) {
                     System.out.print("   ");
                     continue;
                 }
@@ -506,16 +644,15 @@ public class HelloController {
                 System.out.print("   ");
             }
 
-            if (y == height-1){
+            if (y == height - 1) {
                 System.out.println("   ");
                 break;
-            }
-            else {
+            } else {
                 System.out.println("│");
             }
 
             for (int x = 0; x < width; x++) {
-                if (y == height-1){
+                if (y == height - 1) {
                     System.out.print(grill[y][x].getWest() ? "│" : " ");
                     System.out.print("   ");
                     continue;
@@ -612,17 +749,17 @@ public class HelloController {
     }
 
     @FXML
-    public void SaveMaze(){
+    public void SaveMaze() {
         String Name;
-        try{
+        try {
             Name = MazeName.getText();
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             Name = "Labyrinthe";
         }
         db.SaveMaze(currentMaze, Name);
     }
 
-    public void ChargeMaze(String name){
+    public void ChargeMaze(String name) {
         currentMaze = db.DataChargeMaze(name);
         gridPane.getChildren().clear();
         double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
@@ -631,14 +768,15 @@ public class HelloController {
 
         gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
 
-        for(int i = 0; i < currentMaze.getHeight(); i++){
-            for(int j = 0; j < currentMaze.getWidth(); j++){
+        for (int i = 0; i < currentMaze.getHeight(); i++) {
+            for (int j = 0; j < currentMaze.getWidth(); j++) {
                 Case cell = currentMaze.getMaze()[i][j];
                 Pane pane = createCellPane(cell, cellSize);
                 gridPane.add(pane, j, i);
             }
         }
     }
+
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -651,8 +789,18 @@ public class HelloController {
         this.db = db;
     }
 
+
+    private void setControlsDisabled(boolean disabled) {
+        widthInput.setDisable(disabled);
+        heightInput.setDisable(disabled);
+        seedInput.setDisable(disabled);
+        MethodGeneration.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
+        MethodSolve.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
+
+    }
+
     @FXML
-    public void ReturnHomepage(MouseEvent event){
+    public void ReturnHomepage(MouseEvent event) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Homepage.fxml"));
         Parent root = null;
         try {
@@ -667,6 +815,8 @@ public class HelloController {
         stage.show();
     }
 }
+
+
 
 
 

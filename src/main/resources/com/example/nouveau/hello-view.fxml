@@ -63,12 +63,20 @@
                <Insets bottom="5.0" left="10.0" top="5.0" />
             </HBox.margin>
          </Button>
-         <Button id="generateLab" mnemonicParsing="false" onAction="#ResetEvent" prefHeight="21.0" prefWidth="82.0" text="Reset">
+         <Button fx:id="resetButton" id="generateLab" mnemonicParsing="false" onAction="#resetMaze" prefHeight="20.0" prefWidth="82.0" text="Reset">
             <font>
                <Font size="10.0" />
             </font>
             <HBox.margin>
-               <Insets left="10.0" top="5.0" />
+               <Insets bottom="5.0" left="10.0" top="5.0" />
+            </HBox.margin>
+         </Button>
+         <Button fx:id="resetZoom" id="generateLab" mnemonicParsing="false" onAction="#resetZoom" prefHeight="20.0" prefWidth="82.0" text="Reset Zoom">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0" />
             </HBox.margin>
          </Button>
       </HBox>
@@ -173,6 +181,9 @@
                <String fx:value="Text" />
             </styleClass>
          </RadioButton>
+
+         <!-- <Button id="generateLab" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleEditMode" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER"> -->
+
          <Label alignment="CENTER" text="Résolution pas à pas" textAlignment="CENTER" underline="true" wrapText="true">
             <font>
                <Font name="System Bold" size="10.0" />
@@ -182,6 +193,7 @@
             </VBox.margin>
          </Label>
          <ToggleButton id="generateLab" fx:id="toggleSwitchResolve" mnemonicParsing="false" onAction="#handleToggleResolve" prefHeight="16.0" prefWidth="85.0" text="Activer">
+<!-- origin/main-->
             <font>
                <Font size="10.0" />
             </font>
