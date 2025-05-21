@@ -29,6 +29,7 @@ public class HelloController {
     private Timeline generationTimeline;
     private ProgressBar progressBar;
     private Database db;
+    private boolean isPerfect;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -45,6 +46,9 @@ public class HelloController {
     @FXML private TextField SpeedInputResolve;
     @FXML private Button SaveButton;
     @FXML private Button ModeEdition;
+    @FXML private Label mazeSizeLabel;
+    @FXML private Label mazeSeedLabel;
+    @FXML private Label mazePerfectLabel;
 
 
     @FXML
@@ -125,8 +129,10 @@ public class HelloController {
         RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
         if(SelectMethod.getText().equals("Parfait")){
             steps = currentMaze.KruskalGeneration(seed);
+            isPerfect = true;
         } else {
             steps = currentMaze.KruskalImperfectGeneration(seed);
+            isPerfect = false;
         }
         double cellWidth = mainPane.getWidth() / width;
         double cellHeight = mainPane.getHeight() / height;
@@ -185,6 +191,10 @@ public class HelloController {
             SaveButton.setDisable(false);
             ModeEdition.setDisable(false);
         }
+        mazeSizeLabel.setText("Taille : " + height + " x " + width);
+        mazeSeedLabel.setText("Seed : " + seed);
+        mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
+
     }
 
     private Pane createCellPane(Case cell, double cellSize) {
