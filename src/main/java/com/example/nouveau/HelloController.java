@@ -244,8 +244,27 @@ public class HelloController {
             pathTimeline = null;
         }
 
+        // stop la génération (surtout pour le pas à pas)
+        if (generationTimeline != null) {
+            generationTimeline.stop();
+            generationTimeline = null;
+            currentMaze = null;
+            gridPane.getChildren().clear();
+        }
+
+        // supprime la bar de chargement
+        if (progressBar != null) {
+            MazeStackPane.getChildren().remove(progressBar);
+            progressBar = null;
+        }
+
 
         redrawMaze();
+    }
+    @FXML
+    public void resetZoom() {
+        zoomFactor = 1.0;
+        applyZoom();
     }
 
     @FXML
@@ -770,6 +789,7 @@ public class HelloController {
         seedInput.setDisable(disabled);
         MethodGeneration.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
         MethodSolve.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
+
     }
 
     @FXML

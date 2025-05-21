@@ -63,13 +63,19 @@
                <Insets bottom="5.0" left="10.0" top="5.0" />
             </HBox.margin>
          </Button>
-
-         <Button fx:id="resetButton" id="generateLab" mnemonicParsing="false" onAction="#resetMaze" prefHeight="20.0" prefWidth="120.0" text="Reset">
+         <Button fx:id="resetButton" id="generateLab" mnemonicParsing="false" onAction="#resetMaze" prefHeight="20.0" prefWidth="82.0" text="Reset">
             <font>
                <Font size="10.0" />
             </font>
             <HBox.margin>
-
+               <Insets bottom="5.0" left="10.0" top="5.0" />
+            </HBox.margin>
+         </Button>
+         <Button fx:id="resetZoom" id="generateLab" mnemonicParsing="false" onAction="#resetZoom" prefHeight="20.0" prefWidth="82.0" text="Reset Zoom">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <HBox.margin>
                <Insets bottom="5.0" left="10.0" top="5.0" />
             </HBox.margin>
          </Button>
