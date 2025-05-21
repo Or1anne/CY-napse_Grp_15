@@ -30,15 +30,17 @@ public class Maze {
         return this.width;
     }
 
-    /////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////
 
-    public void KruskalGeneration(int seed){
+    public LinkedList<int[]> KruskalGeneration(int seed){
         int[] father = new int[this.height * this.width];
         for(int i = 0; i< father.length; i++){
             father[i] = i;
         }
 
+        LinkedList<int[]> steps = new LinkedList<>();
         LinkedList<int[]> walls = new LinkedList<>();
+
         for(int i=0; i<this.height; i++){
             for(int j=0; j<this.width; j++){
                 if(i>0){
@@ -49,56 +51,33 @@ public class Maze {
                 }
             }
         }
-        Collections.shuffle(walls, new Random(seed)); //Il faut remplacer la seed ici
+        Collections.shuffle(walls, new Random(seed));
 
         for(int[] wall: walls){
             Case c1 = this.maze[wall[0]][wall[1]];
             Case c2 = this.maze[wall[2]][wall[3]];
 
             if(union(c1.getID(), c2.getID(), father)){
-                if(wall[0] == wall[2]){
-                    if(wall[1] > wall[3]){
-                        c1.setWest(false);
-                        c2.setEast(false);
-                    }
-                    else{
-                        c2.setWest(false);
-                        c1.setEast(false);
-                    }
-                }
-                else{
-                    if(wall[0] > wall[2]){
-                        c1.setNorth(false);
-                        c2.setSouth(false);;
-                    }
-                    else{
-                        c2.setNorth(false);
-                        c1.setSouth(false);
-                    }
-                }
+                steps.add(wall);
             }
         }
+        return steps;
     }
 
-    public void KruskalImperfectGeneration(int seed){
+    public LinkedList<int[]> KruskalImperfectGeneration(int seed){
+        LinkedList<int[]> steps = new LinkedList<>();
         Random randSeed = new Random(seed);
         for(int i=0; i<this.height; i++){
             for(int j=0; j<this.width; j++){
-                if(j == 0 && randSeed.nextDouble() < 0.2){
-                    this.maze[i][j].setWest(false);
-                } else if (j == this.width-1 && randSeed.nextDouble() < 0.2) {
-                    this.maze[i][j].setEast(false);
-                }
                 if(i<this.height-1 && countWalls(this.maze[i][j])>1 && countWalls(this.maze[i+1][j])>1 && randSeed.nextDouble() < 0.7) {
-                    this.maze[i][j].setSouth(false);
-                    this.maze[i+1][j].setNorth(false);
+                    steps.add(new int[]{i, j, i + 1, j});
                 }
                 if(j<this.width-1 && countWalls(this.maze[i][j])>1 && countWalls(this.maze[i][j+1])>1 && randSeed.nextDouble() < 0.7) {
-                    this.maze[i][j].setEast(false);
-                    this.maze[i][j+1].setWest(false);
+                    steps.add(new int[]{i, j, i, j + 1});
                 }
             }
         }
+        return steps;
     }
 
     private int countWalls(Case c) {
@@ -130,6 +109,40 @@ public class Maze {
             return false;
         }
     }
+
+    public void setWallsPerfect(int[] wall, Case c1, Case c2){
+        if(wall[0] == wall[2]){
+            if(wall[1] > wall[3]){
+                c1.setWest(false);
+                c2.setEast(false);
+            }
+            else{
+                c2.setWest(false);
+                c1.setEast(false);
+            }
+        }
+        else{
+            if(wall[0] > wall[2]){
+                c1.setNorth(false);
+                c2.setSouth(false);;
+            }
+            else{
+                c2.setNorth(false);
+                c1.setSouth(false);
+            }
+        }
+    }
+    public void setWallsPerfectImperfect(int[] wall, Case c1, Case c2){
+        if(wall[0] == wall[2]){
+            c1.setEast(false);
+            c2.setWest(false);
+        }
+        else{
+            c1.setSouth(false);
+            c2.setNorth(false);
+        }
+    }
+
 
 /////////////////////////////////////////////////////////////////////
 

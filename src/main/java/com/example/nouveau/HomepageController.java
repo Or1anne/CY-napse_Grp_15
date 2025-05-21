@@ -172,9 +172,7 @@ public class HomepageController {
                 GoBack.setLayoutY(260);
                 GoBack.getStyleClass().add("Button");
                 Begin.getChildren().add(GoBack);
-                GoBack.setOnMouseClicked(mouseEvent -> {
-                    AnimationSaveBack(null);
-                });
+                GoBack.setOnMouseClicked(mouseEvent -> AnimationSaveBack(null));
 
                 BorderSave.setLayoutX(125);
                 BorderSave.setLayoutY(300);
@@ -230,6 +228,7 @@ public class HomepageController {
         pause.setOnFinished(ev -> {
             Image finalFrame = new Image(getClass().getResource("home-sans-cy.png").toExternalForm());
             BGHome.setImage(finalFrame);
+
             CyNapse.setLayoutX(325);
             CyNapse.setLayoutY(90);
             Begin.getChildren().addAll(NewLab, ChargeSave);
@@ -248,8 +247,6 @@ public class HomepageController {
         });
         pause.play();
     }
-
-
 
     public void ShowSaves(){
         try(Connection conn = db.connectDatabase()){
