@@ -13,9 +13,10 @@
 
 .SaveBorder{
     -fx-border-width: 4px;
-    -fx-border-radius: 8;
+    -fx-border-radius: 8px;
     -fx-border-color: black;
     -fx-margin: 20px, 20px, 20px, 20px;
+    -fx-background-radius: 10px;
     -fx-background-color: linear-gradient(to bottom, #a8a5a5, #322e2e);;
 }
 
@@ -29,5 +30,9 @@
 }
 
 #Title{
+    -fx-font-family: "Adventure Time Logo";
+}
+
+.Text{
     -fx-font-family: "Adventure Time Logo";
 }

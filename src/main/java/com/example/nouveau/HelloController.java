@@ -2,15 +2,24 @@ package com.example.nouveau;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+
+import javafx.scene.input.MouseEvent;
+
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
+
 
 
 import javafx.scene.image.Image;
@@ -20,6 +29,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import java.io.IOException;
+import java.util.*;
+
+
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class HelloController {
@@ -27,6 +41,8 @@ public class HelloController {
     private double zoomFactor = 1.0;
     private Maze currentMaze;
     private Timeline pathTimeline;
+    private Timeline generationTimeline;
+    private ProgressBar progressBar;
     private Database db;
     private Image wallHorizontal = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_horizontal.png"));
     private Image wallVertical = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_vertical.png"));
@@ -35,29 +51,102 @@ public class HelloController {
     private boolean editMode = false;
 
 
-
-
-    @FXML private ScrollPane mainPane;
-    @FXML private GridPane gridPane;
-    @FXML private TextField widthInput;
-    @FXML private TextField heightInput;
-    @FXML private TextField MazeName;
-    @FXML private TextField seedInput;
-    @FXML private ToggleGroup MethodGeneration;
-    @FXML private ToggleGroup MethodSolve;
-    @FXML private Button editModeButton;
+    @FXML
+    private ScrollPane mainPane;
+    @FXML
+    private GridPane gridPane;
+    @FXML
+    private TextField widthInput;
+    @FXML
+    private TextField heightInput;
+    @FXML
+    private TextField MazeName;
+    @FXML
+    private TextField seedInput;
+    @FXML
+    private TextField SpeedInputGeneration;
+    @FXML
+    private ToggleGroup MethodGeneration;
+    @FXML
+    private ToggleGroup MethodSolve;
+    @FXML
+    private Button editModeButton;
+    @FXML
+    private ToggleButton toggleSwitch;
+    @FXML
+    private StackPane MazeStackPane;
+    @FXML
+    private ToggleButton toggleSwitchResolve;
+    @FXML
+    private TextField SpeedInputResolve;
+    @FXML
+    private Button SaveButton;
+    @FXML
+    private Button ModeEdition;
 
 
     @FXML
     public void initialize() {
+        SpeedInputGeneration.setVisible(false);
+        SpeedInputGeneration.setManaged(false);
+        SpeedInputResolve.setVisible(false);
+        SpeedInputResolve.setManaged(false);
+        ModeEdition.setDisable(true);
+        SaveButton.setDisable(true);
+    }
+
+
+    @FXML
+    private void handleToggle() {
+        if (toggleSwitch.isSelected()) {
+            toggleSwitch.setText("Désactiver");
+            SpeedInputGeneration.setVisible(true);
+            SpeedInputGeneration.setManaged(true);
+        } else {
+            toggleSwitch.setText("Activer");
+            SpeedInputGeneration.setVisible(false);
+            SpeedInputGeneration.setManaged(false);
+            SpeedInputGeneration.setText(null);
+        }
     }
 
     @FXML
-    public void GenerateMaze(){
+    private void handleToggleResolve() {
+        if (toggleSwitchResolve.isSelected()) {
+            toggleSwitchResolve.setText("Désactiver");
+            SpeedInputResolve.setVisible(true);
+            SpeedInputResolve.setManaged(true);
+        } else {
+            toggleSwitchResolve.setText("Activer");
+            SpeedInputResolve.setVisible(false);
+            SpeedInputResolve.setManaged(false);
+            SpeedInputResolve.setText(null);
+        }
+    }
+
+    @FXML
+    public void GenerateMaze() {
+
         if (editMode) {
             showError("Mode édition", "La résolution est désactivée en mode édition.");
             return;
         }
+
+        if (generationTimeline != null) {
+            generationTimeline.stop();
+            generationTimeline = null;
+        }
+        if (progressBar != null) {
+            MazeStackPane.getChildren().remove(progressBar);
+            progressBar = null;
+        }
+        if (pathTimeline != null) {
+            pathTimeline.stop();
+            pathTimeline = null;
+        }
+        SaveButton.setDisable(true);
+        ModeEdition.setDisable(true);
+
 
         zoomFactor = 1.0;
         applyZoom();
@@ -72,23 +161,24 @@ public class HelloController {
                 showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
                 return;
             }
-        } catch(NumberFormatException e) {
-            width = 30;
-            height = 30;
+        } catch (NumberFormatException e) {
+            width = 20;
+            height = 20;
         }
 
-        try{
+        try {
             seed = Integer.parseInt(seedInput.getText());
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             seed = new Random().nextInt();
         }
 
+        LinkedList<int[]> steps;
         currentMaze = new Maze(width, height);
         RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
-        if(SelectMethod.getText().equals("Parfait")){
-            currentMaze.KruskalGeneration(seed);
+        if (SelectMethod.getText().equals("Parfait")) {
+            steps = currentMaze.KruskalGeneration(seed);
         } else {
-            currentMaze.KruskalImperfectGeneration(seed);
+            steps = currentMaze.KruskalImperfectGeneration(seed);
         }
         double cellWidth = mainPane.getWidth() / width;
         double cellHeight = mainPane.getHeight() / height;
@@ -96,12 +186,53 @@ public class HelloController {
 
         gridPane.setPrefSize(width * cellSize, height * cellSize);
 
-        for(int i = 0; i < currentMaze.getHeight(); i++){
-            for(int j = 0; j < currentMaze.getWidth(); j++){
+        for (int i = 0; i < currentMaze.getHeight(); i++) {
+            for (int j = 0; j < currentMaze.getWidth(); j++) {
                 Case cell = currentMaze.getMaze()[i][j];
                 Pane pane = createCellPane(cell, cellSize);
                 gridPane.add(pane, j, i);
             }
+        }
+        if (toggleSwitch.isSelected()) {
+            progressBar = new ProgressBar(0);
+            progressBar.setMaxWidth(width * cellSize / 2);
+            progressBar.prefHeight(50);
+            MazeStackPane.getChildren().add(progressBar);
+            double totalSteps = steps.size();
+            int speed = (SpeedInputGeneration.getText() == null || SpeedInputGeneration.getText().isEmpty()) ? 10 : Integer.parseInt(SpeedInputGeneration.getText());
+            generationTimeline = new Timeline();
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(speed), event -> {
+                if (!steps.isEmpty()) {
+                    int[] wall = steps.poll();
+                    if (SelectMethod.getText().equals("Parfait")) {
+                        currentMaze.setWallsPerfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
+                    } else {
+                        currentMaze.setWallsPerfectImperfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
+                    }
+                    redrawMaze();
+                    progressBar.setProgress(1 - ((double) steps.size() / totalSteps));
+                }
+            });
+            generationTimeline.getKeyFrames().add(keyFrame);
+            generationTimeline.setCycleCount(steps.size());
+            generationTimeline.play();
+            generationTimeline.setOnFinished(e -> {
+                MazeStackPane.getChildren().remove(progressBar);
+                SaveButton.setDisable(false);
+                ModeEdition.setDisable(false);
+            });
+        } else {
+            while (!steps.isEmpty()) {
+                int[] wall = steps.poll();
+                if (SelectMethod.getText().equals("Parfait")) {
+                    currentMaze.setWallsPerfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
+                } else {
+                    currentMaze.setWallsPerfectImperfect(wall, currentMaze.getMaze()[wall[0]][wall[1]], currentMaze.getMaze()[wall[2]][wall[3]]);
+                }
+            }
+            redrawMaze();
+            SaveButton.setDisable(false);
+            ModeEdition.setDisable(false);
         }
     }
 
@@ -145,15 +276,13 @@ public class HelloController {
     }
 
 
-
-
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
         pane.setStyle("-fx-background-color: white;");
 
         // Mur en image (pierre)
-        pane.getChildren().clear();
+        /*pane.getChildren().clear();
 
         double wallThickness = Math.max(2, cellSize * wallThicknessRatio);
 
@@ -193,23 +322,23 @@ public class HelloController {
             eastWall.setLayoutX(cellSize - 5);
             eastWall.setLayoutY(0);
             pane.getChildren().add(eastWall);
-        }
+        }*/
 
 
-        /* Mur en trait
+        // mur en trait
         pane.setStyle("-fx-border-color: black; -fx-border-width: " +
                 (cell.getNorth() ? "1 " : "0 ") +
                 (cell.getEast() ? "1 " : "0 ") +
                 (cell.getSouth() ? "1 " : "0 ") +
                 (cell.getWest() ? "1" : "0") + ";");
-                */
+
 
         pane.setOnMouseClicked(event -> {
             if (!editMode) {
                 return; // pas en mode édition
             }
-            //int x = cell.getX();
-            //int y = cell.getY();
+            int x = cell.getX();
+            int y = cell.getY();
             double clickX = event.getX();
             double clickY = event.getY();
 
@@ -217,9 +346,9 @@ public class HelloController {
 
             // Murs extérieurs : contour
             boolean isBorderWall = (x == 0 && clickY < margin) || // Nord extérieur
-                    (x == currentMaze.getHeight()-1 && clickY > cellSize-margin) || // Sud extérieur
+                    (x == currentMaze.getHeight() - 1 && clickY > cellSize - margin) || // Sud extérieur
                     (y == 0 && clickX < margin) || // Ouest extérieur
-                    (y == currentMaze.getWidth()-1 && clickX > cellSize-margin); // Est extérieur
+                    (y == currentMaze.getWidth() - 1 && clickX > cellSize - margin); // Est extérieur
 
             if (isBorderWall) {
                 showError("Mur extérieur", "Les murs extérieurs ne peuvent pas être modifiés");
@@ -259,22 +388,21 @@ public class HelloController {
         return pane;
     }
 
-    private void redrawMaze(){
-        if(currentMaze==null) return;
+    private void redrawMaze() {
+        if (currentMaze == null) return;
 
-        for (int i=0; i<currentMaze.getHeight(); i++){
-            for (int j=0; j<currentMaze.getWidth();j++){
+        for (int i = 0; i < currentMaze.getHeight(); i++) {
+            for (int j = 0; j < currentMaze.getWidth(); j++) {
                 Case cell = currentMaze.getMaze()[i][j];
-                Pane pane =(Pane) getNodeFromGridPane(gridPane,j,i);
+                Pane pane = (Pane) getNodeFromGridPane(gridPane, j, i);
 
-                if(pane!=null){
+                if (pane != null) {
 
-                    //Mur en image (pierre)
-                    pane.getChildren().clear();
                     pane.setStyle("-fx-background-color: white;");
 
+                    //Mur en image (pierre)
+                    /*pane.getChildren().clear();
                     double wallThickness = Math.max(2, pane.getPrefWidth() * wallThicknessRatio);
-
 
                     if(cell.getNorth()) {
                         ImageView northWall = new ImageView(wallHorizontal);
@@ -307,16 +435,16 @@ public class HelloController {
                         eastWall.setLayoutX(pane.getPrefWidth() - 5);
                         eastWall.setLayoutY(0);
                         pane.getChildren().add(eastWall);
-                    }
+                    }*/
 
-                    /* Mur en trait
+                    // Mur en trait
                     pane.setStyle("-fx-border-color: black; -fx-border-width: " +
                             (cell.getNorth() ? "1 " : "0 ") +
                             (cell.getEast() ? "1 " : "0 ") +
                             (cell.getSouth() ? "1 " : "0 ") +
                             (cell.getWest() ? "1" : "0") + ";");
 
-                     */
+
                 }
             }
         }
@@ -342,6 +470,7 @@ public class HelloController {
         }
         applyZoom();
     }
+
     private void applyZoom() {
         gridPane.setScaleX(zoomFactor);
         gridPane.setScaleY(zoomFactor);
@@ -350,10 +479,6 @@ public class HelloController {
     @FXML
     public void MousePressed() {
         mainPane.setCursor(Cursor.CLOSED_HAND);
-    }
-    @FXML
-    public void MouseReleased() {
-        mainPane.setCursor(Cursor.DEFAULT);
     }
 
     @FXML
@@ -364,13 +489,26 @@ public class HelloController {
         }
 
         if (currentMaze == null) return;
+        if (pathTimeline != null) {
+            pathTimeline.stop();
+            pathTimeline = null;
+        }
+        if (generationTimeline != null) {
+            generationTimeline.stop();
+            generationTimeline = null;
+        }
+        if (progressBar != null) {
+            MazeStackPane.getChildren().remove(progressBar);
+            progressBar = null;
+        }
+
 
         redrawMaze();
         Resolve solver = new Resolve(currentMaze);
         List<Case> path = new ArrayList<>();
         RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
         switch (SolveMethod.getText()) {
-            case "Trémaux":
+            case "Tremaux":
                 path = solver.Tremaux();
                 break;
             case "BFS":
@@ -386,8 +524,11 @@ public class HelloController {
             showError("Labyrinthe insoluble", "Aucun chemin n’a été trouvé.\nVérifie que l’entrée et la sortie sont accessibles.");
             return;
         }
-        //drawPath(path);
-        showPathStepByStep(path);
+        if (toggleSwitchResolve.isSelected()) {
+            showPathStepByStep(path);
+        } else {
+            drawPath(path);
+        }
     }
 
     private void drawPath(List<Case> path) {
@@ -414,7 +555,8 @@ public class HelloController {
     }
 
     public void showPathStepByStep(List<Case> path) {
-        if (editMode){
+
+        if (editMode) {
             if (pathTimeline != null) {
                 pathTimeline.stop();
                 pathTimeline = null;
@@ -425,12 +567,13 @@ public class HelloController {
             pathTimeline.stop();
         }
 
+
+        int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty()) ? 100 : Integer.parseInt(SpeedInputResolve.getText());
         pathTimeline = new Timeline();
-        int delay = 100;
 
         for (int i = 0; i < path.size(); i++) {
             final int index = i;
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * delay), event -> {
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * speed), event -> {
                 Case c = path.get(index);
                 Pane cellPane = getPaneFromGrid(c.getY(), c.getX());
                 if (cellPane != null) {
@@ -466,7 +609,7 @@ public class HelloController {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (y == height-1 && x == width-1){
+                if (y == height - 1 && x == width - 1) {
                     System.out.print("   ");
                     continue;
                 }
@@ -475,16 +618,15 @@ public class HelloController {
                 System.out.print("   ");
             }
 
-            if (y == height-1){
+            if (y == height - 1) {
                 System.out.println("   ");
                 break;
-            }
-            else {
+            } else {
                 System.out.println("│");
             }
 
             for (int x = 0; x < width; x++) {
-                if (y == height-1){
+                if (y == height - 1) {
                     System.out.print(grill[y][x].getWest() ? "│" : " ");
                     System.out.print("   ");
                     continue;
@@ -575,20 +717,23 @@ public class HelloController {
     }
 
 
+    @FXML
+    public void ResetEvent(ActionEvent event) {
 
+    }
 
     @FXML
-    public void SaveMaze(){
+    public void SaveMaze() {
         String Name;
-        try{
+        try {
             Name = MazeName.getText();
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             Name = "Labyrinthe";
         }
         db.SaveMaze(currentMaze, Name);
     }
 
-    public void ChargeMaze(String name){
+    public void ChargeMaze(String name) {
         currentMaze = db.DataChargeMaze(name);
         gridPane.getChildren().clear();
         double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
@@ -597,16 +742,17 @@ public class HelloController {
 
         gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
 
-        for(int i = 0; i < currentMaze.getHeight(); i++){
-            for(int j = 0; j < currentMaze.getWidth(); j++){
+        for (int i = 0; i < currentMaze.getHeight(); i++) {
+            for (int j = 0; j < currentMaze.getWidth(); j++) {
                 Case cell = currentMaze.getMaze()[i][j];
                 Pane pane = createCellPane(cell, cellSize);
                 gridPane.add(pane, j, i);
             }
         }
     }
+
     private void showError(String title, String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -617,14 +763,32 @@ public class HelloController {
         this.db = db;
     }
 
+
     private void setControlsDisabled(boolean disabled) {
         widthInput.setDisable(disabled);
         heightInput.setDisable(disabled);
         seedInput.setDisable(disabled);
-        MethodGeneration.getToggles().forEach(toggle -> ((RadioButton)toggle).setDisable(disabled));
-        MethodSolve.getToggles().forEach(toggle -> ((RadioButton)toggle).setDisable(disabled));
+        MethodGeneration.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
+        MethodSolve.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
+    }
+
+    @FXML
+    public void ReturnHomepage(MouseEvent event) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Homepage.fxml"));
+        Parent root = null;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        Scene scene = new Scene(root, 1000, 600);
+        stage.setScene(scene);
+        stage.show();
     }
 }
+
 
 
 
