@@ -16,6 +16,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
 
+
 import javafx.scene.image.Image;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class HelloController {
     private Image wallCorner = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_corner.png"));
     private double wallThicknessRatio = 0.25;
     private boolean editMode = false;
+    private boolean isPerfect;
 
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
@@ -57,6 +59,10 @@ public class HelloController {
     @FXML private TextField SpeedInputResolve;
     @FXML private Button SaveButton;
     @FXML private Button editModeButton;
+    @FXML private Label mazeSizeLabel;
+    @FXML private Label mazeSeedLabel;
+    @FXML private Label mazePerfectLabel;
+
 
 
     @FXML
@@ -157,8 +163,10 @@ public class HelloController {
         RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
         if (SelectMethod.getText().equals("Parfait")) {
             steps = currentMaze.KruskalGeneration(seed);
+            isPerfect = true;
         } else {
             steps = currentMaze.KruskalImperfectGeneration(seed);
+            isPerfect = false;
         }
         double cellWidth = mainPane.getWidth() / width;
         double cellHeight = mainPane.getHeight() / height;
@@ -218,6 +226,9 @@ public class HelloController {
             SaveButton.setDisable(false);
             editModeButton.setDisable(false);
         }
+        mazeSizeLabel.setText("Taille : " + height + " x " + width);
+        mazeSeedLabel.setText("Seed : " + seed);
+        mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
     }
 
     @FXML
