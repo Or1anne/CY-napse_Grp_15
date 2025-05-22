@@ -140,15 +140,22 @@ public class HelloController {
         int width, height, seed;
         try {
             width = Integer.parseInt(widthInput.getText());
-            height = Integer.parseInt(heightInput.getText());
-
             // Limites de génération 100 * 100
-            if (width < 1 || height < 1 || width > 100 || height > 100) {
+            if (width < 1 || width > 100) {
                 showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
                 return;
             }
         } catch (NumberFormatException e) {
             width = 20;
+        }
+        try {
+            height = Integer.parseInt(heightInput.getText());
+            // Limites de génération 100 * 100
+            if (height < 1 || height > 100) {
+                showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
+                return;
+            }
+        } catch (NumberFormatException e) {
             height = 20;
         }
 
