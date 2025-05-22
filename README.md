@@ -6,7 +6,7 @@
 - [Objectif](#objectif) Expliquer le but de ce projet
 - [Groupe](#groupe) Les membres du groupe
 - [Fichiers](#fichiers) Quels sont les fichiers et leurs fonctions
-- [Compiler](#compiler) Comment compiler le projet
+- [Compilation](#compilation) Comment compiler le projet
 - [Prérequis](#prérequis) Les bibliothèques à installer
 - [Lancement](#lancement) Accéder à la page d'accueil du site
 
@@ -85,8 +85,9 @@ Notre groupe est le groupe 15 et est constitué d'Orianne Courtade, Alban Souppp
 ```
 
 
-## Compiler
+## Compilation
 
+Terminal :
 Aller dans le dossier du projet puis ouvrir le terminal
 ```
  javac --module-path src\lib\javafx-sdk-21.0.7\lib --add-modules javafx.controls,javafx.fxml -d out src\main\java\com\example\nouveau\*.java
@@ -100,11 +101,21 @@ Aller dans le dossier du projet puis ouvrir le terminal
 
 Avoir le JDK21 au minimum
 
+Si vous utilisez IntellJ pour lancer l'application, allez dans :
+src/lib/jdk 21.../lib
+Cherchez le fichier sqlite connectivity, clique droit/ Add as Library (Ajouter en temps que bibliotheque en fr ?)
+
 ## Lancement
+
+Terminal :
 
 ```
  java --module-path src\lib\javafx-sdk-21.0.7\lib --add-modules javafx.controls,javafx.fxml -cp out com.example.nouveau.HelloApplication
 ```
+
+IntellJ :
+
+Aller dans la classe HelloApplication et lancez l'application
 
 # CY_Tech
 ![CYTECH](CY_Tech_logo.jpg)
