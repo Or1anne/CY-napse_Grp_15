@@ -77,12 +77,14 @@ public class HelloController {
     private Button SaveButton;
     @FXML
     private Button ModeEdition;
-    @FXML 
+    @FXML
     private Label mazeSizeLabel;
-    @FXML 
+    @FXML
     private Label mazeSeedLabel;
-    @FXML 
+    @FXML
     private Label mazePerfectLabel;
+    
+
 
     @FXML
     public void initialize() {
