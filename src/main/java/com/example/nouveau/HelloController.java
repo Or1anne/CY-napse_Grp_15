@@ -11,14 +11,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
-
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
@@ -26,10 +21,6 @@ import javafx.scene.layout.*;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
 
 import java.io.IOException;
 import java.util.*;
@@ -51,6 +42,7 @@ public class HelloController {
     private Image wallCorner = new Image(getClass().getResourceAsStream("/com/example/nouveau/wall_corner.png"));
     private double wallThicknessRatio = 0.25;
     private boolean editMode = false;
+    private boolean isPerfect;
 
 
     @FXML
@@ -85,7 +77,12 @@ public class HelloController {
     private Button SaveButton;
     @FXML
     private Button ModeEdition;
-
+    @FXML 
+    private Label mazeSizeLabel;
+    @FXML 
+    private Label mazeSeedLabel;
+    @FXML 
+    private Label mazePerfectLabel;
 
     @FXML
     public void initialize() {
@@ -238,6 +235,9 @@ public class HelloController {
             SaveButton.setDisable(false);
             ModeEdition.setDisable(false);
         }
+        mazeSizeLabel.setText("Taille : " + height + " x " + width);
+        mazeSeedLabel.setText("Seed : " + seed);
+        mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
     }
 
     @FXML
