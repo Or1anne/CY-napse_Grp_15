@@ -1,5 +1,6 @@
 package com.example.nouveau;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,14 +14,19 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.*;
+import java.util.ResourceBundle;
 
 public class HomepageController {
     @FXML private AnchorPane Begin;
@@ -31,7 +37,7 @@ public class HomepageController {
     @FXML private Button NewLab;
     @FXML private Label CyNapse;
     @FXML private HBox HBoxSave;
-    private Label GoBack;
+    @FXML private Button GoBack;
 
     private HelloController controller;
     private Database db;
@@ -42,38 +48,118 @@ public class HomepageController {
         db.createDatabase();
         db.createTable();
 
-        /*ColorAdjust colorAdjust = new ColorAdjust();
-        BGHome.setEffect(colorAdjust);
+        Scene scene = Begin.getScene();
+        if (scene != null) {
+            FullScreen(scene);
+        } else {
+            Begin.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    FullScreen(newScene);
+                }
+            });
+        }
 
-        Timeline timeline = new Timeline(
-                new KeyFrame(
-                        Duration.seconds(5),
-                        new KeyValue(colorAdjust.saturationProperty(), -0.1)
-                )
-        );
-        colorAdjust.setSaturation(-0.7);
+        BGHome.setPreserveRatio(false);
 
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.setAutoReverse(true);
-        timeline.play();
+        BGHome.fitWidthProperty().bind(Begin.widthProperty());
+        BGHome.fitHeightProperty().bind(Begin.heightProperty());
 
-        fade = new FadeTransition(Duration.seconds(2), StartButton);
-        fade.setFromValue(1.0);
-        fade.setToValue(0.0);
-        fade.setCycleCount(FadeTransition.INDEFINITE);
-        fade.setAutoReverse(true);
-        fade.play(); */
+        BorderSave.prefWidthProperty().bind(Begin.widthProperty().multiply(0.8));
+        BorderSave.prefHeightProperty().bind(Begin.heightProperty().multiply(0.3));
+
+        Begin.widthProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(() -> {
+                ReplaceLabel(StartButton, 0.47, 0.6, 0.045);
+                ReplaceLabel(CyNapse, 0.47, 0.2, 0.045);
+                ReplaceButton(NewLab, 0.30, 0.65, 0.02);
+                ReplaceButton(ChargeSave, 0.65, 0.65, 0.02);
+                ReplaceAnchorPane(BorderSave, 0.5, 0.6);
+                ReplaceButton(GoBack, 0.15, 0.42, 0.02);
+            });
+        });
+
+        ActiveReplaceLabel(StartButton, 0.47, 0.6, 0.045);
+        ActiveReplaceLabel(CyNapse, 0.47, 0.2, 0.045);
+        ActiveReplaceButton(NewLab, 0.30, 0.65, 0.02);
+        ActiveReplaceButton(ChargeSave, 0.65, 0.65, 0.02);
+        ActiveReplaceAnchorPane(BorderSave, 0.5, 0.6);
+        ActiveReplaceButton(GoBack, 0.15, 0.42, 0.02);
+    }
+
+    private void ReplaceLabel(Label label, double x, double y, double fontSizeRatio) {
+        label.setStyle("-fx-font-size: " + Begin.getWidth() * fontSizeRatio + "px;");
+        Platform.runLater(() -> {
+                double centerX = Begin.getWidth() * x;
+                double centerY = Begin.getHeight() * y;
+
+                label.setLayoutX(centerX - label.getWidth() / 2);
+                label.setLayoutY(centerY - label.getHeight() / 2);
+        });
+    }
+    private void ActiveReplaceLabel(Label label, double x, double y, double FontSize) {
+        label.widthProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(() -> ReplaceLabel(label, x, y, FontSize));
+        });
+
+        label.heightProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(() -> ReplaceLabel(label, x, y, FontSize));
+        });
+    }
+
+    private void ReplaceButton(Button btn, double x, double y, double fontSizeRatio) {
+        btn.setStyle("-fx-font-size: " + Begin.getWidth() * fontSizeRatio + "px;");
+
+            Platform.runLater(() -> {
+                double centerX = Begin.getWidth() * x;
+                double centerY = Begin.getHeight() * y;
+
+                btn.setLayoutX(centerX - btn.getWidth() / 2);
+                btn.setLayoutY(centerY - btn.getHeight() / 2);
+            });
+    }
+    private void ActiveReplaceButton(Button btn, double x, double y, double FontSize) {
+        btn.widthProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(() -> ReplaceButton(btn, x, y, FontSize));
+        });
+
+        btn.heightProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(() -> ReplaceButton(btn, x, y, FontSize));
+        });
+    }
+
+    private void ReplaceAnchorPane(AnchorPane anchor, double x, double y) {
+        double centerX = Begin.getWidth() * x;
+        double centerY = Begin.getHeight() * y;
+
+        anchor.setLayoutX(centerX - anchor.getWidth() / 2);
+        anchor.setLayoutY(centerY - anchor.getHeight() / 2);
+    }
+    private void ActiveReplaceAnchorPane(AnchorPane anchor, double x, double y) {
+        anchor.widthProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(() -> ReplaceAnchorPane(anchor, x, y));
+        });
+
+        anchor.heightProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(() -> ReplaceAnchorPane(anchor, x, y));
+        });
+    }
+
+
+
+    private void AdaptSize(ImageView view, Scene scene) {
+        view.fitWidthProperty().bind(scene.widthProperty());
+        view.fitHeightProperty().bind(scene.heightProperty());
+        view.setPreserveRatio(false);
     }
 
     @FXML
     void NewGame() {
         Begin.setOnMouseClicked(null);
-        //fade.stop();
         FadeTransition finalFade = new FadeTransition(Duration.seconds(1), StartButton);
         finalFade.setFromValue(StartButton.getOpacity());
         finalFade.setToValue(0);
         finalFade.setOnFinished(e -> {
-            Begin.getChildren().remove(StartButton);
+            StartButton.setVisible(false);
             showLevelButtons();
         });
         finalFade.play();
@@ -81,24 +167,19 @@ public class HomepageController {
 
     private void showLevelButtons() {
 
-        double targetY1 = 370;
-        double targetY2 = 370;
+        FadeTransition fade1 = new FadeTransition(Duration.seconds(1), NewLab);
+        fade1.setFromValue(0);
+        fade1.setToValue(1);
 
-        NewLab.setLayoutX(150);
-        NewLab.setLayoutY(700);
-        ChargeSave.setLayoutX(500);
-        ChargeSave.setLayoutY(700);
+        FadeTransition fade2 = new FadeTransition(Duration.seconds(1), ChargeSave);
+        fade2.setFromValue(0);
+        fade2.setToValue(1);
 
-        TranslateTransition slideUp1 = new TranslateTransition(Duration.seconds(1), NewLab);
-        slideUp1.setFromY(0);
-        slideUp1.setToY(targetY1 - 700);
+        fade1.setOnFinished(e -> NewLab.setVisible(true));
+        fade2.setOnFinished(e -> ChargeSave.setVisible(true));
 
-        TranslateTransition slideUp2 = new TranslateTransition(Duration.seconds(1), ChargeSave);
-        slideUp2.setFromY(0);
-        slideUp2.setToY(targetY2 - 700);
-
-        slideUp1.play();
-        slideUp2.play();
+        fade1.play();
+        fade2.play();
     }
 
     @FXML
@@ -109,8 +190,7 @@ public class HomepageController {
     public void OpenMazeGeneration(Stage stage, Runnable onFinished) throws IOException {
         Image gif = new Image(getClass().getResource("StartNewMaze.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
-        gifView.setFitWidth(1000);
-        gifView.setFitHeight(600);
+        AdaptSize(gifView, stage.getScene());
         ColorAdjust colorAdjust = new ColorAdjust();
         colorAdjust.setSaturation(-0.5);
         colorAdjust.setBrightness(-0.2);
@@ -147,8 +227,7 @@ public class HomepageController {
     public void AnimationSave() {
         Image gif = new Image(getClass().getResource("ChargeScene.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
-        gifView.setFitWidth(1000);
-        gifView.setFitHeight(600);
+        AdaptSize(gifView, Begin.getScene());
 
         ColorAdjust colorAdjust = new ColorAdjust();
         colorAdjust.setSaturation(-0.5);
@@ -156,7 +235,8 @@ public class HomepageController {
         gifView.setEffect(colorAdjust);
 
         Begin.getChildren().add(gifView);
-        Begin.getChildren().removeAll(NewLab, ChargeSave);
+        NewLab.setVisible(false);
+        ChargeSave.setVisible(false);
 
         ParallelTransition showGif = getParallelTransition(gifView);
 
@@ -165,20 +245,9 @@ public class HomepageController {
             pause.setOnFinished(ev -> {
                 Image finalFrame = new Image(getClass().getResource("ChargeSceneFinal.png").toExternalForm());
                 BGHome.setImage(finalFrame);
-                CyNapse.setLayoutX(410);
-                CyNapse.setLayoutY(55);
-                GoBack = new Label("Retour");
-                GoBack.setLayoutX(150);
-                GoBack.setLayoutY(260);
-                GoBack.getStyleClass().add("Button");
-                Begin.getChildren().add(GoBack);
+                GoBack.setVisible(true);
                 GoBack.setOnMouseClicked(mouseEvent -> AnimationSaveBack(null));
-
-                BorderSave.setLayoutX(125);
-                BorderSave.setLayoutY(300);
-                if(!Begin.getChildren().contains(BorderSave)) {
-                    Begin.getChildren().add(BorderSave);
-                }
+                BorderSave.setVisible(true);
                 ShowSaves();
                 Begin.getChildren().remove(gifView);
             });
@@ -215,8 +284,7 @@ public class HomepageController {
     public void AnimationSaveBack(Runnable onFinished) {
         Image gif = new Image(getClass().getResource("ChargeSceneBackWard.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
-        gifView.setFitWidth(1000);
-        gifView.setFitHeight(600);
+        AdaptSize(gifView, Begin.getScene());
         ColorAdjust colorAdjust = new ColorAdjust();
         colorAdjust.setSaturation(-0.5);
         colorAdjust.setBrightness(-0.2);
@@ -229,10 +297,11 @@ public class HomepageController {
             Image finalFrame = new Image(getClass().getResource("home-sans-cy.png").toExternalForm());
             BGHome.setImage(finalFrame);
 
-            CyNapse.setLayoutX(325);
-            CyNapse.setLayoutY(90);
-            Begin.getChildren().addAll(NewLab, ChargeSave);
-            Begin.getChildren().removeAll(GoBack, BorderSave, gifView);
+            NewLab.setVisible(true);
+            ChargeSave.setVisible(true);
+            Begin.getChildren().remove(gifView);
+            GoBack.setVisible(false);
+            BorderSave.setVisible(false);
             HBoxSave.getChildren().clear();
             if (onFinished != null) {
                 onFinished.run();
@@ -293,6 +362,16 @@ public class HomepageController {
         }catch (SQLException e){
             e.printStackTrace();
         }
+    }
+
+    private void FullScreen(Scene scene){
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F11) {
+                Stage stage = (Stage) scene.getWindow();
+                stage.setFullScreen(!stage.isFullScreen());
+                Begin.layout();
+            }
+        });
     }
 }
 

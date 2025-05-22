@@ -11,6 +11,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
@@ -49,6 +51,16 @@ public class HelloController {
 
     @FXML
     public void initialize() {
+        Scene scene = mainPane.getScene();
+        if (scene != null) {
+            FullScreen(scene);
+        } else {
+            mainPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    FullScreen(newScene);
+                }
+            });
+        }
         SpeedInputGeneration.setVisible(false);
         SpeedInputGeneration.setManaged(false);
         SpeedInputResolve.setVisible(false);
@@ -557,6 +569,20 @@ public class HelloController {
         Scene scene = new Scene(root, 1000, 600);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void FullScreen(Scene scene){
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F11) {
+                Stage stage = (Stage) scene.getWindow();
+                stage.setFullScreen(!stage.isFullScreen());
+                double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
+                double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
+                double cellSize = Math.min(cellWidth, cellHeight);
+                gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
+                redrawMaze();
+            }
+        });
     }
 }
 

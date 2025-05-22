@@ -9,6 +9,8 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-effect: dropshadow(three-pass-box, rgba(73, 166, 140, 0.68), 10, 0.3, 0, 0);
+    -fx-background-image: url('LoadMaze.png');
+    -fx-background-size: cover;
 }
 
 .SaveBorder{
@@ -24,15 +26,12 @@
     -fx-font-family: "Adventure Time Logo";
     -fx-text-fill: #864141;
     -fx-font-size: 24px;
+    -fx-background-color: transparent;
 }
 .Button:hover{
     -fx-text-fill: #b18282;
 }
 
-#Title{
-    -fx-font-family: "Adventure Time Logo";
-}
-
-.Text{
+#Title, .Text{
     -fx-font-family: "Adventure Time Logo";
 }
