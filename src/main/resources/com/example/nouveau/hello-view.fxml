@@ -79,6 +79,15 @@
                <Insets bottom="5.0" left="10.0" top="5.0" />
             </HBox.margin>
          </Button>
+         <Button id="generateLab" fx:id="selectEntryExitButton" alignment="CENTER" mnemonicParsing="false" onAction="#toggleEntryExitSelection" prefHeight="20.0"
+                 prefWidth="82.0" text="Choisir Entrée/Sortie">
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0"/>
+            </HBox.margin>
+            <font>
+               <Font size="10.0"/>
+            </font>
+         </Button>
       </HBox>
    </bottom>
    <right>
@@ -182,7 +191,7 @@
             </styleClass>
          </RadioButton>
 
-         <!-- <Button id="generateLab" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleEditMode" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER"> -->
+
 
          <Label alignment="CENTER" text="Résolution pas à pas" textAlignment="CENTER" underline="true" wrapText="true">
             <font>
@@ -193,7 +202,6 @@
             </VBox.margin>
          </Label>
          <ToggleButton id="generateLab" fx:id="toggleSwitchResolve" mnemonicParsing="false" onAction="#handleToggleResolve" prefHeight="16.0" prefWidth="85.0" text="Activer">
-<!-- origin/main-->
             <font>
                <Font size="10.0" />
             </font>
@@ -214,7 +222,10 @@
                <Insets top="10.0" />
             </VBox.margin>
          </Separator>
-         <Button id="generateLab" fx:id="ModeEdition" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER">
+
+         <!-- <Button id="generateLab" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleEditMode" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER"> -->
+
+         <Button id="generateLab" fx:id="ModeEdition" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleEditMode" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER">
             <font>
                <Font size="10.0" />
             </font>

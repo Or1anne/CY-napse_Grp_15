@@ -8,12 +8,32 @@ public class Resolve {
     private Case start;
     private Case end;
 
-    public Resolve(Maze Labyrinthe) {
-        this.Labyrinthe = Labyrinthe.getMaze();
+    public Resolve(Maze labyrinth) {
+        this(labyrinth, null, null); // Appelle le constructeur principal avec entry et exit null
+    }
+
+
+    public Resolve(Maze labyrinth, Case entry, Case exit) {
+        this.Labyrinthe = labyrinth.getMaze();
         this.height = this.Labyrinthe.length;
         this.width = this.Labyrinthe[0].length;
-        this.start = Labyrinthe.getMaze()[0][0];
-        this.end = Labyrinthe.getMaze()[height-1][width-1];
+        this.start = entry;
+        this.end = exit;
+
+        // Forcer l'ouverture des murs pour les entrées/sorties
+        if (start != null) {
+            if (start.getX() == 0) start.setNorth(false);
+            else if (start.getX() == height - 1) start.setSouth(false);
+            else if (start.getY() == 0) start.setWest(false);
+            else if (start.getY() == width - 1) start.setEast(false);
+        }
+
+        if (end != null) {
+            if (end.getX() == 0) end.setNorth(false);
+            else if (end.getX() == height - 1) end.setSouth(false);
+            else if (end.getY() == 0) end.setWest(false);
+            else if (end.getY() == width - 1) end.setEast(false);
+        }
     }
 
 
@@ -43,7 +63,7 @@ public class Resolve {
         nbCase++;
         System.out.println("Exploration de la case : " + current);
 
-        if (x == height - 1 && y == width - 1){
+        if (Labyrinthe[x][y] == end){
             System.out.println("Nb Case visité:" + nbCase);
             return true;
         }
@@ -98,7 +118,7 @@ public class Resolve {
         int maxSteps = width * height * 4;
 
         // Condition pour sortir du labyrinthe
-        while (!(x == height - 1 && y == width - 1)) {
+        while (Labyrinthe[x][y] != end) {
             if (steps++ > maxSteps) {
                 System.out.println("Labyrinthe insoluble (boucle infinie détectée)");
                 return null;
