@@ -180,6 +180,10 @@ public class HelloController {
             MazeStackPane.getChildren().add(progressBar);
             double totalSteps = steps.size();
             int speed = (SpeedInputGeneration.getText() == null || SpeedInputGeneration.getText().isEmpty()) ? 10 : Integer.parseInt(SpeedInputGeneration.getText());
+            if (speed < 10 || speed > 101) {
+                showError("Vitesse invalide", "La vitesse doit être entre 10 et 100");
+                return;
+            }
             generationTimeline = new Timeline();
             KeyFrame keyFrame = new KeyFrame(Duration.millis(speed), event -> {
                 if (!steps.isEmpty()) {
@@ -563,6 +567,10 @@ public class HelloController {
 
 
         int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty()) ? 100 : Integer.parseInt(SpeedInputResolve.getText());
+        if (speed < 10 || speed > 101) {
+            showError("Vitesse invalide", "La vitesse doit être entre 10 et 100");
+            return;
+        }
         pathTimeline = new Timeline();
 
         for (int i = 0; i < path.size(); i++) {
@@ -582,10 +590,19 @@ public class HelloController {
     public static Maze generateMaze(int width, int height, String method, Integer seedOpt) {
         int seed = (seedOpt != null) ? seedOpt : new Random().nextInt();
         Maze maze = new Maze(width, height);
+        LinkedList<int[]> steps;
         if ("Parfait".equalsIgnoreCase(method)) {
-            maze.KruskalGeneration(seed);
+            steps = maze.KruskalGeneration(seed);
         } else {
-            maze.KruskalImperfectGeneration(seed);
+            steps = maze.KruskalImperfectGeneration(seed);
+        }
+        while (!steps.isEmpty()) {
+            int[] wall = steps.poll();
+            if ("Parfait".equalsIgnoreCase(method)) {
+                maze.setWallsPerfect(wall, maze.getMaze()[wall[0]][wall[1]], maze.getMaze()[wall[2]][wall[3]]);
+            } else {
+                maze.setWallsPerfectImperfect(wall, maze.getMaze()[wall[0]][wall[1]], maze.getMaze()[wall[2]][wall[3]]);
+            }
         }
         return maze;
     }
