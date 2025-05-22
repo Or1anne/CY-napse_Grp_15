@@ -2,7 +2,6 @@ package com.example.nouveau;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,20 +10,21 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.*;
+
 
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 import java.io.IOException;
 import java.util.*;
-
 
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -44,58 +44,46 @@ public class HelloController {
     private boolean editMode = false;
     private boolean isPerfect;
 
+    @FXML private ScrollPane mainPane;
+    @FXML private GridPane gridPane;
+    @FXML private TextField widthInput;
+    @FXML private TextField heightInput;
+    @FXML private TextField MazeName;
+    @FXML private TextField seedInput;
+    @FXML private TextField SpeedInputGeneration;
+    @FXML private ToggleGroup MethodGeneration;
+    @FXML private ToggleGroup MethodSolve;
+    @FXML private ToggleButton toggleSwitch;
+    @FXML private StackPane MazeStackPane;
+    @FXML private ToggleButton toggleSwitchResolve;
+    @FXML private TextField SpeedInputResolve;
+    @FXML private Button SaveButton;
+    @FXML private Button editModeButton;
+    @FXML private Label mazeSizeLabel;
+    @FXML private Label mazeSeedLabel;
+    @FXML private Label mazePerfectLabel;
 
-    @FXML
-    private ScrollPane mainPane;
-    @FXML
-    private GridPane gridPane;
-    @FXML
-    private TextField widthInput;
-    @FXML
-    private TextField heightInput;
-    @FXML
-    private TextField MazeName;
-    @FXML
-    private TextField seedInput;
-    @FXML
-    private TextField SpeedInputGeneration;
-    @FXML
-    private ToggleGroup MethodGeneration;
-    @FXML
-    private ToggleGroup MethodSolve;
-    @FXML
-    private Button editModeButton;
-    @FXML
-    private ToggleButton toggleSwitch;
-    @FXML
-    private StackPane MazeStackPane;
-    @FXML
-    private ToggleButton toggleSwitchResolve;
-    @FXML
-    private TextField SpeedInputResolve;
-    @FXML
-    private Button SaveButton;
-    @FXML
-    private Button ModeEdition;
-    @FXML
-    private Label mazeSizeLabel;
-    @FXML
-    private Label mazeSeedLabel;
-    @FXML
-    private Label mazePerfectLabel;
-    
 
 
     @FXML
     public void initialize() {
+        Scene scene = mainPane.getScene();
+        if (scene != null) {
+            FullScreen(scene);
+        } else {
+            mainPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    FullScreen(newScene);
+                }
+            });
+        }
         SpeedInputGeneration.setVisible(false);
         SpeedInputGeneration.setManaged(false);
         SpeedInputResolve.setVisible(false);
         SpeedInputResolve.setManaged(false);
-        ModeEdition.setDisable(true);
+        editModeButton.setDisable(true);
         SaveButton.setDisable(true);
     }
-
 
     @FXML
     private void handleToggle() {
@@ -127,12 +115,10 @@ public class HelloController {
 
     @FXML
     public void GenerateMaze() {
-
         if (editMode) {
             showError("Mode édition", "La résolution est désactivée en mode édition.");
             return;
         }
-
         if (generationTimeline != null) {
             generationTimeline.stop();
             generationTimeline = null;
@@ -146,8 +132,7 @@ public class HelloController {
             pathTimeline = null;
         }
         SaveButton.setDisable(true);
-        ModeEdition.setDisable(true);
-
+        editModeButton.setDisable(true);
 
         zoomFactor = 1.0;
         applyZoom();
@@ -203,6 +188,10 @@ public class HelloController {
             MazeStackPane.getChildren().add(progressBar);
             double totalSteps = steps.size();
             int speed = (SpeedInputGeneration.getText() == null || SpeedInputGeneration.getText().isEmpty()) ? 10 : Integer.parseInt(SpeedInputGeneration.getText());
+            if (speed < 10 || speed > 101) {
+                showError("Vitesse invalide", "La vitesse doit être entre 10 et 100");
+                return;
+            }
             generationTimeline = new Timeline();
             KeyFrame keyFrame = new KeyFrame(Duration.millis(speed), event -> {
                 if (!steps.isEmpty()) {
@@ -222,7 +211,7 @@ public class HelloController {
             generationTimeline.setOnFinished(e -> {
                 MazeStackPane.getChildren().remove(progressBar);
                 SaveButton.setDisable(false);
-                ModeEdition.setDisable(false);
+                editModeButton.setDisable(false);
             });
         } else {
             while (!steps.isEmpty()) {
@@ -235,7 +224,7 @@ public class HelloController {
             }
             redrawMaze();
             SaveButton.setDisable(false);
-            ModeEdition.setDisable(false);
+            editModeButton.setDisable(false);
         }
         mazeSizeLabel.setText("Taille : " + height + " x " + width);
         mazeSeedLabel.setText("Seed : " + seed);
@@ -354,13 +343,6 @@ public class HelloController {
 
 
         //Mur en trait
-        pane.setStyle("-fx-border-color: black; -fx-border-width: " +
-                (cell.getNorth() ? "1 " : "0 ") +
-                (cell.getEast() ? "1 " : "0 ") +
-                (cell.getSouth() ? "1 " : "0 ") +
-                (cell.getWest() ? "1" : "0") + ";");
-
-
         pane.setOnMouseClicked(event -> {
             if (!editMode) {
                 return; // pas en mode édition
@@ -473,8 +455,6 @@ public class HelloController {
                             (cell.getEast() ? "1 " : "0 ") +
                             (cell.getSouth() ? "1 " : "0 ") +
                             (cell.getWest() ? "1" : "0") + ";");
-
-
                 }
             }
         }
@@ -500,7 +480,6 @@ public class HelloController {
         }
         applyZoom();
     }
-
     private void applyZoom() {
         gridPane.setScaleX(zoomFactor);
         gridPane.setScaleY(zoomFactor);
@@ -599,6 +578,10 @@ public class HelloController {
 
 
         int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty()) ? 100 : Integer.parseInt(SpeedInputResolve.getText());
+        if (speed < 10 || speed > 101) {
+            showError("Vitesse invalide", "La vitesse doit être entre 10 et 100");
+            return;
+        }
         pathTimeline = new Timeline();
 
         for (int i = 0; i < path.size(); i++) {
@@ -618,10 +601,19 @@ public class HelloController {
     public static Maze generateMaze(int width, int height, String method, Integer seedOpt) {
         int seed = (seedOpt != null) ? seedOpt : new Random().nextInt();
         Maze maze = new Maze(width, height);
+        LinkedList<int[]> steps;
         if ("Parfait".equalsIgnoreCase(method)) {
-            maze.KruskalGeneration(seed);
+            steps = maze.KruskalGeneration(seed);
         } else {
-            maze.KruskalImperfectGeneration(seed);
+            steps = maze.KruskalImperfectGeneration(seed);
+        }
+        while (!steps.isEmpty()) {
+            int[] wall = steps.poll();
+            if ("Parfait".equalsIgnoreCase(method)) {
+                maze.setWallsPerfect(wall, maze.getMaze()[wall[0]][wall[1]], maze.getMaze()[wall[2]][wall[3]]);
+            } else {
+                maze.setWallsPerfectImperfect(wall, maze.getMaze()[wall[0]][wall[1]], maze.getMaze()[wall[2]][wall[3]]);
+            }
         }
         return maze;
     }
@@ -746,12 +738,6 @@ public class HelloController {
         System.out.println("Labyrinthe sauvegardé sous le nom : " + name);
     }
 
-
-    @FXML
-    public void ResetEvent(ActionEvent event) {
-
-    }
-
     @FXML
     public void SaveMaze() {
         String Name;
@@ -793,7 +779,6 @@ public class HelloController {
         this.db = db;
     }
 
-
     private void setControlsDisabled(boolean disabled) {
         widthInput.setDisable(disabled);
         heightInput.setDisable(disabled);
@@ -818,9 +803,23 @@ public class HelloController {
         stage.setScene(scene);
         stage.show();
     }
+
+    private void FullScreen(Scene scene){
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F11) {
+                Stage stage = (Stage) scene.getWindow();
+                stage.setFullScreen(!stage.isFullScreen());
+                if(currentMaze != null){
+                    double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
+                    double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
+                    double cellSize = Math.min(cellWidth, cellHeight);
+                    gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
+                    redrawMaze();
+                }
+            }
+        });
+    }
 }
-
-
 
 
 
