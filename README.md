@@ -87,15 +87,24 @@ Notre groupe est le groupe 15 et est constitué d'Orianne Courtade, Alban Souppp
 
 ## Compiler
 
+Aller dans le dossier du projet puis ouvrir le terminal
+```
+ javac --module-path src\lib\javafx-sdk-21.0.7\lib --add-modules javafx.controls,javafx.fxml -d out src\main\java\com\example\nouveau\*.java
+```
+
+```
+ xcopy src\main\resources\* out\ /E /Y
+```
 
 ## Prérequis
 
-IntelliJ : clic droit sur lib/sqlite-jdbc-3.43.2.0.jar > Add as Library  
-VS Code : ajoute au classpath
+Avoir le JDK21 au minimum
 
 ## Lancement
 
-
+```
+ java --module-path src\lib\javafx-sdk-21.0.7\lib --add-modules javafx.controls,javafx.fxml -cp out com.example.nouveau.HelloApplication
+```
 
 # CY_Tech
 ![CYTECH](CY_Tech_logo.jpg)
