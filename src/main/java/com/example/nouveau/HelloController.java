@@ -17,7 +17,6 @@ import javafx.scene.layout.*;
 
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -57,7 +56,6 @@ public class HelloController {
     @FXML private ToggleButton toggleSwitchResolve;
     @FXML private TextField SpeedInputResolve;
     @FXML private Button SaveButton;
-    @FXML private Button ModeEdition;
     @FXML private Button editModeButton;
 
 
@@ -77,7 +75,7 @@ public class HelloController {
         SpeedInputGeneration.setManaged(false);
         SpeedInputResolve.setVisible(false);
         SpeedInputResolve.setManaged(false);
-        ModeEdition.setDisable(true);
+        editModeButton.setDisable(true);
         SaveButton.setDisable(true);
     }
 
@@ -128,7 +126,7 @@ public class HelloController {
             pathTimeline = null;
         }
         SaveButton.setDisable(true);
-        ModeEdition.setDisable(true);
+        editModeButton.setDisable(true);
 
         zoomFactor = 1.0;
         applyZoom();
@@ -201,7 +199,7 @@ public class HelloController {
             generationTimeline.setOnFinished(e -> {
                 MazeStackPane.getChildren().remove(progressBar);
                 SaveButton.setDisable(false);
-                ModeEdition.setDisable(false);
+                editModeButton.setDisable(false);
             });
         } else {
             while (!steps.isEmpty()) {
@@ -214,7 +212,7 @@ public class HelloController {
             }
             redrawMaze();
             SaveButton.setDisable(false);
-            ModeEdition.setDisable(false);
+            editModeButton.setDisable(false);
         }
     }
 
@@ -712,12 +710,6 @@ public class HelloController {
         System.out.println("Labyrinthe sauvegardé sous le nom : " + name);
     }
 
-
-    @FXML
-    public void ResetEvent(ActionEvent event) {
-
-    }
-
     @FXML
     public void SaveMaze() {
         String Name;
@@ -759,7 +751,6 @@ public class HelloController {
         this.db = db;
     }
 
-
     private void setControlsDisabled(boolean disabled) {
         widthInput.setDisable(disabled);
         heightInput.setDisable(disabled);
@@ -790,11 +781,13 @@ public class HelloController {
             if (event.getCode() == KeyCode.F11) {
                 Stage stage = (Stage) scene.getWindow();
                 stage.setFullScreen(!stage.isFullScreen());
-                double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
-                double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
-                double cellSize = Math.min(cellWidth, cellHeight);
-                gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
-                redrawMaze();
+                if(currentMaze != null){
+                    double cellWidth = mainPane.getWidth() / currentMaze.getWidth();
+                    double cellHeight = mainPane.getHeight() / currentMaze.getHeight();
+                    double cellSize = Math.min(cellWidth, cellHeight);
+                    gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
+                    redrawMaze();
+                }
             }
         });
     }
