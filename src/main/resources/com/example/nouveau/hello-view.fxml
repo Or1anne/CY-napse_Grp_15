@@ -278,6 +278,9 @@
          <Label fx:id="mazeSizeLabel" text="Taille : -" />
          <Label fx:id="mazeSeedLabel" text="Seed : -" />
          <Label fx:id="mazePerfectLabel" text="Parfait : -" />
+         <Label fx:id="time" text="Temps de résolution : -" />
+         <Label fx:id="NbCaseExplore" text="Nombre de cases parcourues : -" />
+         <Label fx:id="NbCaseFinal" text="Nombre de cases du chemin final : -" />
       </VBox>
    </left>
    <stylesheets>
