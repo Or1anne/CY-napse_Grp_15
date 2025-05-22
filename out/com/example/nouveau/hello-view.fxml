@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nouveau.HelloController">
+   <bottom>
+      <HBox prefHeight="28.0" prefWidth="709.0" style="-fx-background-color: #7b939c;" BorderPane.alignment="CENTER">
+         <TextField fx:id="heightInput" alignment="CENTER" prefHeight="20.0" prefWidth="70.0" promptText="Hauteur" styleClass="input">
+            <HBox.margin>
+               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </HBox.margin>
+            <font>
+               <Font size="10.0" />
+            </font>
+         </TextField>
+         <TextField fx:id="widthInput" alignment="CENTER" prefHeight="20.0" prefWidth="70.0" promptText="Largueur" styleClass="input">
+            <HBox.margin>
+               <Insets bottom="5.0" right="5.0" top="5.0" />
+            </HBox.margin>
+            <font>
+               <Font size="10.0" />
+            </font>
+         </TextField>
+         <TextField fx:id="seedInput" alignment="CENTER" prefHeight="20.0" prefWidth="138.0" promptText="Graine de Génération" styleClass="input">
+            <HBox.margin>
+               <Insets bottom="5.0" top="5.0" />
+            </HBox.margin>
+            <font>
+               <Font size="10.0" />
+            </font>
+         </TextField>
+         <Button id="generateLab" mnemonicParsing="false" onAction="#GenerateMaze" prefHeight="20.0" prefWidth="120.0" text="Générer un labyrinthe">
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0" />
+            </HBox.margin>
+            <font>
+               <Font size="10.0" />
+            </font>
+         </Button>
+         <Button id="generateLab" mnemonicParsing="false" onAction="#ChooseMaze" prefHeight="21.0" prefWidth="82.0" text="Résoudre">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0" />
+            </HBox.margin>
+         </Button>
+         <Button id="generateLab" fx:id="resetButton" mnemonicParsing="false" onAction="#resetMaze" prefHeight="20.0" prefWidth="82.0" text="Reset">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0" />
+            </HBox.margin>
+         </Button>
+         <Button id="generateLab" fx:id="resetZoom" mnemonicParsing="false" onAction="#resetZoom" prefHeight="20.0" prefWidth="82.0" text="Reset Zoom">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0" />
+            </HBox.margin>
+         </Button>
+      </HBox>
+   </bottom>
+   <right>
+      <VBox prefHeight="349.0" prefWidth="122.0" style="-fx-background-color: #7b939c;" BorderPane.alignment="CENTER">
+         <Label text="Type de labyrinthe" textAlignment="CENTER" underline="true" wrapText="true">
+            <VBox.margin>
+               <Insets bottom="10.0" left="16.0" top="10.0" />
+            </VBox.margin>
+            <font>
+               <Font name="System Bold" size="10.0" />
+            </font>
+         </Label>
+         <RadioButton mnemonicParsing="false" selected="true" styleClass="Text" text="Parfait" textAlignment="CENTER">
+            <font>
+               <Font size="8.0" />
+            </font>
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </VBox.margin>
+            <toggleGroup>
+               <ToggleGroup fx:id="MethodGeneration" />
+            </toggleGroup>
+         </RadioButton>
+         <RadioButton mnemonicParsing="false" prefHeight="20.0" prefWidth="85.0" styleClass="Text" text=" Imparfait" textAlignment="CENTER" toggleGroup="$MethodGeneration">
+            <font>
+               <Font size="8.0" />
+            </font>
+            <VBox.margin>
+               <Insets left="10.0" right="10.0" />
+            </VBox.margin>
+         </RadioButton>
+         <Label alignment="CENTER" text="Génération pas à pas" textAlignment="CENTER" underline="true" wrapText="true">
+            <font>
+               <Font name="System Bold" size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets left="12.0" top="10.0" />
+            </VBox.margin>
+         </Label>
+         <ToggleButton id="generateLab" fx:id="toggleSwitch" mnemonicParsing="false" onAction="#handleToggle" prefHeight="16.0" prefWidth="85.0" text="Activer">
+            <VBox.margin>
+               <Insets bottom="5.0" left="18.0" top="10.0" />
+            </VBox.margin>
+            <font>
+               <Font size="10.0" />
+            </font>
+         </ToggleButton>
+         <TextField fx:id="SpeedInputGeneration" alignment="CENTER" prefHeight="23.0" prefWidth="86.0" promptText="Vitesse de génération" styleClass="input">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets left="5.0" right="5.0" top="5.0" />
+            </VBox.margin>
+         </TextField>
+         <Label text="Méthode de résolution" textAlignment="CENTER" underline="true" wrapText="true">
+            <font>
+               <Font name="System Bold" size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets bottom="10.0" left="7.0" top="10.0" />
+            </VBox.margin>
+         </Label>
+         <RadioButton mnemonicParsing="false" selected="true" text="Tremaux" textAlignment="CENTER">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </VBox.margin>
+            <toggleGroup>
+               <ToggleGroup fx:id="MethodSolve" />
+            </toggleGroup>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
+         </RadioButton>
+         <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="99.0" text="Hand on Wall" textAlignment="CENTER" toggleGroup="$MethodSolve">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </VBox.margin>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
+         </RadioButton>
+         <RadioButton mnemonicParsing="false" text="BFS" textAlignment="CENTER" toggleGroup="$MethodSolve">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets left="10.0" right="10.0" />
+            </VBox.margin>
+            <styleClass>
+               <String fx:value="radio" />
+               <String fx:value="Text" />
+            </styleClass>
+         </RadioButton>
+
+         <!-- <Button id="generateLab" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleEditMode" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER"> -->
+
+         <Label alignment="CENTER" text="Résolution pas à pas" textAlignment="CENTER" underline="true" wrapText="true">
+            <font>
+               <Font name="System Bold" size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets left="12.0" top="10.0" />
+            </VBox.margin>
+         </Label>
+         <ToggleButton id="generateLab" fx:id="toggleSwitchResolve" mnemonicParsing="false" onAction="#handleToggleResolve" prefHeight="16.0" prefWidth="85.0" text="Activer">
+<!-- origin/main-->
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets bottom="8.0" left="18.0" top="10.0" />
+            </VBox.margin>
+         </ToggleButton>
+         <TextField fx:id="SpeedInputResolve" alignment="CENTER" prefHeight="23.0" prefWidth="86.0" promptText="Vitesse de résolution" styleClass="input">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets left="5.0" right="5.0" top="5.0" />
+            </VBox.margin>
+         </TextField>
+         <Separator prefWidth="200.0">
+            <VBox.margin>
+               <Insets top="10.0" />
+            </VBox.margin>
+         </Separator>
+         <Button id="generateLab" fx:id="editModeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleEditMode" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </VBox.margin>
+         </Button>
+         <Separator prefWidth="200.0">
+            <VBox.margin>
+               <Insets bottom="10.0" />
+            </VBox.margin>
+         </Separator>
+         <TextField fx:id="MazeName" alignment="CENTER" prefHeight="10.0" prefWidth="44.0" styleClass="input">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets left="5.0" right="5.0" />
+            </VBox.margin>
+         </TextField>
+         <Button id="generateLab" fx:id="SaveButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#SaveMaze" prefHeight="20.0" prefWidth="100.0" text="Sauvegarder" textAlignment="CENTER">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </VBox.margin>
+         </Button>
+      </VBox>
+   </right>
+   <center>
+      <ScrollPane id="scroll" fx:id="mainPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" onMousePressed="#MousePressed" pannable="true" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+         <StackPane fx:id="MazeStackPane">
+            <Group>
+               <children>
+                  <GridPane id="stack" fx:id="gridPane" alignment="CENTER" onScroll="#MazeZoom">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </GridPane>
+               </children>
+            </Group>
+         </StackPane>
+      </ScrollPane>
+   </center>
+   <top>
+      <ToolBar prefHeight="18.0" prefWidth="600.0" style="-fx-background-color: #285157;" BorderPane.alignment="CENTER">
+         <items>
+            <Label onMouseClicked="#ReturnHomepage" styleClass="Button" text="Retour" />
+         </items>
+      </ToolBar>
+   </top>
+   <stylesheets>
+      <URL value="@main.css" />
+      <URL value="@Homepage.css" />
+   </stylesheets>
+</BorderPane>
