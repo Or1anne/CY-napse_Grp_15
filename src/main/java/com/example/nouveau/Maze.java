@@ -149,4 +149,5 @@ public class Maze {
     public Case[][] getMaze(){
         return maze;
     }
+    public Case getCase(int x, int y){ return maze[x][y];}
 }
