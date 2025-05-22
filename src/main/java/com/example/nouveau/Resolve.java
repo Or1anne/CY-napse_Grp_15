@@ -48,6 +48,7 @@ public class Resolve {
 
 
         if (x == height - 1 && y == width - 1){
+            System.out.println("Nb Case visité:" + nbCase);
             return true;
         }
 
@@ -98,20 +99,24 @@ public class Resolve {
             if (canMove(x, y, left)) {
                 dir = left;
                 int[] newPos = move(x, y, dir);
+                System.out.println(Arrays.toString(newPos)); // Debug
                 x = newPos[0];
                 y = newPos[1];
             } else if (canMove(x, y, dir)) {
                 int[] newPos = move(x, y, dir);
+                System.out.println(Arrays.toString(newPos)); // Debug
                 x = newPos[0];
                 y = newPos[1];
             } else if (canMove(x, y, dir.turnRight())) {
                 dir = dir.turnRight();
                 int[] newPos = move(x, y, dir);
+                System.out.println(Arrays.toString(newPos)); // Debug
                 x = newPos[0];
                 y = newPos[1];
             } else {
                 dir = dir.opposite();
-                int[] newPos = move(x, y, dir);// Debug
+                int[] newPos = move(x, y, dir);
+                System.out.println(Arrays.toString(newPos)); // Debug
                 x = newPos[0];
                 y = newPos[1];
             }
@@ -229,31 +234,3 @@ public class Resolve {
 
     public void setDuration(long duration) { this.duration = duration; }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

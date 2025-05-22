@@ -18,10 +18,6 @@ import javafx.scene.layout.*;
 
 
 import javafx.scene.image.Image;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
 
 import java.io.IOException;
 import java.util.*;
@@ -62,6 +58,9 @@ public class HelloController {
     @FXML private Label mazeSizeLabel;
     @FXML private Label mazeSeedLabel;
     @FXML private Label mazePerfectLabel;
+    @FXML private Label time;
+    @FXML private Label NbCaseExplore;
+    @FXML private Label NbCaseFinal;
 
 
 
@@ -140,15 +139,22 @@ public class HelloController {
         int width, height, seed;
         try {
             width = Integer.parseInt(widthInput.getText());
-            height = Integer.parseInt(heightInput.getText());
-
             // Limites de génération 100 * 100
-            if (width < 1 || height < 1 || width > 100 || height > 100) {
+            if (width < 1 || width > 100) {
                 showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
                 return;
             }
         } catch (NumberFormatException e) {
             width = 20;
+        }
+        try {
+            height = Integer.parseInt(heightInput.getText());
+            // Limites de génération 100 * 100
+            if (height < 1 || height > 100) {
+                showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
+                return;
+            }
+        } catch (NumberFormatException e) {
             height = 20;
         }
 
@@ -229,6 +235,9 @@ public class HelloController {
         mazeSizeLabel.setText("Taille : " + height + " x " + width);
         mazeSeedLabel.setText("Seed : " + seed);
         mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
+        time.setText("Temps de résolution :");
+        NbCaseExplore.setText("Nombre de cases parcourues :");
+        NbCaseFinal.setText("Nombre de cases du chemin final :");
     }
 
     @FXML
@@ -529,6 +538,12 @@ public class HelloController {
             default:
                 return;
         }
+
+        long duration = solver.getDuration();
+        time.setText("Temps de résolution : " + duration + " ms");
+        NbCaseExplore.setText("Nombre de cases parcourues : " + solver.getNbCase());
+        NbCaseFinal.setText("Nombre de cases du chemin final : " + path.size());
+
         if (path == null || path.isEmpty()) {
             showError("Labyrinthe insoluble", "Aucun chemin n’a été trouvé.\nVérifie que l’entrée et la sortie sont accessibles.");
             return;
