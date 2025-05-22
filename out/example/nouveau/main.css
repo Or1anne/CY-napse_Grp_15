@@ -1,0 +1,56 @@
+#generateLab{
+    -fx-background-color: #285157;
+    -fx-font-weight: bold;
+    -fx-text-fill: lightgray;
+}
+#scroll .viewport{
+    -fx-background-color: #7b939c; 
+    -fx-border-color: #7b939c;
+}
+
+#stack{
+    -fx-background-color: #7b939c; 
+}
+
+.input{
+    -fx-background-color: #7b939c; 
+    -fx-border-color: #285157;
+    -fx-border-radius: 5px;
+    -fx-prompt-text-fill: lightgray;
+    -fx-text-fill: white;
+}
+
+#title{
+    -fx-text-fill: #285157;
+    -fx-font-weight: bold;
+}
+
+.cell {
+    position: relative; /* conteneur principal */
+    width: 50px;
+    height: 50px;
+}
+
+.border-horizontal {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 10px; /* épaisseur mur horizontal */
+    border-style: solid;
+    border-width: 10px 0 10px 0;
+    border-image-source: url('/com/example/nouveau/wall_horizontal.png');
+    border-image-slice: 10;
+    border-image-repeat: stretch;
+}
+
+.border-vertical {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 10px; /* épaisseur mur vertical */
+    border-style: solid;
+    border-width: 0 10px 0 10px;
+    border-image-source: url('/com/example/nouveau/wall_vertical.png');
+    border-image-slice: 10;
+    border-image-repeat: stretch;
+}
+
+
