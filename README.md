@@ -88,7 +88,8 @@ Notre groupe est le groupe 15 et est constitué de :
 
 Lien d'installation de JavaFX SDK : https://gluonhq.com/products/javafx/
 
-Si vous n'avez pas de JDK, pour ubuntu :
+#### Pour ubuntu :
+Si vous n'avez pas de JDK :
 ```
 sudo apt update
 ```
@@ -96,24 +97,26 @@ sudo apt update
 sudo apt install openjdk-21-jdk
 ```
 
-Pour Windows :
+#### Pour Windows :
 
 Lien d'installation du JDK : https://www.oracle.com/fr/java/technologies/downloads/#jdk21-linux
 
 Après avoir lancé l'exécutable, aller dans Paramètres/Paramètres de Système avancé/Variables d'environnements/Double clic sur Path et ajouter le dossier bin jdk (Généralement il se trouve dans Programmes/Java/jdk-21/bin)
 
 
-Si vous utilisez **IntelliJ IDEA**, ajoutez manuellement la bibliothèque `sqlite-jdbc` :
+#### Si vous utilisez IntelliJ IDEA :
+Ajoutez manuellement la bibliothèque `sqlite-jdbc` :
   * Naviguez jusqu'à `src/lib/jdk21.../lib`
   * Faites un clic droit sur le fichier `sqlite connectivity` puis sélectionnez `Add as Library`
 
 ## Compilation
 
-#### Si vous utilisez le ternimal 
+#### Si vous utilisez le ternimal :
 
 PATH est le chemin absolu du dossier lib se situant dans votre SDK
 
-Pour compiler sur windows ouvrez un exécute de commande (PowerShell par exemple) dans le répertoire du projet et exécutez ces commande :
+#### Si vous utilisez windows :
+Pour compiler ouvrez un exécute de commande (PowerShell par exemple) dans le répertoire du projet et exécutez ces commande :
 ```bash
 javac --module-path "PATH" --add-modules javafx.controls,javafx.fxml -cp "src\lib\sqlite-jdbc-3.49.1.0.jar" -d out src\main\java\com\example\nouveau\*.java
 ```
@@ -121,12 +124,13 @@ javac --module-path "PATH" --add-modules javafx.controls,javafx.fxml -cp "src\li
 xcopy src\main\resources\* out\ /E /Y
 ```
 
-Pour lancer l'application (Windows):
+Pour lancer l'application :
 ```bash
 java --module-path "PATH" --add-modules javafx.controls,javafx.fxml -cp "out;src\lib\sqlite-jdbc-3.49.1.0.jar" com.example.nouveau.Main
 ```
 
-Pour compiler sur Ubuntu :
+#### Si vous utilisez Ubuntu :
+Pour compiler :
 ```bash
 javac --module-path PATH:src/lib/sqlite-jdbc-3.49.1.0.jar --add-modules javafx.controls,javafx.fxml -d out src/main/java/com/example/nouveau/*.java
 ```
@@ -134,7 +138,7 @@ javac --module-path PATH:src/lib/sqlite-jdbc-3.49.1.0.jar --add-modules javafx.c
 cp -r src/main/resources/* out/
 ```
 
-Pour lancer l'application (Ubuntu) :
+Pour lancer l'application :
 ```bash
 java --module-path PATH:src/lib/sqlite-jdbc-3.49.1.0.jar --add-modules javafx.controls,javafx.fxml -cp out com.example.nouveau.Main
 ```
