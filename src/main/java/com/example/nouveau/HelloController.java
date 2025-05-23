@@ -71,17 +71,17 @@ public class HelloController {
 
 
     /**
-     * Initialise le contrôleur après le chargement du fichier FXML.
+     * Initilise the controller after the FXML file has been loaded.
      * <p>
-     * Cette méthode configure le mode plein écran pour la scène principale,
-     * et initialise la visibilité ainsi que l'état des contrôles liés à la vitesse
-     * et aux boutons d'édition et de sauvegarde.
+     * This method sets the full screen mode for the main scene,
+     * and initializes the visibility and state of the controls linked with the speed
+     * and the edit and save buttons.
      * </p>
      * <ul>
-     *   <li>Si la scène est déjà disponible, elle applique directement le plein écran.</li>
-     *   <li>Sinon, elle ajoute un écouteur pour appliquer le plein écran dès que la scène est disponible.</li>
-     *   <li>Cache et désactive les contrôles liés à la vitesse de génération et de résolution.</li>
-     *   <li>Désactive les boutons "mode édition" et "sauvegarder".</li>
+     *  <li>If the scene is already available, it applies full screen directly.</li>
+     *  <li>Otherwise, it adds a listener to apply full screen as soon as the scene is available.</li>
+     *  <li>Hides and disables the controls related to the generation and resolution speed.</li>
+     *  <li>Disables the "edit mode" and "save" buttons.</li>
      * </ul>
      */
     @FXML
@@ -108,13 +108,13 @@ public class HelloController {
     }
 
     /**
-     * Gère l'état du bouton bascule (toggleSwitch).
+     * Manages the state of the toggle button (toggleSwitch).
      * <p>
-     * Lorsqu'il est activé (sélectionné), le texte du bouton change en "Désactiver" et
-     * le champ SpeedInputGeneration devient visible et géré dans la mise en page.
+     * When activated (selected), the button text changes to "Désactiver" and
+     * the SpeedInputGeneration field becomes visible and managed in the layout.
      * <p>
-     * Lorsqu'il est désactivé (non sélectionné), le texte revient à "Activer",
-     * le champ SpeedInputGeneration est caché et non géré, et son contenu est vidé.
+     * When deactivated (not selected), the text returns to "Activer",
+     * the SpeedInputGeneration field is hidden and not managed, and its content is cleared.
      */
     @FXML
     private void handleToggle() {
@@ -131,9 +131,10 @@ public class HelloController {
     }
 
     /**
-     * Gère l'état du bouton bascule (toggleSwitch).
+     * Manages the state of the toggle button (toggleSwitchResolve).
      * <p>
-     *  Gère l'inverse de la fonction {@code handleToggle}.
+     *  Manages the inverse of the {@code handleToggle} function.
+     * </p>
      */
     @FXML
     private void handleToggleResolve() {
@@ -150,46 +151,55 @@ public class HelloController {
     }
 
     /**
-     * Génère un nouveau labyrinthe en fonction des paramètres saisis par l'utilisateur.
+     * Generate a new maze based on user input.
      * <p>
-     * Le type de labyrinthe (parfait ou imparfait) est déterminé par la sélection radio.
-     * Les dimensions du labyrinthe, ainsi que la seed aléatoire, sont saisies par l'utilisateur.
-     * Des vérifications sont effectuées pour s'assurer de la validité des entrées.
+     * The type of maze (perfect or imperfect) is determined by the selected radio button.
+     * The maze dimensions and random seed are provided by the user.
+     * Validations are performed to ensure the inputs are valid.
      * <p>
-     * En cas d'erreur (dimensions invalides ou vitesse hors limites), un message est affiché.
+     * In case of an error (invalid dimensions or out-of-bounds speed), an error message is displayed.
      * <p>
-     * Une fois le labyrinthe généré, les cellules sont affichées dans une `GridPane`.
-     * Si l'animation est activée, une `ProgressBar` suit l'avancement de la génération.
-     * À la fin de la génération, l'entrée et la sortie du labyrinthe sont initialisées.
+     * Once the maze is generated, the cells are displayed in a `GridPane`.
+     * If animation is enabled, a `ProgressBar` tracks the progress of the generation.
+     * At the end of the generation, the maze's entry and exit are initialized.
      * <p>
-     * Désactive les boutons d'édition et de sauvegarde pendant la génération.
+     * Disables the edit and save buttons during generation.
      */
     @FXML
     public void GenerateMaze() {
+        // If the user is in edit mode, we can't generate a new maze
         if (editMode) {
             showError("Mode édition", "La résolution est désactivée en mode édition.");
             return;
         }
-        if (generationTimeline != null) {
+        // If an generation animation is already running, we stop it
+        if (generationTimeline != null) { 
             generationTimeline.stop();
             generationTimeline = null;
         }
+        // If a progress bar is already displayed, we remove it
         if (progressBar != null) {
-            MazeStackPane.getChildren().remove(progressBar);
+            MazeStackPane.getChildren().remove(progressBar); 
             progressBar = null;
         }
+        // If a path animation is already running, we stop it
         if (pathTimeline != null) {
             pathTimeline.stop();
             pathTimeline = null;
         }
+        // Disable the edit and save buttons when generating a new maze
         SaveButton.setDisable(true);
         // ModeEdition.setDisable(true);
         editModeButton.setDisable(true);
-
+        
+        // Reset the zoom factor and clear the grid
         zoomFactor = 1.0;
         applyZoom();
         gridPane.getChildren().clear();
+
         int width, height, seed;
+        // It will read the values from the text fields
+        // If the text field is empty or invalid, it will set the default value to 20
         try {
             width = Integer.parseInt(widthInput.getText());
             // Limites de génération 100 * 100
@@ -200,6 +210,7 @@ public class HelloController {
         } catch (NumberFormatException e) {
             width = 20;
         }
+        // Same for height
         try {
             height = Integer.parseInt(heightInput.getText());
             // Limites de génération 100 * 100
@@ -211,6 +222,7 @@ public class HelloController {
             height = 20;
         }
 
+        // Get the seed from the text field, if empty or invalid, it will set a random seed
         try {
             seed = Integer.parseInt(seedInput.getText());
         } catch (NumberFormatException e) {
@@ -219,12 +231,13 @@ public class HelloController {
 
         LinkedList<int[]> steps;
         currentMaze = new Maze(width, height);
-        RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
+        RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle(); // Get the selected generation method (perfect or imperfect)
         if (SelectMethod.getText().equals("Parfait")) {
             steps = currentMaze.KruskalGeneration(seed);
         } else {
             steps = currentMaze.KruskalImperfectGeneration(seed);
         }
+        
         double cellWidth = mainPane.getWidth() / width;
         double cellHeight = mainPane.getHeight() / height;
         double cellSize = Math.min(cellWidth, cellHeight);
@@ -238,19 +251,24 @@ public class HelloController {
                 gridPane.add(pane, j, i);
             }
         }
-        if (toggleSwitch.isSelected()) {
+        if (toggleSwitch.isSelected()) { // If the toggle switch is selected, we animate the generation
+            // Create a progress bar to show the generation progress
             progressBar = new ProgressBar(0);
             progressBar.setMaxWidth(width * cellSize / 2);
             progressBar.prefHeight(50);
             MazeStackPane.getChildren().add(progressBar);
+            // Get the speed from the text field, if empty or invalid, it will show an error message
             double totalSteps = steps.size();
             int speed = (SpeedInputGeneration.getText() == null || SpeedInputGeneration.getText().isEmpty()) ? 30 : Integer.parseInt(SpeedInputGeneration.getText());
             if (speed < 10 || speed > 501) {
                 showError("Vitesse invalide", "La vitesse doit être entre 10 et 500");
                 return;
             }
-            generationTimeline = new Timeline();
+            generationTimeline = new Timeline(); // Create a timeline to animate the generation
             KeyFrame keyFrame = new KeyFrame(Duration.millis(speed), event -> {
+                // For each step, we remove the wall between the two cells
+                //modify the maze and redraw it
+                // and update the progress bar
                 if (!steps.isEmpty()) {
                     int[] wall = steps.poll();
                     if (SelectMethod.getText().equals("Parfait")) {
@@ -262,6 +280,8 @@ public class HelloController {
                     progressBar.setProgress(1 - ((double) steps.size() / totalSteps));
                 }
             });
+            // Start the animation
+            // When the animation is finished, we remove the progress bar and enable the edit and save buttons
             generationTimeline.getKeyFrames().add(keyFrame);
             generationTimeline.setCycleCount(steps.size());
             generationTimeline.play();
@@ -273,7 +293,7 @@ public class HelloController {
 
 
             });
-        } else {
+        } else { // Generate the maze without animation
             while (!steps.isEmpty()) {
                 int[] wall = steps.poll();
                 if (SelectMethod.getText().equals("Parfait")) {
@@ -289,8 +309,9 @@ public class HelloController {
 
 
         }
-        isPerfect = currentMaze.isPerfect();
+        isPerfect = currentMaze.isPerfect(); // Check if the maze is perfect
 
+        // Update the labels with the maze information
         mazeSizeLabel.setText("Taille : " + height + " x " + width);
         mazeSeedLabel.setText("Seed : " + seed);
         mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
@@ -300,25 +321,25 @@ public class HelloController {
     }
 
     /**
-     * Réinitialise l'état actuel du labyrinthe et de l'interface graphique.
+     * Resets the actual state of the maze and the graphical interface.
      * <p>
-     *  Cette méthode est utilisée pour annuler une génération ou une résolution en cours
-     *  et nettoyer l'interface avant de lancer une nouvelle opération.
-     *  <p>
-     *  Cette méthode laisse l'interface prête à accueillir une nouvelle génération.
+     * This method is used to cancel an ongoing generation or resolution
+     * and clean the interface before starting a new operation.
+     * <p>
+     * This method leaves the interface ready to host a new generation.
      */
     @FXML
     public void resetMaze() {
         if (currentMaze == null) {
             return;
         }
-        // on stoppe l'animation du serpent
+        // stop the path animation
         if (pathTimeline != null) {
             pathTimeline.stop();
             pathTimeline = null;
         }
 
-        // stop la génération (surtout pour le pas à pas)
+        // stop the generation (especially for the Pas-à-Pas)
         if (generationTimeline != null) {
             generationTimeline.stop();
             generationTimeline = null;
@@ -326,7 +347,7 @@ public class HelloController {
             gridPane.getChildren().clear();
         }
 
-        // supprime la bar de chargement
+        // delete the progress bar if it exists
         if (progressBar != null) {
             MazeStackPane.getChildren().remove(progressBar);
             progressBar = null;
@@ -342,13 +363,14 @@ public class HelloController {
         redrawMaze();
     }
 
-    /** Permet de remettre le zoom à 0 */
+    // Allows us to reset the zoom factor to 1.0
     @FXML
     public void resetZoom() {
         zoomFactor = 1.0;
         applyZoom();
     }
 
+    // Method to toggle in and out of the edit mode
     @FXML
     private void toggleEditMode() {
         
@@ -358,7 +380,7 @@ public class HelloController {
             editModeButton.setText("Mode édition : ON");
             setControlsDisabled(true);
 
-            // Arrête l'animation en cours si elle existe
+            // Stop the ongoing generation if it exists
             if (pathTimeline != null) {
                 pathTimeline.stop();
                 pathTimeline = null;
@@ -369,6 +391,7 @@ public class HelloController {
             setControlsDisabled(false);
             validateMaze();
             
+            // Update the labels with the maze information if the maze has been edited
             mazeSizeLabel.setText("Taille : " + currentMaze.getHeight() + " x " + currentMaze.getWidth());
             mazeSeedLabel.setText("Seed : Labyrinthe personnalisé");
             mazePerfectLabel.setText("Parfait : " + (currentMaze.isPerfect() ? "Oui" : "Non"));
@@ -380,23 +403,23 @@ public class HelloController {
 
 
     /**
-     * Active ou désactive le mode édition du labyrinthe.
+     * Activate or deactivate the edit mode of the maze.
      * <p>
-     * En mode édition, l'utilisateur peut être modifer manuellement les cases du labyrinthe.
-     * Cette méthode met à jour l'état du bouton d'édition, désactive certains contrôles
-     * de l'interface utilisateur, et interrompt toute animation de résolution en cours.
+     * In edit mode, the user can manually modify the maze cells.
+     * This method updates the state of the edit button, disables some controls
+     * of the user interface, and interrupts any ongoing resolution animation.
      * <p>
-     * Si le mode édition est désactivé, les contrôles sont réactivés et une validation du
-     * labyrinthe est affectuée via {@code validateMaze()}.
+     * If the edit mode is deactivated, the controls are reactivated and a validation of the
+     * maze is performed via {@code validateMaze()}.
      */
     @FXML
     private void toggleEntryExitSelection() {
         if (selectingEntryExit) {
-            // Annuler sélection
+            // Cancel the selection
             selectingEntryExit = false;
             selectionStep = 0;
             selectEntryExitButton.setText("Choisir Entrée/Sortie");
-            setAllControlsDisabled(false); // Réactive tous les contrôles
+            setAllControlsDisabled(false); // Reactivate all controls
         } else {
             selectingEntryExit = true;
             selectionStep = 1;
@@ -406,10 +429,10 @@ public class HelloController {
             if (pathTimeline != null) pathTimeline.stop();
             if (generationTimeline != null) generationTimeline.stop();
 
-            // Désactiver controles
+            // Desactivate all controles
             setControlsDisabled(true);
 
-            // Réinitialiser anciennes entrées/sorties
+            // Reset old entry/exit cells
             resetEntryExit();
         }
         redrawMaze();
@@ -417,22 +440,22 @@ public class HelloController {
 
 
     /**
-     * Réinitialise les cellules d'entrée et de sortie du labyrinthe.
+     * Resets the entry and exit cells of the maze.
      * <p>
-     * Cette méthode annule les sélections actuelles d'entrée et de sortie, restaure
-     * leurs murs d'origine.
+     * This method cancels the current entry and exit selections, restoring
+     * their original walls.
      * <p>
      */
     private void resetEntryExit() {
-        // Sauvegarde des anciennes cellules
+        // Save oldEntry and oldExit cells
         Case oldEntry = entryCell;
         Case oldExit = exitCell;
 
-        // Réinitialisation des références
+        // Resets all references
         entryCell = null;
         exitCell = null;
 
-        // Restauration des murs et rafraîchissement visuel
+        // Restauration of the walls and visual refresh
         if (oldEntry != null) {
             restoreBorderWall(oldEntry);
             refreshCell(oldEntry);
@@ -445,12 +468,12 @@ public class HelloController {
     }
 
     /**
-     * Rafraîchit l'affichage visuel d'une cellule spécifique dans la grille du labyrinthe.
+     * Refreshes the visual representation of a specific cell in the maze grid.
      * <p>
-     * Cette méthode supprime l'ancien panneau correspondant à la cellule dans le `gridPane`,
-     * puis en recrée un nouveau avec les propriétés actuelles de la cellule (murs, couleurs, etc.).
-     *
-     * @param cell La cellule {@link Case} à mettre à jour visuellement.
+     * This method removes the old pane corresponding to the cell in the `gridPane`,
+     * then recreates a new one with the current properties of the cell (walls, colors, etc.).
+     * 
+     * @param cell The {@link Case} cell to visually update.
      */
     private void refreshCell(Case cell) {
         Pane pane = getPaneFromGrid(cell.getY(), cell.getX());
@@ -464,24 +487,25 @@ public class HelloController {
 
 
     /**
-     * Gère la sélection d'une cellule pour définir l'entrée ou la sortie du labyrinthe.
+     * Handles the selection of a cell to define the entry or exit of the maze.
      * <p>
-     * Cette méthode est utilisée lors du mode de sélection d'entrée/sortie activé par l'utilisateur.
-     * Elle vérifie que la cellule sélectionnée se trouve sur les bords du labyrinthe, et distingue
-     * si la cellule doit devenir l'entrée ou la sortie en fonction de l'état de progression.
-     *
-     * @param cell La cellule sélectionnée par l'utilisateur.
+     * This method is used when the entry/exit selection mode is activated by the user.
+     * It checks that the selected cell is on the edges of the maze, and distinguishes
+     * whether the cell should become the entry or exit based on the progress state.
+     * 
+     * @param cell The cell selected by the user.
      */
     private void handleCellSelectionForEntryExit(Case cell) {
         if (!selectingEntryExit) return;
 
         if (!isBorderCell(cell)) {
+            // If the cell is not on the border, show an error message
             showError("Sélection invalide", "L'entrée et la sortie doivent être sur les bords du labyrinthe.");
             return;
         }
 
         if (selectionStep == 1) {
-            // Réinitialise l'ancienne entrée si elle existe
+            // Resets the old entry if it exists
             if (entryCell != null) {
                 restoreBorderWall(entryCell);
                 refreshCell(entryCell);
@@ -500,7 +524,7 @@ public class HelloController {
                 return;
             }
 
-            // Réinitialise l'ancienne sortie si elle existe
+            // Resets the old exit if it exists
             if (exitCell != null) {
                 restoreBorderWall(exitCell);
                 refreshCell(exitCell);
@@ -518,14 +542,14 @@ public class HelloController {
     }
 
     /**
-     * Vérifie si une cellule se trouve sur la bordure du labyrinthe.
+     * Verify if the cell is on the border of the maze.
      * <p>
-     * Une cellule est considérée comme une cellule de bordure si elle est située
-     * sur la première ou la dernière ligne, ou sur la première ou la dernière colonne
-     * de la grille du labyrinthe.
-     *
-     * @param cell La cellule à vérifier.
-     * @return {@code true} si la cellule est sur un bord du labyrinthe, sinon {@code false}.
+     * A cell is considered a border cell if it is located
+     * on the first or last row, or on the first or last column
+     * of the maze grid.
+     * 
+     * @param cell The cell to check.
+     * @return {@code true} if the cell is on a maze border, otherwise {@code false}.
      */
     private boolean isBorderCell(Case cell) {
         return cell.getX() == 0 || cell.getX() == currentMaze.getHeight()-1 ||
@@ -534,9 +558,9 @@ public class HelloController {
 
 
     /**
-     * Rétablit le mur sur le bord correspondant de la cellule donnée.
-     *
-     * @param cell La cellule dont le mur de bordure doit être restauré.
+     * Restore the wall on the corresponding border of the given cell.
+     * 
+     * @param cell The cell whose border wall should be restored.
      */
     private void restoreBorderWall(Case cell) {
         if (currentMaze == null) {
@@ -549,9 +573,9 @@ public class HelloController {
     }
 
     /**
-     * Supprime le mur sur le bord correspondant de la cellule donnée.
-     *
-     * @param cell La cellule dont le mur de bordure doit être supprimé.
+     * Deletes the wall on the corresponding border of the given cell.
+     * 
+     * @param cell The cell whose border wall should be deleted.
      */
     private void removeBorderWall(Case cell) {
         if (cell.getX() == 0) cell.setNorth(false);
@@ -562,16 +586,16 @@ public class HelloController {
 
 
     /**
-     * Initialise les cellules d'entrée et de sortie du labyrinthe..
+     * Initialise the entry and exit cells of the maze.
      */
     private void initializeEntryExit() {
         if (currentMaze == null) return;
 
-        // Entrée par défaut
+        // Default entry
         entryCell = currentMaze.getMaze()[0][0];
         entryCell.setNorth(false);
 
-        // Sortie par défaut
+        // Default exit
         exitCell = currentMaze.getMaze()[currentMaze.getHeight() - 1][currentMaze.getWidth() - 1];
         exitCell.setSouth(false);
 
@@ -580,33 +604,33 @@ public class HelloController {
 
 
     /**
-     * Valide l'état actuel du labyrinthe après la fin du mode édition.
+     * Validate the current state of the maze after exiting edit mode.
      */
     private void validateMaze() {
-        // Par exemple, on pourrait sauvegarder automatiquement le labyrinthe ou juste afficher un message
+        // For example, we could automatically save the maze or just display a message
         System.out.println("Labyrinthe validé !");
-        // ou tu peux appeler ta méthode de sauvegarde, ou juste redessiner sans édition possible
+        // or you can call your save method, or just redraw without possible edition
         redrawMaze();
     }
 
 
     /**
-     * Crée un panneau graphique représentant une cellule du labyrinthe.
+     * Create a graphical pane representing a maze cell.
      * <p>
-     * Cette méthode construit visuellement la cellule en fonction de ses murs.
+     * This method builds the visual representation of the cell based on its walls.
      * <p>
-     * Elle gère aussi l'interaction utilisateur lors d'un clic :
+     * It also handles user interaction on click:
      * <ul>
-     *   <li>Si le mode sélection d'entrée/sortie est activé, elle délègue la gestion
-     *       de la sélection à {@code handleCellSelectionForEntryExit}.</li>
-     *   <li>Si le mode édition est activé, elle permet de modifier les murs intérieurs
-     *       en cliquant sur les bords de la cellule, sauf les murs extérieurs qui sont
-     *       protégés.</li>
+     *  <li>If the entry/exit selection mode is activated, it delegates the selection
+     *      to {@code handleCellSelectionForEntryExit}.</li>
+     *  <li>If the edit mode is activated, it allows modifying the inner walls
+     *      by clicking on the cell edges, except for the outer walls which are
+     *      protected.</li>
      * </ul>
-     *
-     * @param cell la cellule du labyrinthe à représenter graphiquement
-     * @param cellSize la taille (largeur et hauteur) en pixels du panneau représentant la cellule
-     * @return un objet {@code Pane} configuré graphiquement et avec les événements associés
+     * 
+     * @param cell The maze cell to represent graphically.
+     * @param cellSize The size (width and height) in pixels of the pane representing the cell.
+     * @return A {@code Pane} object configured graphically and with the associated events.
      */
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
@@ -656,7 +680,7 @@ public class HelloController {
         }*/
 
 
-        // Mur en trait
+        // Line walls
         String style = "-fx-background-color: white; -fx-border-color: black; -fx-border-width: " +
                 (cell.getNorth() ? "1 " : "0 ") +
                 (cell.getEast() ? "1 " : "0 ") +
@@ -664,16 +688,16 @@ public class HelloController {
                 (cell.getWest() ? "1" : "0") + ";";
 
 
-        // Entrée/sortie
+        // Entry/exit
         if (cell == entryCell) {
-            style += " -fx-background-color: #00ff00;"; // Vert vif pour l'entrée
+            style += " -fx-background-color: #00ff00;"; // Bright green for entry
             Label label = new Label("E");
             label.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
             label.setLayoutX(cellSize/2 - 5);
             label.setLayoutY(cellSize/2 - 10);
             pane.getChildren().add(label);
         } else if (cell == exitCell) {
-            style += " -fx-background-color: #ff0000;"; // Rouge vif pour la sortie
+            style += " -fx-background-color: #ff0000;"; // Bright red for exit
             Label label = new Label("S");
             label.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
             label.setLayoutX(cellSize/2 - 5);
@@ -698,13 +722,14 @@ public class HelloController {
 
                 double margin = cellSize * 0.2;
 
-                // Murs extérieurs : contour
-                boolean isBorderWall = (x == 0 && clickY < margin) || // Nord extérieur
-                        (x == currentMaze.getHeight() - 1 && clickY > cellSize - margin) || // Sud extérieur
-                        (y == 0 && clickX < margin) || // Ouest extérieur
-                        (y == currentMaze.getWidth() - 1 && clickX > cellSize - margin); // Est extérieur
+                // Exterior walls: outline
+                boolean isBorderWall = (x == 0 && clickY < margin) || // North exterior
+                        (x == currentMaze.getHeight() - 1 && clickY > cellSize - margin) || // South exterior
+                        (y == 0 && clickX < margin) || // West exterior
+                        (y == currentMaze.getWidth() - 1 && clickX > cellSize - margin); // East exterior
 
                 if (isBorderWall) {
+                    // Show an error message if the user tries to modify the exterior walls
                     showError("Mur extérieur", "Les murs extérieurs ne peuvent pas être modifiés");
                     return;
                 }
@@ -743,20 +768,19 @@ public class HelloController {
 
 
     /**
-     * Redessine entièrement le labyrinthe sur la grille graphique.
+     * Redraws the entire maze on the graphical grid.
      * <p>
-     * Cette méthode parcourt chaque cellule du labyrinthe {@code currentMaze} et
-     * met à jour le panneau graphique correspondant dans {@code gridPane} pour
-     * refléter l'état actuel des murs et la position des cellules d'entrée et de sortie.
+     * This method iterates through each cell of the maze {@code currentMaze} and
+     * updates the corresponding graphical pane in {@code gridPane} to
+     * reflect the current state of the walls and the positions of the entry and exit cells.
      * <p>
-     * Les murs peuvent être affichés sous forme de bordures CSS noires, et la
-     * cellule d'entrée est colorée en vert, tandis que la sortie est en rouge.
+     * Walls can be displayed as black CSS borders, and the entry cell is colored green,
+     * while the exit cell is red.
      * <p>
-     * Cette méthode permet ainsi de synchroniser l'affichage avec les données
-     * internes du labyrinthe après des modifications, comme en mode édition ou
-     * après une génération.
-     *
-     * @throws NullPointerException si {@code currentMaze} est null (évité par un test au début)
+     * This method allows the synchronization of the display with the internal data
+     * of the maze after modifications, such as in edit mode or after generation.
+     * 
+     * @throws NullPointerException if {@code currentMaze} is null (avoided by a test at the beginning)
      */
     private void redrawMaze() {
         if (currentMaze == null) return;
@@ -808,8 +832,8 @@ public class HelloController {
                     }*/
 
 
-                    // Mur en trait
-                    pane.setStyle(null); // Réinitialise le style avant de le remettre
+                    // Line walls
+                    pane.setStyle(null); // Reset the style before applying new styles
                     pane.setStyle("-fx-background-color: " +
                             (cell == entryCell ? "#00ff00" :
                                     cell == exitCell ? "#ff0000" : "white") +
