@@ -40,6 +40,7 @@ public class HomepageController {
 
     @FXML
     public void initialize() {
+        //Initialisation de la BDD
         db = new Database();
         db.createDatabase();
         db.createTable();
@@ -55,14 +56,16 @@ public class HomepageController {
             });
         }
 
+        //Lie la taille de l'image avec celle de l'AnchorPane
         BGHome.setPreserveRatio(false);
-
         BGHome.fitWidthProperty().bind(Begin.widthProperty());
         BGHome.fitHeightProperty().bind(Begin.heightProperty());
 
+        //Lie la taille de l'AnchorPane avec celle de son parent
         BorderSave.prefWidthProperty().bind(Begin.widthProperty().multiply(0.8));
         BorderSave.prefHeightProperty().bind(Begin.heightProperty().multiply(0.3));
 
+        //Adapte la taille des éléments avec celle du AnchorPane
         Begin.widthProperty().addListener((obs, oldVal, newVal) -> {
             Platform.runLater(() -> {
                 ReplaceLabel(StartButton, 0.47, 0.6, 0.045);
@@ -74,6 +77,7 @@ public class HomepageController {
             });
         });
 
+        //Réadaptation (Je sais pas pourquoi mais il faut le faire)
         ActiveReplaceLabel(StartButton, 0.47, 0.6, 0.045);
         ActiveReplaceLabel(CyNapse, 0.47, 0.2, 0.045);
         ActiveReplaceButton(NewLab, 0.30, 0.65, 0.02);
@@ -82,6 +86,7 @@ public class HomepageController {
         ActiveReplaceButton(GoBack, 0.15, 0.42, 0.02);
     }
 
+    //Méthodes pour déplacer les éléments et adapte leur taille en fonction de la taille de la page
     private void ReplaceLabel(Label label, double x, double y, double fontSizeRatio) {
         label.setStyle("-fx-font-size: " + Begin.getWidth() * fontSizeRatio + "px;");
         Platform.runLater(() -> {
@@ -140,8 +145,7 @@ public class HomepageController {
         });
     }
 
-
-
+    //Adapte la taille
     private void AdaptSize(ImageView view, Scene scene) {
         view.fitWidthProperty().bind(scene.widthProperty());
         view.fitHeightProperty().bind(scene.heightProperty());

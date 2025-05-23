@@ -144,6 +144,16 @@ public class Database {
         return labyrinth;
     }
 
+    public void DeleteMaze(String Name) {
+        try (Connection conn = connectDatabase()){
+            PreparedStatement deleteStmt = conn.prepareStatement("DELETE FROM Maze WHERE name = ?");
+            deleteStmt.setString(1, Name);
+            deleteStmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public ObservableList<String> getMazeList() {
         ObservableList<String> SavedMaze = FXCollections.observableArrayList();
         try (Connection conn = connectDatabase()) {

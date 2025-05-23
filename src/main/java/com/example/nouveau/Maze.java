@@ -18,8 +18,6 @@ public class Maze {
             }
         }
         Case.resetNumber();
-        this.maze[0][0].setWest(false);
-        this.maze[height-1][width-1].setEast(false);
     }
 
 
@@ -155,4 +153,58 @@ public class Maze {
         }
         return null;
     }
+
+
+    public boolean isPerfect() {  //Returns true if the maze is perfect
+        //Initializing variables
+        int height = this.getHeight();
+        int width = this.getWidth();
+        Case[][] maze = this.getMaze();
+
+        boolean[][] visited = new boolean[height][width]; // Create a matrice to track visited cells
+        int totalCells = height * width; // Total number of cells in the maze
+        int visitedCount = 0; // Counter of visited cells
+
+        Stack<Case> stack = new Stack<>(); // Stack for DFS
+        stack.push(maze[0][0]); // Start from the cell (0,0)
+        visited[0][0] = true; // Mark the starting cell as visited
+        visitedCount++; // Increment the visited count
+
+        Map<Case, Case> parentMap = new HashMap<>(); // Map to track parent cells
+
+        while (!stack.isEmpty()) { // While there are cells to explore
+            Case current = stack.pop(); //Get the cell on top of the stack
+            int x = current.getX();
+            int y = current.getY(); // Get the coordinates of the current cell
+
+            for (int[] dir : new int[][]{{-1,0},{1,0},{0,-1},{0,1}}) {
+                int nx = x + dir[0];
+                int ny = y + dir[1]; // Calculate the neighbor's coordinates
+
+                if (nx < 0 || ny < 0 || nx >= height || ny >= width) continue; // Check if the neighbor is out of bounds
+
+                Case neighbor = maze[nx][ny]; // Get the neighbor cell
+                // Check if there is a wall between the current cell and the neighbor
+                if ((nx == x - 1 && current.getNorth()) ||
+                    (nx == x + 1 && current.getSouth()) ||
+                    (ny == y - 1 && current.getWest()) ||
+                    (ny == y + 1 && current.getEast())) {
+                    continue;
+                }
+
+                if (!visited[nx][ny]) { // Check if the neighboring cell has not been visited yet
+                    visited[nx][ny] = true; // Mark it as visited
+                    visitedCount++; // Increment the visited count
+                    parentMap.put(neighbor, current); // Set the current cell as the parent of the neighbor
+                    stack.push(neighbor); // Add the neighbor cell onto the stack
+                } else {
+                    if (parentMap.get(current) != neighbor) { // Check if the neighbor is not the parent of the current cell
+                        return false; //Then we have found a cycle and the maze is not perfect
+                    }
+                }
+            }
+        }
+        return visitedCount == totalCells; // Return true if all cells have been visited and no cycles were found
+    }
+
 }
