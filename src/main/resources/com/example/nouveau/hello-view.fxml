@@ -63,13 +63,30 @@
                <Insets bottom="5.0" left="10.0" top="5.0" />
             </HBox.margin>
          </Button>
-         <Button id="generateLab" mnemonicParsing="false" onAction="#ResetEvent" prefHeight="21.0" prefWidth="82.0" text="Reset">
+         <Button id="generateLab" fx:id="resetButton" mnemonicParsing="false" onAction="#resetMaze" prefHeight="20.0" prefWidth="82.0" text="Reset">
             <font>
                <Font size="10.0" />
             </font>
             <HBox.margin>
-               <Insets left="10.0" top="5.0" />
+               <Insets bottom="5.0" left="10.0" top="5.0" />
             </HBox.margin>
+         </Button>
+         <Button id="generateLab" fx:id="resetZoom" mnemonicParsing="false" onAction="#resetZoom" prefHeight="20.0" prefWidth="82.0" text="Reset Zoom">
+            <font>
+               <Font size="10.0" />
+            </font>
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0" />
+            </HBox.margin>
+         </Button>
+         <Button id="generateLab" fx:id="selectEntryExitButton" alignment="CENTER" mnemonicParsing="false" onAction="#toggleEntryExitSelection" prefHeight="20.0"
+                 prefWidth="82.0" text="Choisir Entrée/Sortie">
+            <HBox.margin>
+               <Insets bottom="5.0" left="10.0" top="5.0"/>
+            </HBox.margin>
+            <font>
+               <Font size="10.0"/>
+            </font>
          </Button>
       </HBox>
    </bottom>
@@ -83,9 +100,9 @@
                <Font name="System Bold" size="10.0" />
             </font>
          </Label>
-         <RadioButton mnemonicParsing="false" selected="true" text="Parfait" textAlignment="CENTER">
+         <RadioButton mnemonicParsing="false" selected="true" styleClass="Text" text="Parfait" textAlignment="CENTER">
             <font>
-               <Font size="10.0" />
+               <Font size="8.0" />
             </font>
             <VBox.margin>
                <Insets bottom="10.0" left="10.0" right="10.0" />
@@ -93,22 +110,14 @@
             <toggleGroup>
                <ToggleGroup fx:id="MethodGeneration" />
             </toggleGroup>
-            <styleClass>
-               <String fx:value="radio" />
-               <String fx:value="Text" />
-            </styleClass>
          </RadioButton>
-         <RadioButton mnemonicParsing="false" prefHeight="20.0" prefWidth="85.0" text=" Imparfait" textAlignment="CENTER" toggleGroup="$MethodGeneration">
+         <RadioButton mnemonicParsing="false" prefHeight="20.0" prefWidth="85.0" styleClass="Text" text=" Imparfait" textAlignment="CENTER" toggleGroup="$MethodGeneration">
             <font>
-               <Font size="10.0" />
+               <Font size="8.0" />
             </font>
             <VBox.margin>
                <Insets left="10.0" right="10.0" />
             </VBox.margin>
-            <styleClass>
-               <String fx:value="radio" />
-               <String fx:value="Text" />
-            </styleClass>
          </RadioButton>
          <Label alignment="CENTER" text="Génération pas à pas" textAlignment="CENTER" underline="true" wrapText="true">
             <font>
@@ -181,6 +190,9 @@
                <String fx:value="Text" />
             </styleClass>
          </RadioButton>
+
+
+
          <Label alignment="CENTER" text="Résolution pas à pas" textAlignment="CENTER" underline="true" wrapText="true">
             <font>
                <Font name="System Bold" size="10.0" />
@@ -210,7 +222,7 @@
                <Insets top="10.0" />
             </VBox.margin>
          </Separator>
-         <Button id="generateLab" fx:id="ModeEdition" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER">
+         <Button id="generateLab" fx:id="editModeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleEditMode" prefHeight="20.0" prefWidth="100.0" text="Mode édition" textAlignment="CENTER">
             <font>
                <Font size="10.0" />
             </font>
@@ -263,6 +275,22 @@
          </items>
       </ToolBar>
    </top>
+   <left>
+      <VBox spacing="10" alignment="CENTER" style="-fx-background-color: #aabac1; -fx-padding: 10;">
+         <Label text="Infos Labyrinthe" underline="true">
+            <font>
+               <Font size="12.0" />
+            </font>
+         </Label>
+
+         <Label fx:id="mazeSizeLabel" text="Taille : -" />
+         <Label fx:id="mazeSeedLabel" text="Seed : -" />
+         <Label fx:id="mazePerfectLabel" text="Parfait : -" />
+         <Label fx:id="time" text="Temps de résolution : -" />
+         <Label fx:id="NbCaseExplore" text="Nombre de cases parcourues : -" />
+         <Label fx:id="NbCaseFinal" text="Nombre de cases du chemin final : -" />
+      </VBox>
+   </left>
    <stylesheets>
       <URL value="@main.css" />
       <URL value="@Homepage.css" />
