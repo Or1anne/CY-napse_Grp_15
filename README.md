@@ -117,8 +117,3 @@ Si vous utilisez **IntelliJ IDEA**, ajoutez manuellement la bibliothèque `sqlit
 
 # CY_Tech
 ![CYTECH](CY_Tech_logo.jpg)
-
-
-
-
-
