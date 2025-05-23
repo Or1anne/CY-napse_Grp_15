@@ -9,9 +9,10 @@ public class Resolve {
     private Case start;
     private Case end;
     private Map<Case, Case> parentMap;
+    private List<Case> visitedCases;
 
     public Resolve(Maze Labyrinthe) {
-        this(Labyrinthe, null, null); // Appelle le constructeur principal avec entry et exit null
+        this(Labyrinthe, Labyrinthe.getMaze()[0][0], Labyrinthe.getMaze()[Labyrinthe.getHeight()-1][Labyrinthe.getWidth()-1] ); // Appelle le constructeur principal avec entry et exit null
     }
 
 
@@ -50,12 +51,12 @@ public class Resolve {
 
     //Trémaux resolution
     public List<Case> Tremaux(){
+        visitedCases = new ArrayList<>();
         long startTIme = System.nanoTime();
         resetCounts();
         List<Case> path = new ArrayList<>();
         boolean found = explore(start.getX(), start.getY(), path);
         if (!found) return null;
-        path.removeIf(c ->(c.getCount()==2));
         long endTime = System.nanoTime();
         setDuration(endTime-startTIme);
         return path;
@@ -67,8 +68,9 @@ public class Resolve {
         path.add(current);
         addNbCase();
 
+        visitedCases.add(current);
 
-        if (Labyrinthe[x][y] == end){
+        if (current == end){
             System.out.println("Nb Case visité:" + nbCase);
             return true;
         }
@@ -93,8 +95,13 @@ public class Resolve {
                 }
             }
         }
+        path.removeLast();
         current.incrementCount();
         return false;
+    }
+
+    public List<Case> getVisitedCases() {
+        return visitedCases;
     }
 
 

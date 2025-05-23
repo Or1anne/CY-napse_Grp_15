@@ -366,7 +366,7 @@ public class HomepageController {
 
     private void FullScreen(Scene scene){
         scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.F11) {
+            if (event.getCode() == KeyCode.F11 || event.getCode() == KeyCode.F) {
                 Stage stage = (Stage) scene.getWindow();
                 stage.setFullScreen(!stage.isFullScreen());
                 Begin.layout();

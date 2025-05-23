@@ -3,11 +3,8 @@ package com.example.nouveau;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -23,7 +20,6 @@ import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
-import java.sql.*;
 import java.util.*;
 
 import javafx.stage.Stage;
@@ -230,7 +226,6 @@ public class HelloController {
             generationTimeline.setOnFinished(e -> {
                 MazeStackPane.getChildren().remove(progressBar);
                 SaveButton.setDisable(false);
-                //ModeEdition.setDisable(false);
                 editModeButton.setDisable(false);
                 initializeEntryExit();
 
@@ -247,7 +242,6 @@ public class HelloController {
             }
             redrawMaze();
             SaveButton.setDisable(false);
-            //ModeEdition.setDisable(false);
             editModeButton.setDisable(false);
             initializeEntryExit();
 
@@ -736,54 +730,47 @@ public class HelloController {
         }
 
         RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
-        if (SolveMethod.getText().equals("BFS") && toggleSwitchResolve.isSelected()) {
-            // Mode pas à pas spécifique pour BFS
-            List<Case> exploredCells = solver.BFS(true);
-            List<Case> finalPath = solver.getFinalPath();
+            // Mode normal pour tous les algorithmes
+            List<Case> path = null;
+            List<Case> finalPath = null;
+            switch (SolveMethod.getText()) {
+                case "Tremaux":
+                    finalPath = solver.Tremaux();
+                    path = solver.getVisitedCases();
+                    break;
+                case "BFS":
+                    path = solver.BFS(true);
+                    finalPath = solver.getFinalPath();
+                    break;
+                case "Hand on Wall":
+                    finalPath = solver.HandOnWall();
+                    break;
+            }
 
             if (finalPath == null || finalPath.isEmpty()) {
                 showError("Labyrinthe insoluble", "Aucun chemin n'a été trouvé.\nVérifie que l'entrée et la sortie sont accessibles.");
                 return;
             }
 
-            showBFSSteps(exploredCells, solver);
-
-        } else {
-            // Mode normal pour tous les algorithmes
-            List<Case> path = null;
-            switch (SolveMethod.getText()) {
-                case "Tremaux":
-                    path = solver.Tremaux();
-                    break;
-                case "BFS":
-                    path = solver.BFS();
-                    break;
-                case "Hand on Wall":
-                    path = solver.HandOnWall();
-                    break;
-            }
-
-            if (path == null || path.isEmpty()) {
-                showError("Labyrinthe insoluble", "Aucun chemin n'a été trouvé.\nVérifie que l'entrée et la sortie sont accessibles.");
-                return;
-            }
-
             if (toggleSwitchResolve.isSelected()) {
-                showPathStepByStep(path);
+                if(SolveMethod.getText().equals("Hand on Wall")) {
+                    showPathStepByStep(finalPath);
+                }else{
+                    showBFSSteps(path, finalPath);
+                }
             } else {
-                drawPath(path);
+                drawPath(finalPath);
             }
-        }
-
         // Mise à jour des statistiques
-        time.setText("Temps de résolution : " + solver.getDuration() + " ms");
+        time.setText("Temps de résolution : " + solver.getDuration()/1000.0 + " µs");
         NbCaseExplore.setText("Nombre de cases parcourues : " + solver.getNbCase());
         if (solver.getFinalPath() != null) {
-            NbCaseFinal.setText("Nombre de cases du chemin final : " + solver.getFinalPath().size());
+            NbCaseFinal.setText("Nombre de cases du chemin final : " + finalPath.size());
         }
+
     }
 
-    private void showBFSSteps(List<Case> exploredCells, Resolve solver) {
+    private void showBFSSteps(List<Case> exploredCells, List<Case> finalPath) {
         if (pathTimeline != null) {
             pathTimeline.stop();
         }
@@ -792,21 +779,20 @@ public class HelloController {
         int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty())
                 ? 100 : Integer.parseInt(SpeedInputResolve.getText());
 
-        // 1. Affiche l'exploration progressive
-        for (int i = 0; i < exploredCells.size(); i++) {
-            final int stepIndex = i;
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * speed), event -> {
-                Pane cellPane = getPaneFromGrid(exploredCells.get(stepIndex).getY(),
-                        exploredCells.get(stepIndex).getX());
-                if (cellPane != null) {
-                    cellPane.setStyle(cellPane.getStyle() + "; -fx-background-color: #ffcccc;");
-                }
-            });
-            pathTimeline.getKeyFrames().add(keyFrame);
-        }
+            // 1. Affiche l'exploration progressive
+            for (int i = 0; i < exploredCells.size(); i++) {
+                final int stepIndex = i;
+                KeyFrame keyFrame = new KeyFrame(Duration.millis(i * speed), event -> {
+                    Pane cellPane = getPaneFromGrid(exploredCells.get(stepIndex).getY(),
+                            exploredCells.get(stepIndex).getX());
+                    if (cellPane != null) {
+                        cellPane.setStyle(cellPane.getStyle() + "; -fx-background-color: #ffcccc;");
+                    }
+                });
+                pathTimeline.getKeyFrames().add(keyFrame);
+            }
 
         // 2. Récupère le chemin final
-        List<Case> finalPath = solver.getFinalPath();
         int startFinalPathTime = exploredCells.size() * speed;
 
         // 3. Affiche le chemin final progressivement
@@ -1086,6 +1072,13 @@ public class HelloController {
     public void loadMaze() {
         if(!SaveList.getItems().isEmpty() && SaveList.getValue() != null){
             ChargeMaze(SaveList.getValue());
+            isPerfect = currentMaze.isPerfect();
+            mazeSizeLabel.setText("Taille : " + currentMaze.getHeight() + " x " + currentMaze.getWidth());
+            mazeSeedLabel.setText("Seed : Labyrinthe Personnalisé");
+            mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
+            time.setText("Temps de résolution :");
+            NbCaseExplore.setText("Nombre de cases parcourues :");
+            NbCaseFinal.setText("Nombre de cases du chemin final :");
         }
         else{
             showError("Erreur de restauration", "Aucun labyrinthe à charger");
@@ -1125,6 +1118,7 @@ public class HelloController {
                 gridPane.add(pane, j, i);
             }
         }
+        editModeButton.setDisable(false);
     }
 
     private void showError(String title, String message) {
@@ -1193,7 +1187,7 @@ public class HelloController {
 
     private void FullScreen(Scene scene){
         scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.F11) {
+            if (event.getCode() == KeyCode.F11 || event.getCode() == KeyCode.F) {
                 Stage stage = (Stage) scene.getWindow();
                 stage.setFullScreen(!stage.isFullScreen());
                 if(currentMaze != null){
