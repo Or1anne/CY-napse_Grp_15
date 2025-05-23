@@ -115,7 +115,7 @@ PATH est le chemin absolu du dossier lib se situant dans votre SDK
 
 Pour compiler sur windows ouvrez un exécute de commande (PowerShell par exemple) dans le répertoire du projet et exécutez ces commande :
 ```bash
-javac --module-path "PATH;src\lib\sqlite-jdbc-3.49.1.0.jar" --add-modules javafx.controls,javafx.fxml -d out src\main\java\com\example\nouveau\*.java
+javac --module-path "PATH" --add-modules javafx.controls,javafx.fxml -cp "src\lib\sqlite-jdbc-3.49.1.0.jar" -d out src\main\java\com\example\nouveau\*.java
 ```
 ```bash
 xcopy src\main\resources\* out\ /E /Y
@@ -123,7 +123,7 @@ xcopy src\main\resources\* out\ /E /Y
 
 Pour lancer l'application (Windows):
 ```bash
-java --module-path "PATH;src\lib\sqlite-jdbc-3.49.1.0.jar" --add-modules javafx.controls,javafx.fxml -d out src\main\java\com\example\nouveau\Main
+java --module-path "PATH" --add-modules javafx.controls,javafx.fxml -cp "out;src\lib\sqlite-jdbc-3.49.1.0.jar" com.example.nouveau.Main
 ```
 
 Pour compiler sur Ubuntu :
