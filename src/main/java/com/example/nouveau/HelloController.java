@@ -42,7 +42,7 @@ public class HelloController {
     private Case entryCell = null;
     private Case exitCell = null;
     private boolean selectingEntryExit = false;
-    private int selectionStep = 0; // 0: inactif, 1: sélection entrée, 2: sélection sortie
+    private int selectionStep = 0; // 0: inactive, 1: selection of the entry 2: selection of the exit
     private boolean isPerfect;
 
     @FXML private ScrollPane mainPane;
