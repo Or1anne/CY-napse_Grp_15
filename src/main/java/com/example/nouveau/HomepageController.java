@@ -1,5 +1,6 @@
-package com.example.nouveau;
-import javafx.animation.*;
+package com.example.nouveau; // Define the project package
+// Importations of the JavaFX libraries
+import javafx.animation.*; // For the transitions and animations
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,30 +23,36 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.*; // For the database
 
 public class HomepageController {
-    @FXML private AnchorPane Begin;
-    @FXML private AnchorPane BorderSave;
-    @FXML private ImageView BGHome;
-    @FXML private Label StartButton;
-    @FXML private Button ChargeSave;
-    @FXML private Button NewLab;
-    @FXML private Label CyNapse;
-    @FXML private HBox HBoxSave;
-    @FXML private Button GoBack;
+    //FXML elements
+    @FXML private AnchorPane Begin; // AnchorPane for the main scene
+    @FXML private AnchorPane BorderSave; // AnchorPane for the save section
+    @FXML private ImageView BGHome; // ImageView for the background image
+    @FXML private Label StartButton; // Label for the start button
+    @FXML private Button ChargeSave; // Button to load a saved maze
+    @FXML private Button NewLab; // Button to create a new maze
+    @FXML private Label CyNapse; // Label for the title
+    @FXML private HBox HBoxSave; // HBox for the saved mazes
+    @FXML private Button GoBack; // Button to go back to the main menu
 
-    private HelloController controller;
+    private HelloController controller; 
     private Database db;
 
     @FXML
+    //This methode initializes the homepage by creating a database,
+    //setting the full screen mode, and adapting the size of the elements
     public void initialize() {
-        //Initialisation de la BDD
-        db = new Database();
-        db.createDatabase();
-        db.createTable();
+        //Initialize the database
+        db = new Database(); // Create a new Database instance
+        db.createDatabase(); // Create the database if it doesn't exist
+        db.createTable(); // Creat the tables of the mazes
+        
+        Scene scene = Begin.getScene(); // Retrieve the current scene
 
-        Scene scene = Begin.getScene();
+        //If the scene is already initialized, set the full screen mode
+        //If not, wait for the scene to be available and then set the full screen mode
         if (scene != null) {
             FullScreen(scene);
         } else {
@@ -56,16 +63,16 @@ public class HomepageController {
             });
         }
 
-        //Lie la taille de l'image avec celle de l'AnchorPane
+        //Link the size of the image with the AnchorPane
         BGHome.setPreserveRatio(false);
         BGHome.fitWidthProperty().bind(Begin.widthProperty());
         BGHome.fitHeightProperty().bind(Begin.heightProperty());
-
-        //Lie la taille de l'AnchorPane avec celle de son parent
+        
+        //Link the size of the AnchorPane with the size of its parent
         BorderSave.prefWidthProperty().bind(Begin.widthProperty().multiply(0.8));
         BorderSave.prefHeightProperty().bind(Begin.heightProperty().multiply(0.3));
 
-        //Adapte la taille des éléments avec celle du AnchorPane
+        //Adapt the size of the elements with the AnchorPane
         Begin.widthProperty().addListener((obs, oldVal, newVal) -> {
             Platform.runLater(() -> {
                 ReplaceLabel(StartButton, 0.47, 0.6, 0.045);
@@ -77,7 +84,8 @@ public class HomepageController {
             });
         });
 
-        //Réadaptation (Je sais pas pourquoi mais il faut le faire)
+        //Readapt the size of the elements when the AnchorPane is resized
+
         ActiveReplaceLabel(StartButton, 0.47, 0.6, 0.045);
         ActiveReplaceLabel(CyNapse, 0.47, 0.2, 0.045);
         ActiveReplaceButton(NewLab, 0.30, 0.65, 0.02);
@@ -86,7 +94,9 @@ public class HomepageController {
         ActiveReplaceButton(GoBack, 0.15, 0.42, 0.02);
     }
 
-    //Méthodes pour déplacer les éléments et adapte leur taille en fonction de la taille de la page
+    //Methodes that move the elements and adapt their size according to the size of the page
+    
+    //Labels
     private void ReplaceLabel(Label label, double x, double y, double fontSizeRatio) {
         label.setStyle("-fx-font-size: " + Begin.getWidth() * fontSizeRatio + "px;");
         Platform.runLater(() -> {
@@ -107,6 +117,7 @@ public class HomepageController {
         });
     }
 
+    //Buttons
     private void ReplaceButton(Button btn, double x, double y, double fontSizeRatio) {
         btn.setStyle("-fx-font-size: " + Begin.getWidth() * fontSizeRatio + "px;");
 
@@ -128,6 +139,7 @@ public class HomepageController {
         });
     }
 
+    //AnchorPane
     private void ReplaceAnchorPane(AnchorPane anchor, double x, double y) {
         double centerX = Begin.getWidth() * x;
         double centerY = Begin.getHeight() * y;
@@ -145,13 +157,14 @@ public class HomepageController {
         });
     }
 
-    //Adapte la taille
+    //ImageView
     private void AdaptSize(ImageView view, Scene scene) {
         view.fitWidthProperty().bind(scene.widthProperty());
         view.fitHeightProperty().bind(scene.heightProperty());
         view.setPreserveRatio(false);
     }
 
+    //Start a new game
     @FXML
     void NewGame() {
         Begin.setOnMouseClicked(null);
@@ -165,8 +178,10 @@ public class HomepageController {
         finalFade.play();
     }
 
+    //Show the Level's buttons
     private void showLevelButtons() {
 
+        //Make the buttons NewLab and ChargeSave appear progressively
         FadeTransition fade1 = new FadeTransition(Duration.seconds(1), NewLab);
         fade1.setFromValue(0);
         fade1.setToValue(1);
@@ -182,12 +197,14 @@ public class HomepageController {
         fade2.play();
     }
 
+    //Start the generation of a new maze
     @FXML
     public void OpenMazeGeneration(MouseEvent event) throws IOException {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         OpenMazeGeneration(stage, null);
     }
     public void OpenMazeGeneration(Stage stage, Runnable onFinished) throws IOException {
+        //Show an animation GIF for 4 seconds and then load hello-view.fxml
         Image gif = new Image(getClass().getResource("StartNewMaze.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
         AdaptSize(gifView, stage.getScene());
@@ -222,9 +239,11 @@ public class HomepageController {
         pause.play();
     }
 
-
+    //Animation when loading the saved maze
     @FXML
     public void AnimationSave() {
+        //Shox an animation GIF and desaturates the background image
+        //After 9 seconds or if the screen is clicked, it shows the available saved mazes
         Image gif = new Image(getClass().getResource("ChargeScene.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
         AdaptSize(gifView, Begin.getScene());
@@ -263,6 +282,7 @@ public class HomepageController {
     }
 
     private static ParallelTransition getParallelTransition(ImageView gifView) {
+        //Slide aniamtion + melting effect of the gif
         TranslateTransition slideRight = new TranslateTransition(Duration.seconds(0.5), gifView);
         slideRight.setFromX(0);
         slideRight.setToX(10);
@@ -281,7 +301,10 @@ public class HomepageController {
         return showGif;
     }
 
+    //Animation when going back to the main menu from the saved maze screen
     public void AnimationSaveBack(Runnable onFinished) {
+        //Inversed animation of the previous one
+        //After 6.6 seconds or if the screen is clicked, it shows the main menu
         Image gif = new Image(getClass().getResource("ChargeSceneBackWard.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
         AdaptSize(gifView, Begin.getScene());
@@ -317,6 +340,10 @@ public class HomepageController {
         pause.play();
     }
 
+    //Show the saved mazes from the database.
+    //It will send a request to the table Maze, for each save it will create a VBox with the name, height and width of the maze
+    //If we click on it it will load the maze, if we click on the delete button it will delete the maze from the database
+    //and remove the VBox from the HBox
     public void ShowSaves(){
         try(Connection conn = db.connectDatabase()){
             Statement stmt = conn.createStatement();
@@ -363,7 +390,9 @@ public class HomepageController {
             e.printStackTrace();
         }
     }
-
+    
+    //This method is used to set the full screen mode of the scene
+    //It will set the full screen mode when the F11 key is pressed
     private void FullScreen(Scene scene){
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F11) {

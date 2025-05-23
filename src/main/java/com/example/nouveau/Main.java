@@ -1,11 +1,13 @@
-package com.example.nouveau;
+package com.example.nouveau; //Define the package in which the class is located
 
 import javax.swing.text.Style;
 import java.util.*;
 
 public class Main {
-    private static Maze currentMaze;
-    private static final Scanner sc = new Scanner(System.in);
+    //Global variables
+    private static Maze currentMaze; // Current maze being worked on
+    private static final Scanner sc = new Scanner(System.in); // Scanner for user input
+    // Define ANSI color codes for terminal output
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_GREEN = "\u001B[32m";
@@ -18,6 +20,7 @@ public class Main {
     private static final String blade = "==============================";
 
     public static void main(String[] args) throws InterruptedException {
+        //SHow the title of the application
         Collections.shuffle(color, new Random());
         String [] lines={
 
@@ -44,10 +47,11 @@ public class Main {
         Thread.sleep(600);
         System.out.println("Bienvenue dans l'application de labyrinthe !");
         Thread.sleep(500);
+        // Ask the user if they want to use the graphical interface or the terminal version
         System.out.print("Souhaitez-vous utiliser l'interface graphique ? (o/n) : ");
         String input = sc.nextLine().trim().toLowerCase();
 
-
+        //Start JavaFX application if user chooses "o"
         if (input.equals("o")) {
             HelloApplication.launch(HelloApplication.class);
         } else {
@@ -55,12 +59,15 @@ public class Main {
         }
     }
 
+    // Show the statistics of the maze resolution like the number of visited cells and the duration of the resolution
     public static void Show_Stat(Resolve solver){
         double durationsMs= solver.getDuration()/1_000_000.0;
         System.out.println("Nombre de cases visitées: " +ANSI_YELLOW+ solver.getNbCase()+ANSI_RESET);
         System.out.println(("Durée " +ANSI_YELLOW+durationsMs+" ms"+ANSI_RESET));
     }
 
+    // Generate a new maze in the terminal by asking the user to input
+    // the width, height, the type of maze (Perfect or not) and seed (optionnal, will be random if not given)
     public static void generateTerminal() throws InterruptedException {
         int width = 30;
         int height = 30;
@@ -114,10 +121,11 @@ public class Main {
             Thread.sleep(100);
         }
         System.out.println(ANSI_RESET);
-        currentMaze = HelloController.generateMaze(width, height, method, seed);
-        HelloController.printTerminal(currentMaze);
+        currentMaze = HelloController.generateMaze(width, height, method, seed); // Generate the maze
+        HelloController.printTerminal(currentMaze); // Print the maze in the terminal
     }
 
+    // Display the menu in the terminal (with Thread.sleep) and return the user's choice
     public static String MenuTerminal(String [] Menu) throws InterruptedException{
         for(String menu : Menu){
             Thread.sleep(200);
@@ -129,17 +137,20 @@ public class Main {
 
     }
 
+    // Load a maze from the database and display it in the terminal
+    // by listing all the mazes in the database and asking the user to choose one
     public static void MenuSave() throws InterruptedException{
-        Database db = new Database();
-        List<String> mazeList = db.getMazeList();
-        if (mazeList.isEmpty()) {
+        Database db = new Database(); // Create a new database instance
+        List<String> mazeList = db.getMazeList(); // Get the list of saved mazes
+        if (mazeList.isEmpty()) { // Check if the list is empty
             System.out.println(ANSI_RED+"❌ Aucune sauvegarde trouvée.");
             return;
         }
 
         System.out.println(ANSI_YELLOW+"=== Sauvegardes disponibles ==="+ANSI_RESET);
-        for (int i = 0; i < mazeList.size(); i++) {
-            System.out.println((i + 1) + ". " + mazeList.get(i));
+        // Display the list of mazes
+        for (int i = 0; i < mazeList.size(); i++) { 
+            System.out.println((i + 1) + ". " + mazeList.get(i)); 
         }
 
         System.out.print("Entrez le numéro du labyrinthe à charger : ");
@@ -148,7 +159,7 @@ public class Main {
 
         if (index >= 0 && index < mazeList.size()) {
             String selectedMazeName = mazeList.get(index);
-            currentMaze = db.DataChargeMaze(selectedMazeName);
+            currentMaze = db.DataChargeMaze(selectedMazeName); // Load the maze from the database
             if (currentMaze != null) {
                 System.out.println("Labyrinthe '" + selectedMazeName + "' chargé avec succès !");
                 HelloController.printTerminal(currentMaze);
@@ -160,6 +171,10 @@ public class Main {
         }
     }
 
+    // Allow the user to edit a wall of a cell in the maze
+    // by asking the user to input the coordinates of the cell and the direction of the wall (North, South, East, West)
+    // and whether to add or remove the wall.
+    // The method also updates the opposite wall of the neighboring cell.
     public static void editCase(Maze maze) {
         System.out.println("Modifier une case du labyrinthe");
         System.out.print("Entrez la coordonnée X (0 à " + (maze.getWidth() - 1) + ", ou r pour retour) : ");
@@ -209,7 +224,7 @@ public class Main {
         System.out.print("Souhaitez-vous (1) ajouter ou (2) enlever ce mur ? ");
         String action = sc.nextLine().trim();
 
-        // Modifier le mur de la case courante
+        //Modify the wall of the current cell
         if (action.equals("1")) {
             c.addWall(direction);
         } else if (action.equals("2")) {
@@ -219,8 +234,8 @@ public class Main {
             return;
         }
 
-        // Modifier le mur opposé de la case voisine
-        int nx = x, ny = y;  // coordonnées de la case voisine
+        //Modify the opposite wall of the neighboring cell
+        int nx = x, ny = y;  // coordinates of the neighboring cell
         Direction opposite = null;
         switch (direction) {
             case NORTH:
@@ -241,7 +256,8 @@ public class Main {
                 break;
         }
 
-        // Vérifier que la case voisine existe
+        // Verify that the neighboring cell exists
+        // and modify its wall accordingly
         Case neighbor = maze.getCase(nx, ny);
         if (neighbor != null) {
             if (action.equals("1")) {
@@ -264,12 +280,17 @@ public class Main {
 
 
 
-
+    // Start the console mode of the application
+    // by displaying the main menu and allowing the user to choose between
+    // generating a new maze, loading a saved maze, or quitting the application.
+    // If a maze is already loaded, the user can choose to solve it, save it, generate a new maze, edit it, or return to the main menu.
+    // The method also handles the maze resolution algorithms (Tremaux, HandOnWall, BFS)
+    // and displays the statistics of the resolution (number of visited cells and duration).
     public static void startConsoleMode() throws InterruptedException {
         Database db = new Database();
         String choose;
         while (true) {
-            if (currentMaze == null) {
+            if (currentMaze == null) { // If no maze is loaded
                 String [] Menu = {
                         "\n"+handle + ANSI_YELLOW+"=== Menu Principal ==="+ANSI_RESET,
                         ANSI_BLUE+"    1"+ANSI_RESET+". \uD83E\uDDE9  Générer un labyrinthe",
@@ -293,7 +314,7 @@ public class Main {
                     default:
                         System.out.println(ANSI_RED+"❌ Choix invalide. Veuillez saisir (1, 2 ou 3).");
                 }
-            } else {
+            } else { // If a maze is loaded
                 String [] Menu = {
                         "\n"+handle + ANSI_YELLOW+"=== Menu Labyrinthe ==="+ANSI_RESET,
                         ANSI_BLUE+"    1"+ANSI_RESET+". \uD83E\uDDE9 Résoudre le labyrinthe",
@@ -317,8 +338,8 @@ public class Main {
 
                         };
                         choose = MenuTerminal(MenuAlgo);
-                        Resolve solver = new Resolve(currentMaze);
-                        List<Case> path = new ArrayList<>();
+                        Resolve solver = new Resolve(currentMaze); // Create a new solver instance
+                        List<Case> path = new ArrayList<>(); // List to store the path of the resolution
 
                         switch (choose) {
                             case "1":

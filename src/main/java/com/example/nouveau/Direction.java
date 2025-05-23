@@ -1,9 +1,9 @@
 package com.example.nouveau;
 
 /**
- * Représente les quatre directions cardinales possibles dans un labyrinthe.
+ * Represent the four possible cardinal directions in a maze.
  * <p>
- * Cette énumération permet de manipuler les directions et de calculer les directions à droite, à gauche et opposées.
+ * This enumeration allows us to manipulate the directions and to calculate the left, right and opposite directions.
  * </p>
  */
 public enum Direction{
@@ -11,24 +11,24 @@ public enum Direction{
     NORTH, EAST, SOUTH, WEST;
 
     /**
-     * Retourne la direction obtenue en tournant à gauche à partir de la direction actuelle.
-     * @return direction à gauche de la direction actuelle
+     * Return the direction obtained by turning left from the current direction.
+     * @return direction to the left of the current direction
      */
     public Direction turnLeft() {
         return values()[(this.ordinal() + 3) % 4]; // retrieves the direction index, adds 3 to obtain its left direction
     }
 
     /**
-     * Retourne la direction obtenue en tournant à droite à partir de la direction actuelle.
-     * @return direction à droite de la direction actuelle
+     * Return the direction obtained by turning right from the current direction.
+     * @return direction to the right of the current direction
      */
     public Direction turnRight() {
         return values()[(this.ordinal() + 1) % 4]; // retrieves the direction index, adds 1 to obtain its right direction
     }
 
     /**
-     * Retourne la direction opposée de la direction actuelle.
-     * @return direction opposée de la direction actuelle
+     * Return the direction obtained by turning 180°(the opposite direction) from the current direction.
+     * @return direction opposite to the current direction
      */
     public Direction opposite() {
         return values()[(this.ordinal() + 2) % 4]; // retrieves the direction index, adds 2 to obtain its opposite direction

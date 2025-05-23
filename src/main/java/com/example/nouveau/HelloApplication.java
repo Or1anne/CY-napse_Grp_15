@@ -7,21 +7,21 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
- * La classe {@code HelloApplication} est le point d'entrée de l'application JavaFX.
- * Elle charge l'interface graphique définie dnas le fichier FXML {@code Homepage.fxml}
- * et l'affiche dans une fenêtre de taille fixe.
+ * The class {@code HelloApplication} is the entry point of the JavaFX application.
+ * It loads the graphical interface defined in the FXML file {@code Homepage.fxml}
+ * and displays it in a fixed-size window.
  */
 public class HelloApplication extends Application {
 
     /**
-     * Méthode appelée au démarrage de l'application JavaFX.
-     * Elle charge le fichier FXML, crée la scène pricipale et affiche la fenêtre.
-     * @param stage la fenêtre principale (stage) de l'application.
-     * @throws IOException si le fichier FXML ne peut pas être chargé.
+     * This method is called at the start of the JavaFX application.
+     * It loads the FXML file, creates the main scene, and displays the window.
+     * @param stage the main window (stage) of the application.
+     * @throws IOException if the FXML file cannot be loaded.
      */
     @Override
     public void start(Stage stage) throws IOException {
-        //Création Scene JAVAFX
+        //Creation of THE JavaFX scene
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Homepage.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000,600);
         stage.setTitle("Labyrinthe");
@@ -31,8 +31,8 @@ public class HelloApplication extends Application {
     }
 
     /**
-     * Méthode principale qui lance l'application JavaFX.
-     * @param args les arguments de la lignes de commande.
+     * Principal method that launches the JavaFX application.
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         launch();
