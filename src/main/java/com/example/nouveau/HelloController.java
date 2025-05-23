@@ -49,7 +49,6 @@ public class HelloController {
     private int selectionStep = 0; // 0: inactif, 1: sélection entrée, 2: sélection sortie
     private boolean isPerfect;
 
-
     @FXML private ScrollPane mainPane;
     @FXML private GridPane gridPane;
     @FXML private TextField widthInput;
@@ -185,10 +184,8 @@ public class HelloController {
         RadioButton SelectMethod = (RadioButton) MethodGeneration.getSelectedToggle();
         if (SelectMethod.getText().equals("Parfait")) {
             steps = currentMaze.KruskalGeneration(seed);
-            isPerfect = true;
         } else {
             steps = currentMaze.KruskalImperfectGeneration(seed);
-            isPerfect = false;
         }
         double cellWidth = mainPane.getWidth() / width;
         double cellHeight = mainPane.getHeight() / height;
@@ -256,6 +253,8 @@ public class HelloController {
 
 
         }
+        isPerfect = currentMaze.isPerfect();
+
         mazeSizeLabel.setText("Taille : " + height + " x " + width);
         mazeSeedLabel.setText("Seed : " + seed);
         mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
@@ -303,7 +302,9 @@ public class HelloController {
 
     @FXML
     private void toggleEditMode() {
+        
         editMode = !editMode;
+
         if (editMode) {
             editModeButton.setText("Mode édition : ON");
             setControlsDisabled(true);
@@ -318,6 +319,13 @@ public class HelloController {
             editModeButton.setText("Mode édition : OFF");
             setControlsDisabled(false);
             validateMaze();
+            
+            mazeSizeLabel.setText("Taille : " + currentMaze.getHeight() + " x " + currentMaze.getWidth());
+            mazeSeedLabel.setText("Seed : Labyrinthe personnalisé");
+            mazePerfectLabel.setText("Parfait : " + (currentMaze.isPerfect() ? "Oui" : "Non"));
+            time.setText("Temps de résolution : -");
+            NbCaseExplore.setText("Nombre de cases parcourues : -");
+            NbCaseFinal.setText("Nombre de cases du chemin final : -");
         }
     }
 

@@ -153,4 +153,62 @@ public class Maze {
         }
         return null;
     }
+
+    public boolean isPerfect() {
+        int height = this.getHeight();
+        int width = this.getWidth();
+        Case[][] maze = this.getMaze();
+
+        boolean[][] visited = new boolean[height][width];
+        int totalCells = height * width;
+        int visitedCount = 0;
+
+        Stack<Case> stack = new Stack<>();
+        stack.push(maze[0][0]); // Démarre depuis la première case
+        visited[0][0] = true;
+        visitedCount++;
+
+        // Pour stocker le parent de chaque cellule (éviter cycles)
+        Map<Case, Case> parentMap = new HashMap<>();
+
+        while (!stack.isEmpty()) {
+            Case current = stack.pop();
+            int x = current.getX();
+            int y = current.getY();
+
+            for (int[] dir : new int[][]{{-1,0},{1,0},{0,-1},{0,1}}) {
+                int nx = x + dir[0];
+                int ny = y + dir[1];
+
+                if (nx < 0 || ny < 0 || nx >= height || ny >= width) continue;
+
+                Case neighbor = maze[nx][ny];
+
+                // Vérifie si un mur bloque le passage
+                if ((nx == x - 1 && current.getNorth()) ||
+                    (nx == x + 1 && current.getSouth()) ||
+                    (ny == y - 1 && current.getWest()) ||
+                    (ny == y + 1 && current.getEast())) {
+                    continue;
+                }
+
+                // Déjà visité ?
+                if (!visited[nx][ny]) {
+                    visited[nx][ny] = true;
+                    visitedCount++;
+                    parentMap.put(neighbor, current);
+                    stack.push(neighbor);
+                } else {
+                    // Si déjà visité et pas le parent => cycle détecté
+                    if (parentMap.get(current) != neighbor) {
+                        return false; // Il y a un cycle, donc pas parfait
+                    }
+                }
+            }
+        }
+
+        // Vérifie que toutes les cases ont été visitées (connexité)
+        return visitedCount == totalCells;
+    }
+
 }
