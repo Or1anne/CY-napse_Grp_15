@@ -4,26 +4,27 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /**
- * La classe {@code Database} permet de gérer la persistance des labyrinthes dans une base de données SQLite.
- * Elle permet de créer la base et les tables associées, de sauvegarder un labyrinthe, de le charger
- * et de récupérer la liste des labyrinthes enregistrés.
+ * The class {@code Database} manages the persistence of mazes in an SQLite database.
+ * It allows the creation of the database and associated tables,the save of a maze, the loading of this later,
+ * and the retrieval of the list of saved mazes.
  */
 public class Database {
     String dbName = "Sauvegarde.db";
 
     /**
-     * Établit une connexion à la base de données SQLite.
+     * Establish a connection to the SQLite database.
      *
-     * @return une instance {@link Connection} connectée à la base.
-     * @throws SQLException si une erreur de connexion survient.
+     * @return a {@link Connection} instance connected to the database.
+     * @throws SQLException if a connection error occurs.
      */
     public Connection connectDatabase() throws SQLException {
         return DriverManager.getConnection("jdbc:sqlite:" + dbName);
     }
 
     /**
-     * Crée la base de données si elle n'existe pas.
-     * Affiche un message dans la console en cas de succès ou d'échec.
+     * Creates the SQLite database if it does not exist.
+     * If the database already exists, it does nothing.
+     * Prints a message to the console indicating success or failure.
      */
     public void createDatabase() {
         try (Connection conn = connectDatabase()) {
@@ -36,7 +37,7 @@ public class Database {
     }
 
     /**
-     * Crée les tables {@code Maze} et {@code Cell} dans la base de données si elles n'existent pas.
+     * Creates the tables {@code Maze} and {@code Cell} in the database if they do not exist.
      */
     public void createTable() {
         try (Connection conn = connectDatabase()) {
@@ -73,10 +74,10 @@ public class Database {
     }
 
     /**
-     * Sauvegarde un labyrinthe dans la base de données.
+     * Save a maze in the database.
      *
-     * @param labyrinth le labyrinthe à sauvegarder.
-     * @param Name le nom associé au labyrinthe.
+     * @param labyrinth the maze to save.
+     * @param Name the name associated with the maze.
      */
     public void SaveMaze(Maze labyrinth, String Name) {
         try (Connection conn = connectDatabase()) {
@@ -113,8 +114,8 @@ public class Database {
 
                     count++;
                     if (count % batchSize == 0) {
-                        CellStmt.executeBatch();  // Exécute le batch toutes les 500 requêtes
-                        CellStmt.clearBatch();    // Vide le batch après exécution (optionnel mais recommandé)
+                        CellStmt.executeBatch();  // Execute the batch every 500 requests
+                        CellStmt.clearBatch();    // Clear the batch after execution (optionnal but recommended) 
                     }
                 }
             }
@@ -131,10 +132,10 @@ public class Database {
     }
 
     /**
-     * Charge un labyrinthe depuis la base de données à partir de son nom.
+     * Charge a maze from the database using its name.
      *
-     * @param Name le nom du labyrinthe à charger.
-     * @return le labyrinthe correspondant, ou {@code null} s'il n'existe pas.
+     * @param Name the name of the maze to load.
+     * @return the corresponding maze, or {@code null} if it does not exist.
      */
     public Maze DataChargeMaze(String Name) {
         Maze labyrinth = null;
@@ -185,9 +186,9 @@ public class Database {
     }
 
     /**
-     * Récupère la liste des noms de tous les labyrinthes enregistrés dans la base.
+     * Retrieves the list of names of all mazes saved in the database.
      *
-     * @return une liste contenant les noms des labyrinthes.
+     * @return a list containing the names of the mazes.
      */
     public ObservableList<String> getMazeList() {
         ObservableList<String> SavedMaze = FXCollections.observableArrayList();

@@ -1,9 +1,9 @@
 package com.example.nouveau;
 
 /**
- * La classe {@code Case} représente une cellule dans un labyrinthe.
- * Chaque case possède des murs (nord, est, sud, ouest) qui peuvent être présents ou absents,
- * ainsi que des informations sur sa position, son identifiant unique et son état de visite.
+ * The class {@code Case} represents a cell in a maze.
+ * Each cell has walls (north, east, south, west) that can be present or absent,
+ * as well as information about its position, unique identifier, and visit status.
  */
 public class Case {
     private int count = 0;
@@ -19,9 +19,9 @@ public class Case {
 
 
     /**
-     * Constructeur d'une case à la position donnée. Tous les murs sont initialement présents.
-     * @param x Coordonnée verticale de la case.
-     * @param y Coordonnée horizontale de la case.
+     * Constructor for a cell at the given position. All walls are initially present.
+     * @param x Vertical coordinate of the cell.
+     * @param y Horizontal coordinate of the cell.
      */
     public Case(int x, int y){
         id = number++;
@@ -35,34 +35,34 @@ public class Case {
     }
 
     //Getters
-    /** @return Coordonnée verticale (ligne) de la case. */
+    /** @return The vertical coordinate (line) of the cell*/
     public int getX() { return x; }
 
-    /** @return Coordonnée horizontale (colonne) de la case. */
+    /** @return The horizontal coordinate (column) of the cell. */
     public int getY() { return y; }
 
-    /** @return Identifiant unique de la case. */
+    /** @return The unique id of the cell. */
     public int getID() { return id; }
 
-    /** @return Vrai si le mur nord est présent. */
-    public boolean getNorth() { return North; }
+    /** @return True if the wall at the North is present. */
+    public boolean getNorth() { return North; } 
 
-    /** @return Vrai si le mur sud est présent. */
+    /** @return True if the wall at the South is present. */
     public boolean getSouth() { return South; }
 
-    /** @return Vrai si le mur ouest est présent. */
+    /** @return True if the wall at the West is present. */
     public boolean getWest() { return West; }
 
-    /** @return Vrai si le mur est est présent. */
+    /** @return True if the wall at the East if present. */
     public boolean getEast() { return East; }
 
-    /** @return Faux si la case a déjà été visitée. */
+    /** @return False if the cell has already been visited. */
     public boolean getVisited() { return !visited; }
 
-    /** @return Nombre de fois que cette case a été visitée dans certains algorithmes. */
+    /** @return The number of time the cell has been visited in some algorithmes. */
     public int getCount() { return count; }
 
-    /** @return Nombre total de cases créées (statique). */
+    /** @return The total number of created cells (static). */
     public int getNumber(){ return number; }
 
 
@@ -73,8 +73,8 @@ public class Case {
     public void setEast(boolean East)   { this.East = East; }
 
     /**
-     * Définit l'état de visite de la case.
-     * @param visited Vrai si la case doit être considérée comme non visitée.
+     * Define the visit status of the cell.
+     * @param visited True if the cell should be considered as unvisited.
      */
     public void setVisited(boolean visited) { this.visited = visited; }
 
@@ -83,59 +83,59 @@ public class Case {
     public void setId(int id){this.id = id;}
 
     /**
-     * Réinitialise le compteur de visite de la case.
-     * @param count Nouvelle valeur du compteur.
+     * Renitialise the visit counter of the cell.
+     * @param count New value of the counter.
      */
     public void resetCount(int count){ this.count=count;}
 
-    /** Incrémente le compteur de visite de la case. */
+    /** Increment the visit counter of the cell. */
     public void incrementCount() { this.count++; }
 
-    /** Réinitialise le compteur global de création de cases. */
+    /**Reset the global counter of created cells. */ 
     public static void resetNumber() {
         number = 0;
     }
 
     /**
-     * Vérifie si un mur est présent dans la direction donnée.
-     * @param direction La direction à vérifier.
-     * @return Vrai si un mur est présent, faux sinon.
+     * Verify if a wall is present in the given direction.
+     * @param direction The direction to check.
+     * @return True if a wall is present, false otherwise.
      */
     public boolean hasWall(Direction direction) {
-        switch (direction) {
-            case NORTH: return North;
-            case SOUTH: return South;
-            case EAST:  return East;
-            case WEST:  return West;
-        }
-        return false;
+    switch (direction) {
+        case NORTH: return North;
+        case SOUTH: return South;
+        case EAST:  return East;
+        case WEST:  return West;
     }
+    return false;
+}
 
     /**
-     * Supprime le mur dans la direction donnée.
-     * @param direction Direction dans laquelle enlever le mur.
+     * Delete the wall in the given direction.
+     * @param direction Direction in which to remove the wall.
      */
-    public void removeWall(Direction direction) {
-        switch (direction) {
-            case NORTH: North = false; break;
-            case SOUTH: South = false; break;
-            case EAST:  East  = false; break;
-            case WEST:  West  = false; break;
-        }
+public void removeWall(Direction direction) {
+    switch (direction) {
+        case NORTH: North = false; break;
+        case SOUTH: South = false; break;
+        case EAST:  East  = false; break;
+        case WEST:  West  = false; break;
     }
+}
 
     /**
-     * Ajoute un mur dans la direction donnée.
-     * @param direction Direction dans laquelle ajouter le mur.
+     * Add a wall in the given direction.
+     * @param direction Direction in which to add the wall.
      */
-    public void addWall(Direction direction) {
-        switch (direction) {
-            case NORTH: North = true; break;
-            case SOUTH: South = true; break;
-            case EAST:  East  = true; break;
-            case WEST:  West  = true; break;
-        }
+public void addWall(Direction direction) {
+    switch (direction) {
+        case NORTH: North = true; break;
+        case SOUTH: South = true; break;
+        case EAST:  East  = true; break;
+        case WEST:  West  = true; break;
     }
+}
 
     @Override
     public String toString() {
