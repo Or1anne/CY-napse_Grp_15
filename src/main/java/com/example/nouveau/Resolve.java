@@ -8,6 +8,7 @@ public class Resolve {
     private long duration =0;
     private Case start;
     private Case end;
+    private Map<Case, Case> parentMap;
 
     public Resolve(Maze Labyrinthe) {
         this(Labyrinthe, null, null); // Appelle le constructeur principal avec entry et exit null
@@ -182,21 +183,33 @@ public class Resolve {
 
     //BFS resolution
     public List<Case> BFS() {
+        return BFS(false);
+    }
+
+    public List<Case> BFS(boolean stepByStep) {
+        if (!isSolvable()) {
+            return null; // Retourne null si le labyrinthe est insoluble
+        }
+
         resetCounts();
         Queue<Case> queue = new LinkedList<>();
-        Map<Case, Case> parentMap = new HashMap<>();
+        parentMap = new HashMap<>();
         Set<Case> visited = new HashSet<>();
+        List<Case> path = new ArrayList<>();
 
+        long startTime = System.nanoTime();
         queue.add(start);
         visited.add(start);
         parentMap.put(start, null);
+        path.add(start);
 
         while (!queue.isEmpty()) {
             Case current = queue.poll();
 
             // Si le serpent arrive à la fin
             if (current == end) {
-                return reconstructPath(parentMap, end);
+                setDuration(System.nanoTime() - startTime);
+                return stepByStep ? path : getFinalPath();
             }
 
             // On explore tous les voisins accessibles
@@ -205,11 +218,17 @@ public class Resolve {
                     visited.add(neighbor);
                     parentMap.put(neighbor, current);
                     queue.add(neighbor);
+                    addNbCase();
+
+                    if (stepByStep) {
+                        path.add(neighbor);
+                    }
                 }
             }
         }
 
-        return Collections.emptyList(); // Aucun chemin trouvé
+        setDuration(System.nanoTime() - startTime);
+        return stepByStep ? path : getFinalPath();
     }
 
     // On reconstruis le chemin à partir des parents
@@ -251,6 +270,41 @@ public class Resolve {
 
         return neighbors;
     }
+
+    public List<Case> getFinalPath() {
+        if (parentMap == null || end == null) {
+            return new ArrayList<>();
+        }
+        return reconstructPath(parentMap, end);
+    }
+
+    public boolean isSolvable() {
+        if (start == null || end == null) return false;
+
+        Queue<Case> queue = new LinkedList<>();
+        Set<Case> visited = new HashSet<>();
+
+        queue.add(start);
+        visited.add(start);
+
+        while (!queue.isEmpty()) {
+            Case current = queue.poll();
+
+            if (current == end) {
+                return true; // Chemin trouvé
+            }
+
+            for (Case neighbor : getAccessibleNeighbors(current)) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return false; // Aucun chemin trouvé
+    }
+
 
     public int getNbCase() { return nbCase; }
     public long getDuration() { return duration; }

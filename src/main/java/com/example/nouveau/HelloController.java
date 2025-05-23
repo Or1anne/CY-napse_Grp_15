@@ -715,35 +715,140 @@ public class HelloController {
         redrawMaze();
         Resolve solver = new Resolve(currentMaze, entryCell, exitCell);
 
-        List<Case> path = new ArrayList<>();
-        RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
-        switch (SolveMethod.getText()) {
-            case "Tremaux":
-                path = solver.Tremaux();
-                break;
-            case "BFS":
-                path = solver.BFS();
-                break;
-            case "Hand on Wall":
-                path = solver.HandOnWall();
-                break;
-            default:
-                return;
-        }
-
-        long duration = solver.getDuration();
-        time.setText("Temps de résolution : " + duration + " ms");
-        NbCaseExplore.setText("Nombre de cases parcourues : " + solver.getNbCase());
-        NbCaseFinal.setText("Nombre de cases du chemin final : " + path.size());
-
-        if (path == null || path.isEmpty()) {
-            showError("Labyrinthe insoluble", "Aucun chemin n’a été trouvé.\nVérifie que l’entrée et la sortie sont accessibles.");
+        if (!solver.isSolvable()) {
+            showError("Labyrinthe insoluble", "Aucun chemin n'existe entre l'entrée et la sortie.\nVérifiez que les murs ne bloquent pas complètement le passage.");
             return;
         }
-        if (toggleSwitchResolve.isSelected()) {
-            showPathStepByStep(path);
+
+        RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
+        if (SolveMethod.getText().equals("BFS") && toggleSwitchResolve.isSelected()) {
+            // Mode pas à pas spécifique pour BFS
+            List<Case> exploredCells = solver.BFS(true);
+            List<Case> finalPath = solver.getFinalPath();
+
+            if (finalPath == null || finalPath.isEmpty()) {
+                showError("Labyrinthe insoluble", "Aucun chemin n'a été trouvé.\nVérifie que l'entrée et la sortie sont accessibles.");
+                return;
+            }
+
+            showBFSSteps(exploredCells, solver);
         } else {
-            drawPath(path);
+            // Mode normal pour tous les algorithmes
+            List<Case> path = null;
+            switch (SolveMethod.getText()) {
+                case "Tremaux":
+                    path = solver.Tremaux();
+                    break;
+                case "BFS":
+                    path = solver.BFS();
+                    break;
+                case "Hand on Wall":
+                    path = solver.HandOnWall();
+                    break;
+            }
+
+            if (path == null || path.isEmpty()) {
+                showError("Labyrinthe insoluble", "Aucun chemin n'a été trouvé.\nVérifie que l'entrée et la sortie sont accessibles.");
+                return;
+            }
+
+            if (toggleSwitchResolve.isSelected()) {
+                showPathStepByStep(path);
+            } else {
+                drawPath(path);
+            }
+        }
+
+        // Mise à jour des statistiques
+        time.setText("Temps de résolution : " + solver.getDuration() + " ms");
+        NbCaseExplore.setText("Nombre de cases parcourues : " + solver.getNbCase());
+        if (solver.getFinalPath() != null) {
+            NbCaseFinal.setText("Nombre de cases du chemin final : " + solver.getFinalPath().size());
+        }
+    }
+
+    private void showBFSSteps(List<Case> exploredCells, Resolve solver) {
+        if (pathTimeline != null) {
+            pathTimeline.stop();
+        }
+
+        pathTimeline = new Timeline();
+        int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty())
+                ? 100 : Integer.parseInt(SpeedInputResolve.getText());
+
+        // 1. Affiche l'exploration progressive
+        for (int i = 0; i < exploredCells.size(); i++) {
+            final int stepIndex = i;
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * speed), event -> {
+                Pane cellPane = getPaneFromGrid(exploredCells.get(stepIndex).getY(),
+                        exploredCells.get(stepIndex).getX());
+                if (cellPane != null) {
+                    cellPane.setStyle(cellPane.getStyle() + "; -fx-background-color: #ffcccc;");
+                }
+            });
+            pathTimeline.getKeyFrames().add(keyFrame);
+        }
+
+        // 2. Récupère le chemin final
+        List<Case> finalPath = solver.getFinalPath();
+        int startFinalPathTime = exploredCells.size() * speed;
+
+        // 3. Affiche le chemin final progressivement
+        for (int i = 0; i < finalPath.size(); i++) {
+            final int pathIndex = i;
+            KeyFrame pathFrame = new KeyFrame(Duration.millis(startFinalPathTime + (i * speed)), event -> {
+                Pane pathPane = getPaneFromGrid(finalPath.get(pathIndex).getY(),
+                        finalPath.get(pathIndex).getX());
+                if (pathPane != null) {
+                    redrawCell(finalPath.get(pathIndex));
+                    pathPane.setStyle(pathPane.getStyle() + "; -fx-background-color: #ff0000;");
+
+                    // Ajoute un label pour la dernière case (sortie)
+                    if (pathIndex == finalPath.size() - 1) {
+                        Label label = new Label("S");
+                        label.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
+                        label.setLayoutX(pathPane.getWidth()/2 - 5);
+                        label.setLayoutY(pathPane.getHeight()/2 - 10);
+                        pathPane.getChildren().add(label);
+                    }
+                }
+            });
+            pathTimeline.getKeyFrames().add(pathFrame);
+        }
+
+        pathTimeline.play();
+    }
+
+    private void redrawCell(Case cell) {
+        Pane pane = getPaneFromGrid(cell.getY(), cell.getX());
+        if (pane != null) {
+            pane.getChildren().clear(); // Efface les anciens labels
+
+            String style = "-fx-background-color: " +
+                    (cell == entryCell ? "#00ff00" :
+                            cell == exitCell ? "#ff0000" : "white") +
+                    "; -fx-border-color: black; -fx-border-width: " +
+                    (cell.getNorth() ? "1 " : "0 ") +
+                    (cell.getEast() ? "1 " : "0 ") +
+                    (cell.getSouth() ? "1 " : "0 ") +
+                    (cell.getWest() ? "1" : "0") + ";";
+
+            pane.setStyle(style);
+
+            // Réajoute les labels pour entrée/sortie si nécessaire
+            if (cell == entryCell) {
+                Label label = new Label("E");
+                label.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+                label.setLayoutX(pane.getWidth()/2 - 5);
+                label.setLayoutY(pane.getHeight()/2 - 10);
+                pane.getChildren().add(label);
+            } else if (cell == exitCell) {
+                Label label = new Label("S");
+                label.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
+                label.setLayoutX(pane.getWidth()/2 - 5);
+                label.setLayoutY(pane.getHeight()/2 - 10);
+                pane.getChildren().add(label);
+            }
         }
     }
 
