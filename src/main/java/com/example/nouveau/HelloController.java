@@ -70,7 +70,20 @@ public class HelloController {
     @FXML private Button selectEntryExitButton;
 
 
-
+    /**
+     * Initialise le contrôleur après le chargement du fichier FXML.
+     * <p>
+     * Cette méthode configure le mode plein écran pour la scène principale,
+     * et initialise la visibilité ainsi que l'état des contrôles liés à la vitesse
+     * et aux boutons d'édition et de sauvegarde.
+     * </p>
+     * <ul>
+     *   <li>Si la scène est déjà disponible, elle applique directement le plein écran.</li>
+     *   <li>Sinon, elle ajoute un écouteur pour appliquer le plein écran dès que la scène est disponible.</li>
+     *   <li>Cache et désactive les contrôles liés à la vitesse de génération et de résolution.</li>
+     *   <li>Désactive les boutons "mode édition" et "sauvegarder".</li>
+     * </ul>
+     */
     @FXML
     public void initialize() {
         Scene scene = mainPane.getScene();
@@ -94,6 +107,15 @@ public class HelloController {
         SaveList.setItems(db.getMazeList());
     }
 
+    /**
+     * Gère l'état du bouton bascule (toggleSwitch).
+     * <p>
+     * Lorsqu'il est activé (sélectionné), le texte du bouton change en "Désactiver" et
+     * le champ SpeedInputGeneration devient visible et géré dans la mise en page.
+     * <p>
+     * Lorsqu'il est désactivé (non sélectionné), le texte revient à "Activer",
+     * le champ SpeedInputGeneration est caché et non géré, et son contenu est vidé.
+     */
     @FXML
     private void handleToggle() {
         if (toggleSwitch.isSelected()) {
@@ -108,6 +130,11 @@ public class HelloController {
         }
     }
 
+    /**
+     * Gère l'état du bouton bascule (toggleSwitch).
+     * <p>
+     *  Gère l'inverse de la fonction {@code handleToggle}.
+     */
     @FXML
     private void handleToggleResolve() {
         if (toggleSwitchResolve.isSelected()) {
@@ -122,6 +149,21 @@ public class HelloController {
         }
     }
 
+    /**
+     * Génère un nouveau labyrinthe en fonction des paramètres saisis par l'utilisateur.
+     * <p>
+     * Le type de labyrinthe (parfait ou imparfait) est déterminé par la sélection radio.
+     * Les dimensions du labyrinthe, ainsi que la seed aléatoire, sont saisies par l'utilisateur.
+     * Des vérifications sont effectuées pour s'assurer de la validité des entrées.
+     * <p>
+     * En cas d'erreur (dimensions invalides ou vitesse hors limites), un message est affiché.
+     * <p>
+     * Une fois le labyrinthe généré, les cellules sont affichées dans une `GridPane`.
+     * Si l'animation est activée, une `ProgressBar` suit l'avancement de la génération.
+     * À la fin de la génération, l'entrée et la sortie du labyrinthe sont initialisées.
+     * <p>
+     * Désactive les boutons d'édition et de sauvegarde pendant la génération.
+     */
     @FXML
     public void GenerateMaze() {
         if (editMode) {
@@ -257,6 +299,14 @@ public class HelloController {
         NbCaseFinal.setText("Nombre de cases du chemin final :");
     }
 
+    /**
+     * Réinitialise l'état actuel du labyrinthe et de l'interface graphique.
+     * <p>
+     *  Cette méthode est utilisée pour annuler une génération ou une résolution en cours
+     *  et nettoyer l'interface avant de lancer une nouvelle opération.
+     *  <p>
+     *  Cette méthode laisse l'interface prête à accueillir une nouvelle génération.
+     */
     @FXML
     public void resetMaze() {
         // on stoppe l'animation du serpent
@@ -288,6 +338,8 @@ public class HelloController {
 
         redrawMaze();
     }
+
+    /** Permet de remettre le zoom à 0 */
     @FXML
     public void resetZoom() {
         zoomFactor = 1.0;
@@ -324,6 +376,16 @@ public class HelloController {
     }
 
 
+    /**
+     * Active ou désactive le mode édition du labyrinthe.
+     * <p>
+     * En mode édition, l'utilisateur peut être modifer manuellement les cases du labyrinthe.
+     * Cette méthode met à jour l'état du bouton d'édition, désactive certains contrôles
+     * de l'interface utilisateur, et interrompt toute animation de résolution en cours.
+     * <p>
+     * Si le mode édition est désactivé, les contrôles sont réactivés et une validation du
+     * labyrinthe est affectuée via {@code validateMaze()}.
+     */
     @FXML
     private void toggleEntryExitSelection() {
         if (selectingEntryExit) {
@@ -351,6 +413,13 @@ public class HelloController {
     }
 
 
+    /**
+     * Réinitialise les cellules d'entrée et de sortie du labyrinthe.
+     * <p>
+     * Cette méthode annule les sélections actuelles d'entrée et de sortie, restaure
+     * leurs murs d'origine.
+     * <p>
+     */
     private void resetEntryExit() {
         // Sauvegarde des anciennes cellules
         Case oldEntry = entryCell;
@@ -372,6 +441,14 @@ public class HelloController {
         }
     }
 
+    /**
+     * Rafraîchit l'affichage visuel d'une cellule spécifique dans la grille du labyrinthe.
+     * <p>
+     * Cette méthode supprime l'ancien panneau correspondant à la cellule dans le `gridPane`,
+     * puis en recrée un nouveau avec les propriétés actuelles de la cellule (murs, couleurs, etc.).
+     *
+     * @param cell La cellule {@link Case} à mettre à jour visuellement.
+     */
     private void refreshCell(Case cell) {
         Pane pane = getPaneFromGrid(cell.getY(), cell.getX());
         if (pane != null) {
@@ -383,6 +460,15 @@ public class HelloController {
     }
 
 
+    /**
+     * Gère la sélection d'une cellule pour définir l'entrée ou la sortie du labyrinthe.
+     * <p>
+     * Cette méthode est utilisée lors du mode de sélection d'entrée/sortie activé par l'utilisateur.
+     * Elle vérifie que la cellule sélectionnée se trouve sur les bords du labyrinthe, et distingue
+     * si la cellule doit devenir l'entrée ou la sortie en fonction de l'état de progression.
+     *
+     * @param cell La cellule sélectionnée par l'utilisateur.
+     */
     private void handleCellSelectionForEntryExit(Case cell) {
         if (!selectingEntryExit) return;
 
@@ -428,11 +514,27 @@ public class HelloController {
         }
     }
 
+    /**
+     * Vérifie si une cellule se trouve sur la bordure du labyrinthe.
+     * <p>
+     * Une cellule est considérée comme une cellule de bordure si elle est située
+     * sur la première ou la dernière ligne, ou sur la première ou la dernière colonne
+     * de la grille du labyrinthe.
+     *
+     * @param cell La cellule à vérifier.
+     * @return {@code true} si la cellule est sur un bord du labyrinthe, sinon {@code false}.
+     */
     private boolean isBorderCell(Case cell) {
         return cell.getX() == 0 || cell.getX() == currentMaze.getHeight()-1 ||
                 cell.getY() == 0 || cell.getY() == currentMaze.getWidth()-1;
     }
 
+
+    /**
+     * Rétablit le mur sur le bord correspondant de la cellule donnée.
+     *
+     * @param cell La cellule dont le mur de bordure doit être restauré.
+     */
     private void restoreBorderWall(Case cell) {
         if (cell.getX() == 0) cell.setNorth(true);
         else if (cell.getX() == currentMaze.getHeight()-1) cell.setSouth(true);
@@ -440,6 +542,11 @@ public class HelloController {
         else if (cell.getY() == currentMaze.getWidth()-1) cell.setEast(true);
     }
 
+    /**
+     * Supprime le mur sur le bord correspondant de la cellule donnée.
+     *
+     * @param cell La cellule dont le mur de bordure doit être supprimé.
+     */
     private void removeBorderWall(Case cell) {
         if (cell.getX() == 0) cell.setNorth(false);
         else if (cell.getX() == currentMaze.getHeight()-1) cell.setSouth(false);
@@ -448,6 +555,9 @@ public class HelloController {
     }
 
 
+    /**
+     * Initialise les cellules d'entrée et de sortie du labyrinthe..
+     */
     private void initializeEntryExit() {
         if (currentMaze == null) return;
 
@@ -463,6 +573,9 @@ public class HelloController {
     }
 
 
+    /**
+     * Valide l'état actuel du labyrinthe après la fin du mode édition.
+     */
     private void validateMaze() {
         // Par exemple, on pourrait sauvegarder automatiquement le labyrinthe ou juste afficher un message
         System.out.println("Labyrinthe validé !");
@@ -471,6 +584,24 @@ public class HelloController {
     }
 
 
+    /**
+     * Crée un panneau graphique représentant une cellule du labyrinthe.
+     * <p>
+     * Cette méthode construit visuellement la cellule en fonction de ses murs.
+     * <p>
+     * Elle gère aussi l'interaction utilisateur lors d'un clic :
+     * <ul>
+     *   <li>Si le mode sélection d'entrée/sortie est activé, elle délègue la gestion
+     *       de la sélection à {@code handleCellSelectionForEntryExit}.</li>
+     *   <li>Si le mode édition est activé, elle permet de modifier les murs intérieurs
+     *       en cliquant sur les bords de la cellule, sauf les murs extérieurs qui sont
+     *       protégés.</li>
+     * </ul>
+     *
+     * @param cell la cellule du labyrinthe à représenter graphiquement
+     * @param cellSize la taille (largeur et hauteur) en pixels du panneau représentant la cellule
+     * @return un objet {@code Pane} configuré graphiquement et avec les événements associés
+     */
     private Pane createCellPane(Case cell, double cellSize) {
         Pane pane = new Pane();
         pane.setPrefSize(cellSize, cellSize);
@@ -604,6 +735,23 @@ public class HelloController {
         return pane;
     }
 
+
+    /**
+     * Redessine entièrement le labyrinthe sur la grille graphique.
+     * <p>
+     * Cette méthode parcourt chaque cellule du labyrinthe {@code currentMaze} et
+     * met à jour le panneau graphique correspondant dans {@code gridPane} pour
+     * refléter l'état actuel des murs et la position des cellules d'entrée et de sortie.
+     * <p>
+     * Les murs peuvent être affichés sous forme de bordures CSS noires, et la
+     * cellule d'entrée est colorée en vert, tandis que la sortie est en rouge.
+     * <p>
+     * Cette méthode permet ainsi de synchroniser l'affichage avec les données
+     * internes du labyrinthe après des modifications, comme en mode édition ou
+     * après une génération.
+     *
+     * @throws NullPointerException si {@code currentMaze} est null (évité par un test au début)
+     */
     private void redrawMaze() {
         if (currentMaze == null) return;
 
@@ -669,6 +817,18 @@ public class HelloController {
         }
     }
 
+
+    /**
+     * Retourne le noeud graphique présent dans une cellule spécifique d'un GridPane.
+     * <p>
+     * Cette méthode parcourt les enfants du {@code gridPane} pour trouver un noeud
+     * situé à la colonne {@code col} et la ligne {@code row} spécifiées.
+     *
+     * @param gridPane Le GridPane dans lequel chercher.
+     * @param col La colonne recherchée.
+     * @param row La ligne recherchée.
+     * @return Le Node à la position ({@code col}, {@code row}) ou {@code null} s'il n'existe pas.
+     */
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
             Integer nodeCol = GridPane.getColumnIndex(node);
@@ -680,6 +840,18 @@ public class HelloController {
         return null;
     }
 
+
+    /**
+     * Gère l'événement de zoom sur la grille du labyrinthe via la molette de la souris.
+     * <p>
+     * Augmente ou diminue le facteur de zoom selon la direction de la molette.
+     * Un zoom positif (vers l'avant) augmente le facteur de zoom de 10%,
+     * un zoom négatif (vers l'arrière) le réduit de 10%.
+     * <p>
+     * Appelle ensuite la méthode {@code applyZoom()} pour appliquer l'effet visuel.
+     *
+     * @param event L'événement de défilement de la molette de souris déclenchant le zoom.
+     */
     @FXML
     void MazeZoom(ScrollEvent event) {
         if (event.getDeltaY() > 0) {
@@ -694,11 +866,35 @@ public class HelloController {
         gridPane.setScaleY(zoomFactor);
     }
 
+
+    /**
+     * Change le curseur de la souris en une main fermée lorsque la souris est pressée.
+     * <p>
+     * Utilisé généralement pour indiquer que l'utilisateur peut glisser ou déplacer une zone.
+     */
     @FXML
     public void MousePressed() {
         mainPane.setCursor(Cursor.CLOSED_HAND);
     }
 
+
+    /**
+     * Lance la résolution du labyrinthe sélectionné selon la méthode choisie.
+     * <p>
+     * Cette méthode :
+     * <ul>
+     *   <li> vérifie que le mode édition est désactivé (sinon elle bloque la résolution),</li>
+     *   <li> arrête toute animation en cours (chemin ou génération),</li>
+     *   <li> nettoie la barre de progression, </li>
+     *   <li> redessine le labyrinthe, </li>
+     *   <li> instancie un objet Resolve pour résoudre le labyrinthe, </li>
+     *   <li> récupère la méthode de résolution choisie (Tremaux, BFS, Hand on Wall), </li>
+     *   <li> exécute la méthode correspondante, </li>
+     *   <li> affiche une erreur si aucun chemin n’a été trouvé, </li>
+     *   <li> affiche le temps, le nombre de cases explorées et la longueur du chemin final, </li>
+     *   <li> enfin affiche le chemin soit d’un coup, soit étape par étape selon le toggle. </li>
+     * </ul>
+     */
     @FXML
     public void ChooseMaze() {
         if (editMode) {
@@ -854,6 +1050,14 @@ public class HelloController {
         }
     }
 
+
+    /**
+     * Colore en orange (#ff6a00) le fond des cellules représentant le chemin donné dans la grille.
+     * Chaque cellule du chemin est mise en évidence visuellement.
+     *
+     * @param path Liste ordonnée des cellules (Cases) formant le chemin à dessiner.
+     *             Si la liste est nulle ou vide, la méthode ne fait rien.
+     */
     private void drawPath(List<Case> path) {
         if (path == null || path.isEmpty()) return;
 
@@ -865,6 +1069,14 @@ public class HelloController {
         }
     }
 
+
+    /**
+     * Recherche et retourne le noeud (Pane) contenu dans la GridPane à la position spécifiée.
+     *
+     * @param col numéro de colonne (axe horizontal) dans la grille.
+     * @param row numéro de ligne (axe vertical) dans la grille.
+     * @return Le Node correspondant à cette position dans la GridPane, ou null si aucun nœud n'est trouvé.
+     */
     private Pane getPaneFromGrid(int col, int row) {
         for (Node node : gridPane.getChildren()) {
             Integer nodeCol = GridPane.getColumnIndex(node);
@@ -877,6 +1089,18 @@ public class HelloController {
         return null;
     }
 
+
+    /**
+     * Affiche le chemin donné dans la grille en le colorant étape par étape avec une animation.
+     * Chaque cellule du chemin est mise en surbrillance en rouge selon la vitesse spécifiée.
+     * <p>
+     * Si le mode édition est activé, l'animation en cours est arrêtée et réinitialisée.
+     * La vitesse d'animation est récupérée depuis l'entrée utilisateur, avec une valeur par défaut de 100 ms.
+     * La vitesse doit être comprise entre 10 et 100 ms, sinon un message d'erreur est affiché.
+     *
+     * @param path Liste ordonnée des cellules (Cases) formant le chemin à animer.
+     *             Si la liste est vide ou nulle, la méthode n'affiche rien.
+     */
     public void showPathStepByStep(List<Case> path) {
 
         if (editMode) {
@@ -912,6 +1136,19 @@ public class HelloController {
         pathTimeline.play();
     }
 
+
+    /**
+     * Génère un labyrinthe selon la méthode spécifiée, avec une taille donnée et un seed optionnel.
+     *
+     * @param width   La largeur (nombre de colonnes) du labyrinthe à générer.
+     * @param height  La hauteur (nombre de lignes) du labyrinthe à générer.
+     * @param method  La méthode de génération du labyrinthe :
+     *                "Parfait" pour un labyrinthe parfait (sans cycles),
+     *                toute autre valeur pour un labyrinthe imparfait.
+     * @param seedOpt Un entier optionnel utilisé comme seed pour la génération aléatoire.
+     *                S'il est null, un seed aléatoire sera généré.
+     * @return        Un objet Maze représentant le labyrinthe généré.
+     */
     public static Maze generateMaze(int width, int height, String method, Integer seedOpt) {
         int seed = (seedOpt != null) ? seedOpt : new Random().nextInt();
         Maze maze = new Maze(width, height);
@@ -932,6 +1169,20 @@ public class HelloController {
         return maze;
     }
 
+
+    /**
+     * Affiche une représentation textuelle du labyrinthe dans le terminal.
+     *
+     * Cette méthode utilise des caractères Unicode pour dessiner les murs du labyrinthe
+     * selon les informations contenues dans l'objet {@code Maze} passé en paramètre.
+     *
+     * La bordure supérieure et inférieure ainsi que les jonctions entre les murs sont également dessinées
+     * pour former un cadre cohérent autour du labyrinthe.
+     *
+     * @param maze L'objet {@code Maze} représentant le labyrinthe à afficher.
+     *             Il doit fournir la largeur, la hauteur et la grille des cases via
+     *             les méthodes {@code getWidth()}, {@code getHeight()} et {@code getMaze()}.
+     */
     public static void printTerminal(Maze maze) {
         int width = maze.getWidth();
         int height = maze.getHeight();
@@ -979,6 +1230,22 @@ public class HelloController {
         System.out.println("┘");
     }
 
+
+    /**
+     * Affiche une représentation textuelle du labyrinthe dans le terminal,
+     * en mettant en évidence un chemin solution.
+     * <p>
+     * Cette méthode dessine le labyrinthe avec des caractères Unicode pour représenter
+     * les murs, et affiche le chemin solution fourni en rouge sous forme de points "•".
+     * <p>
+     * Le labyrinthe est représenté case par case, avec des murs à l'ouest et au sud selon
+     * les informations fournies par les méthodes {@code getWest()} et {@code getSouth()} de chaque case.
+     * <p>
+     * Le chemin solution est indiqué par des points rouges dans les cases correspondantes.
+     *
+     * @param maze Le labyrinthe à afficher, contenant la largeur, la hauteur et la grille des cases.
+     * @param solutionPath La liste ordonnée des cases formant le chemin solution à mettre en évidence.
+     */
     public static void printTerminal(Maze maze, List<Case> solutionPath) {
         int width = maze.getWidth();
         int height = maze.getHeight();
@@ -1024,6 +1291,21 @@ public class HelloController {
         System.out.println("┘");
     }
 
+
+
+    /**
+     * Sauvegarde un labyrinthe dans la base de données avec un nom unique fourni par l'utilisateur.
+     * <p>
+     * Cette méthode demande à l'utilisateur, via la console, de saisir un nom unique pour enregistrer
+     * le labyrinthe. Si l'utilisateur ne fournit pas de nom (entrée vide), un nom par défaut est généré
+     * automatiquement en s'assurant qu'il soit unique parmi les noms existants dans la base.
+     * <p>
+     * Si le nom saisi existe déjà, l'utilisateur est invité à en saisir un autre jusqu'à obtenir un nom unique.
+     *
+     * @param currentMaze Le labyrinthe à sauvegarder.
+     * @param db L'objet Database utilisé pour la gestion des sauvegardes.
+     * @param sc Le Scanner utilisé pour lire l'entrée utilisateur depuis la console.
+     */
     public static void saveMazeTerminal(Maze currentMaze, Database db, Scanner sc) {
         List<String> existingNames = db.getMazeList();
         String name;
@@ -1052,6 +1334,18 @@ public class HelloController {
         System.out.println("Labyrinthe sauvegardé sous le nom : " + name);
     }
 
+
+    /**
+     * Sauvegarde le labyrinthe courant dans la base de données avec le nom spécifié par l'utilisateur.
+     * <p>
+     * Cette méthode vérifie que le champ de texte contenant le nom du labyrinthe n'est pas vide,
+     * et que ce nom n'existe pas déjà dans la liste des labyrinthes enregistrés.
+     * Si une de ces conditions n'est pas respectée, un message d'erreur est affiché.
+     * Sinon, le labyrinthe est sauvegardé dans la base via l'objet `db`.
+     * <p>
+     * La méthode dépend d'un champ texte `MazeName` pour récupérer le nom du labyrinthe,
+     * et d'une instance `currentMaze` représentant le labyrinthe courant.
+     */
     @FXML
     public void SaveMaze() {
         ObservableList<String> ListMaze = db.getMazeList();
@@ -1091,6 +1385,12 @@ public class HelloController {
         SaveList.setItems(db.getMazeList());
     }
 
+    /**
+     * Charge un labyrinthe depuis la base de données et met à jour l'affichage.
+     * Calcule la taille des cellules, initialise la grille et détecte l'entrée et la sortie.
+     *
+     * @param name Le nom du labyrinthe à charger.
+     */
     public void ChargeMaze(String name) {
         currentMaze = db.DataChargeMaze(name);
         gridPane.getChildren().clear();
@@ -1121,6 +1421,13 @@ public class HelloController {
         editModeButton.setDisable(false);
     }
 
+
+    /**
+     * Affiche une boîte de dialogue d'erreur avec un titre et un message.
+     *
+     * @param title   Le titre de la fenêtre d'erreur.
+     * @param message Le message d'erreur à afficher.
+     */
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -1136,11 +1443,23 @@ public class HelloController {
         alert.showAndWait();
     }
 
+
+    /**
+     * Définit la base de données utilisée par le contrôleur.
+     *
+     * @param db L'objet Database à utiliser.
+     */
     public void setDatabase(Database db) {
         this.db = db;
         setupWithDatabase();
     }
 
+
+    /**
+     * Active ou désactive les contrôles de l'interface utilisateur.
+     *
+     * @param disabled true pour désactiver les contrôles, false pour les activer.
+     */
     private void setControlsDisabled(boolean disabled) {
         widthInput.setDisable(disabled);
         heightInput.setDisable(disabled);
@@ -1150,6 +1469,12 @@ public class HelloController {
         selectEntryExitButton.setDisable(disabled && !selectingEntryExit); // Permet d'annuler la sélection
     }
 
+
+    /**
+     * Active ou désactive tous les contrôles de l'interface, s'ils sont initialisés.
+     *
+     * @param disabled true pour désactiver les contrôles, false pour les activer.
+     */
     private void setAllControlsDisabled(boolean disabled) {
         // Désactive tous les contrôles
         if (widthInput != null) widthInput.setDisable(disabled);

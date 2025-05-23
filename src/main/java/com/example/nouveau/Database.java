@@ -3,13 +3,29 @@ import java.sql.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * The class {@code Database} manages the persistence of mazes in an SQLite database.
+ * It allows the creation of the database and associated tables,the save of a maze, the loading of this later,
+ * and the retrieval of the list of saved mazes.
+ */
 public class Database {
     String dbName = "Sauvegarde.db";
 
+    /**
+     * Establish a connection to the SQLite database.
+     *
+     * @return a {@link Connection} instance connected to the database.
+     * @throws SQLException if a connection error occurs.
+     */
     public Connection connectDatabase() throws SQLException {
         return DriverManager.getConnection("jdbc:sqlite:" + dbName);
     }
 
+    /**
+     * Creates the SQLite database if it does not exist.
+     * If the database already exists, it does nothing.
+     * Prints a message to the console indicating success or failure.
+     */
     public void createDatabase() {
         try (Connection conn = connectDatabase()) {
             if (conn != null) {
@@ -20,6 +36,9 @@ public class Database {
         }
     }
 
+    /**
+     * Creates the tables {@code Maze} and {@code Cell} in the database if they do not exist.
+     */
     public void createTable() {
         try (Connection conn = connectDatabase()) {
             Statement stmt = conn.createStatement();
@@ -54,6 +73,12 @@ public class Database {
         }
     }
 
+    /**
+     * Save a maze in the database.
+     *
+     * @param labyrinth the maze to save.
+     * @param Name the name associated with the maze.
+     */
     public void SaveMaze(Maze labyrinth, String Name) {
         try (Connection conn = connectDatabase()) {
             conn.setAutoCommit(false);
@@ -89,8 +114,8 @@ public class Database {
 
                     count++;
                     if (count % batchSize == 0) {
-                        CellStmt.executeBatch();  // Exécute le batch toutes les 500 requêtes
-                        CellStmt.clearBatch();    // Vide le batch après exécution (optionnel mais recommandé)
+                        CellStmt.executeBatch();  // Execute the batch every 500 requests
+                        CellStmt.clearBatch();    // Clear the batch after execution (optionnal but recommended) 
                     }
                 }
             }
@@ -106,6 +131,12 @@ public class Database {
         }
     }
 
+    /**
+     * Charge a maze from the database using its name.
+     *
+     * @param Name the name of the maze to load.
+     * @return the corresponding maze, or {@code null} if it does not exist.
+     */
     public Maze DataChargeMaze(String Name) {
         Maze labyrinth = null;
         try (Connection conn = connectDatabase()) {
@@ -154,6 +185,11 @@ public class Database {
         }
     }
 
+    /**
+     * Retrieves the list of names of all mazes saved in the database.
+     *
+     * @return a list containing the names of the mazes.
+     */
     public ObservableList<String> getMazeList() {
         ObservableList<String> SavedMaze = FXCollections.observableArrayList();
         try (Connection conn = connectDatabase()) {
