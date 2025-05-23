@@ -3,13 +3,28 @@ import java.sql.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * La classe {@code Database} permet de gérer la persistance des labyrinthes dans une base de données SQLite.
+ * Elle permet de créer la base et les tables associées, de sauvegarder un labyrinthe, de le charger
+ * et de récupérer la liste des labyrinthes enregistrés.
+ */
 public class Database {
     String dbName = "Sauvegarde.db";
 
+    /**
+     * Établit une connexion à la base de données SQLite.
+     *
+     * @return une instance {@link Connection} connectée à la base.
+     * @throws SQLException si une erreur de connexion survient.
+     */
     public Connection connectDatabase() throws SQLException {
         return DriverManager.getConnection("jdbc:sqlite:" + dbName);
     }
 
+    /**
+     * Crée la base de données si elle n'existe pas.
+     * Affiche un message dans la console en cas de succès ou d'échec.
+     */
     public void createDatabase() {
         try (Connection conn = connectDatabase()) {
             if (conn != null) {
@@ -20,6 +35,9 @@ public class Database {
         }
     }
 
+    /**
+     * Crée les tables {@code Maze} et {@code Cell} dans la base de données si elles n'existent pas.
+     */
     public void createTable() {
         try (Connection conn = connectDatabase()) {
             Statement stmt = conn.createStatement();
@@ -54,6 +72,12 @@ public class Database {
         }
     }
 
+    /**
+     * Sauvegarde un labyrinthe dans la base de données.
+     *
+     * @param labyrinth le labyrinthe à sauvegarder.
+     * @param Name le nom associé au labyrinthe.
+     */
     public void SaveMaze(Maze labyrinth, String Name) {
         try (Connection conn = connectDatabase()) {
             conn.setAutoCommit(false);
@@ -106,6 +130,12 @@ public class Database {
         }
     }
 
+    /**
+     * Charge un labyrinthe depuis la base de données à partir de son nom.
+     *
+     * @param Name le nom du labyrinthe à charger.
+     * @return le labyrinthe correspondant, ou {@code null} s'il n'existe pas.
+     */
     public Maze DataChargeMaze(String Name) {
         Maze labyrinth = null;
         try (Connection conn = connectDatabase()) {
@@ -154,6 +184,11 @@ public class Database {
         }
     }
 
+    /**
+     * Récupère la liste des noms de tous les labyrinthes enregistrés dans la base.
+     *
+     * @return une liste contenant les noms des labyrinthes.
+     */
     public ObservableList<String> getMazeList() {
         ObservableList<String> SavedMaze = FXCollections.observableArrayList();
         try (Connection conn = connectDatabase()) {
