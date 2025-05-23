@@ -2,10 +2,10 @@ package com.example.nouveau;
 import java.util.*;
 
 /**
- * La classe {@code Resolve} est responsable de la résolution d'un labyrinthe.
+ * * The {@code Resolve} class is responsible for solving a maze.
  * <p>
- * Elle contient les informations nécessaires pour parcourir un labyrinthe de type {@link Maze},
- * notamment les dimensions, le point de départ, le point d'arrivée, et les métriques de performance.
+ * It contains the necessary information to run through a maze of type {@link Maze},
+ * including the dimensions, starting and ending points, and performance metrics.
  */
 public class Resolve {
     private Case[][] Labyrinthe;
@@ -16,27 +16,27 @@ public class Resolve {
     private Case end;
 
     /**
-     * Constructeur de la classe {@code Resolve}.
+     * Constructor of the class {@code Resolve}.
      * <p>
-     * Ce constructeur initialise un objet de résolution de labyrinthe en utilisant un labyrinthe donné, sans donner de point d'entrée ni de sortie.
-     * Il appelle le constructeur principal avec des valeurs {@code null} pour l'entrée et la sortie.
-     * @param Labyrinthe le labyrinthe à résoudre
+     * This constructor initializes a maze resolution object using a given maze, without providing an entry or exit point.
+     * It calls the main constructor with {@code null} values for entry and exit.
+     * @param Labyrinthe the maze that need to be solved
      */
     public Resolve(Maze Labyrinthe) {
-        this(Labyrinthe, null, null); // Appelle le constructeur principal avec entry et exit null
+        this(Labyrinthe, null, null); // Call the main constructor with entry and exit null
     }
 
     /**
-     * Constructeur principal de la classe {@code Resolve}.
+     * Main constructor of the {@code Resolve} class.
      * <p>
-     * Initialise la grille du labyrinthe à partir de l'objet {@code Maze} donné,
-     * ainsi que les dimensions et les points d'entrée et de sortie.
-     * Si les cases d'entrée ou de sortie sont situées sur les bords du labyrinthe,
-     * ce constructeur force l'ouverture des murs correspondants pour permettre
-     * l'accès ou la sortie.
-     * @param Labyrinthe le labyrinthe à résoudre, sous forme d'objet {@link Maze}
-     * @param entry case représentant l'entrée du labyrinthe (peut être {@code null})
-     * @param exit case représentant la sortie du labyrinthe (peut être {@code null})
+     * Initializes the maze grid from the given {@code Maze} object,
+     * as well as the dimensions and entry/exit points.
+     * If the entry or exit points are located on the edges of the maze,
+     * this constructor forces the corresponding walls to be opened to allow
+     * access or exit.
+     * @param Labyrinthe the maze to be solved, in the form of a {@link Maze} object
+     * @param entry cell representing the entry point of the maze (can be {@code null})
+     * @param exit cell representing the exit point of the maze (can be {@code null})
      */
     public Resolve(Maze Labyrinthe, Case entry, Case exit) {
         this.Labyrinthe = Labyrinthe.getMaze();
@@ -46,6 +46,7 @@ public class Resolve {
         this.end = exit;
 
         // Forcing walls open for entry/exit
+        // If the entry is on the edge, we remove the wall in the corresponding direction
         if (start != null) {
             if (start.getX() == 0) start.setNorth(false);
             else if (start.getX() == height - 1) start.setSouth(false);
@@ -62,10 +63,14 @@ public class Resolve {
     }
 
     /**
-     * Réinitialise toutes les cases du labyrinthe.
+     * Reset all the cells of the maze.
      * <p>
-     * Cette méthode remet à zéro les compteurs de chaque case et marque toutes les
-     * cases comme non visitées en mettant leur attribut {@code visited} à {@code false}.
+     * This method resets the counters of each cell and marks all cells as unvisited
+     * by setting their {@code visited} attribute to {@code false}.
+     * <p>
+     * This method is called at the beginning of each algorithm to ensure that
+     * the maze is in a clean state before starting the resolution.
+     * <p>
      */
     private void resetCounts() {
         for (int i = 0; i < height; i++) {
@@ -77,17 +82,16 @@ public class Resolve {
     }
 
     /**
-     * Résout un labyrinthe en utilisant l'algorithme de Trémaux.
+     * Resolves the maze using the Trémaux algorithm.
      * <p>
-     * Cette méthode applique une version modifiée de l'algorithme de Trémaux pour
-     * explorer le labyrinthe. Elle réinitialise les cases, explore récursivement
-     * depuis la case de départ, puis filtre les chemins explorés deux fois, ce qui
-     * correspond aux impasses ou aux détours inutiles.
+     * This method applies a modified version of the Trémaux algorithm to explore the maze.
+     * It resets the cells, recursively explores from the starting cell, and then filters
+     * the paths that have been explored twice, which corresponds to dead ends or unnecessary detours.
      * <p>
-     * La durée d'exécution est mesurée en nanosecondes et stockée via {@code setDuration}.
-     *
-     * @return Une liste de {@link Case} représentant le chemin solution entre l'entrée et la sortie du labyrinthe,
-     *         ou {@code null} si aucun chemin n’a été trouvé.
+     * The execution time is measured in nanoseconds and stored via {@code setDuration}.
+     * 
+     * @return A list of {@link Case} representing the solution path between the entrance and exit of the maze,
+     *         or {@code null} if no path was found.
      */
     public List<Case> Tremaux(){
         long startTIme = System.nanoTime();
@@ -102,17 +106,17 @@ public class Resolve {
     }
 
     /**
-     * Méthode récursive utilisée dans l'algorithme de Trémaux pour explorer le labyrinthe.
+     * Recursive method used in the Trémaux algorithm to explore the maze.
      * <p>
-     * Cette méthode visite récursivement les cases accessibles à partir de la position donnée.
-     * Elle marque les cases visitées, compte les passages, et tente de construire un chemin vers la sortie.
-     * Les directions possibles sont mélangées pour éviter un parcours systématique et simuler un comportement aléatoire.
+     * This method recursively visits the accessible cells from the given position.
+     * It marks the visited cells, counts the passages, and attempts to build a path to the exit.
+     * The possible directions are shuffled to avoid a systematic route and simulate a random behavior.
      * <p>
-     * Une case est explorée si elle a été déjà visitée mais n'a pas encore été explorée deux fois.
-     * @param x La coordonnée verticale (ligne) de la case actuelle.
-     * @param y La coordonnée horizontale (colonne) de la case actuelle.
-     * @param path La liste des cases empruntées constituant le chemin actuel.
-     * @return {@code true} si la sortie a été atteinte à partir de cette position, sinon {@code false}.
+     * A cell is explored if it has already been visited but has not yet been explored twice.
+     * @param x The vertical coordinate (row) of the current cell.
+     * @param y The horizontal coordinate (column) of the current cell.
+     * @param path The list of covered cells constituting the current path.
+     * @return {@code true} if the exit has been reached from this position, otherwise {@code false}.
      */
     private boolean explore(int x, int y, List<Case> path) {
         Case current = Labyrinthe[x][y];
@@ -128,15 +132,18 @@ public class Resolve {
 
         List<int[]> directions = new ArrayList<>();
 
-        // Ajouter les directions possibles
+        // Add possible directions to the list
         if (!current.getNorth() && x > 0) directions.add(new int[]{x - 1, y});
         if (!current.getSouth() && x < height - 1) directions.add(new int[]{x + 1, y});
         if (!current.getWest() && y > 0) directions.add(new int[]{x, y - 1});
         if (!current.getEast() && y < width - 1) directions.add(new int[]{x, y + 1});
 
-        Collections.shuffle(directions);
+        Collections.shuffle(directions); // Shuffle the directions to avoid systematic exploration
 
-        for (int[] dir : directions) {
+        for (int[] dir : directions) { 
+            // For each possible direction
+            // Check if the next cell is already visited and has been explored less than twice
+            // If so, we can explore it
             Case next = Labyrinthe[dir[0]][dir[1]];
 
             if (next.getVisited() && next.getCount() < 2) {
@@ -152,10 +159,13 @@ public class Resolve {
 
 
     /**
-     * Algorithme de résolution de labyrinthe : "Hand on Wall"
-     * <p>
-     * Cette méthode consiste à suivre en permanence le mur situé à gauche jusqu'à atteindre la sortie.
-     * @return un tableau de cases représentant le chemin de résolution du labyrinthe
+     * Algorithme of resolution of the maze : "Hand on Wall"
+     * This method consists of continuously following the wall on the left until reaching the exit.
+     * It is a simple and intuitive algorithm, but it does not guarantee the shortest path.
+     * The algorithm starts from the entry point and explores the maze 
+     * The algorithm continues until it reaches the exit or until a maximum number of steps is reached to avoid infinite loops.
+     * The execution time is measured in nanoseconds and stored via {@code setDuration}.
+     * The method returns a list of cells representing the path taken to reach the exit.
      */
     public List<Case> HandOnWall() {
         resetCounts();
@@ -164,7 +174,7 @@ public class Resolve {
         int y = start.getY();
         Case current = Labyrinthe[x][y];
 
-        // Initiale la direction a gauche car l'entrée est toujours sur le bord gauche du labyrinthe
+        // Initialise the direction to the left because the entry is always on the left edge of the maze
         Direction dir = Direction.EAST;
         List<Case> path = new ArrayList<>();
         current.setVisited(true);
@@ -173,7 +183,7 @@ public class Resolve {
         int maxSteps = width * height * 4;
 
 
-        // Condition pour sortir du labyrinthe
+        // Condition to get out of the loop if the maze does not have an solution
         while (Labyrinthe[x][y] != end) {
             if (steps++ > maxSteps) {
                 System.out.println("Labyrinthe insoluble (boucle infinie détectée)");
@@ -183,7 +193,7 @@ public class Resolve {
             addNbCase();
             Direction left = dir.turnLeft();
 
-            // Tester si on peut aller à gauche
+            // Test if we can go left
             if (canMove(x, y, left)) {
                 dir = left;
                 int[] newPos = move(x, y, dir);
@@ -191,14 +201,14 @@ public class Resolve {
                 x = newPos[0];
                 y = newPos[1];
             }
-            // Sinon tester en face
+            // Else test in front
             else if (canMove(x, y, dir)) {
                 int[] newPos = move(x, y, dir);
                 System.out.println(Arrays.toString(newPos)); // Debug
                 x = newPos[0];
                 y = newPos[1];
             }
-            // Sinon tester à droite
+            // Else test right
             else if (canMove(x, y, dir.turnRight())) {
                 dir = dir.turnRight();
                 int[] newPos = move(x, y, dir);
@@ -206,7 +216,7 @@ public class Resolve {
                 x = newPos[0];
                 y = newPos[1];
             }
-            // Sinon faire demi-tour
+            // Else go back
             else {
                 dir = dir.opposite();
                 int[] newPos = move(x, y, dir);
@@ -215,7 +225,7 @@ public class Resolve {
                 y = newPos[1];
             }
 
-            // Si la case n'est pas visitée, la visitée et l'ajouter au chemin parcouru
+            // If the cell is not visited, mark it as visited and add it to the path
             if (Labyrinthe[x][y].getVisited()) {
                 Labyrinthe[x][y].setVisited(true);
                 path.add(Labyrinthe[x][y]);
@@ -229,12 +239,11 @@ public class Resolve {
 
 
     /**
-     * Vérifie si un déplacement est possible depuis une case donnée dans une direction spécifique.
-     *
-     * @param x La coordonnée verticale (ligne) de la case actuelle dans le labyrinthe.
-     * @param y La coordonnée horizontale (colonne) de la case actuelle dans le labyrinthe.
-     * @param dir La direction vers laquelle on souhaite se déplacer (NORTH, EAST, SOUTH ou WEST).
-     * @return true si le déplacement est possible, s'il n'y a pas de mur et que la case cible est dans les limites du labyrinthe, false sinon.
+     * Verify if a move is possible from a given cell in a specific direction.
+     * @param x The vertical coordinate (row) of the current cell in the maze.
+     * @param y The horizontal coordinate (column) of the current cell in the maze.
+     * @param dir The direction in which we want to move (NORTH, EAST, SOUTH or WEST).
+     * @return true if the move is possible, if there is no wall and the target cell is within the maze limits, false otherwise.
      */
     public boolean canMove(int x, int y, Direction dir){
         Case c = Labyrinthe[x][y];
@@ -248,12 +257,11 @@ public class Resolve {
 
 
     /**
-     * Calcule la nouvelle position après un déplacement depuis une position donnée dans une direction spécifiée.
-     *
-     * @param x La coordonnée verticale (ligne) actuelle.
-     * @param y La coordonnée horizontale (colonne) actuelle.
-     * @param dir La direction dans laquelle effectuer le déplacement (NORTH, EAST, SOUTH, WEST).
-     * @return Un tableau d'entiers de taille 2 contenant la nouvelle position après déplacement : [nouveauX, nouveauY].
+     * Calculates the new position after a move from a given position in a specified direction.
+     * @param x The vertical coordinate (row) of the current cell in the maze.
+     * @param y The horizontal coordinate (column) of the current cell in the maze.
+     * @param dir The direction in which to move (NORTH, EAST, SOUTH or WEST).
+     * @return An array of integers of size 2 containing the new position after the move: [newX, newY].
      */
     public int[] move(int x, int y, Direction dir){
         return switch (dir) {
@@ -266,21 +274,21 @@ public class Resolve {
 
 
     /**
-     * Résout le labyrinthe en utilisant l'algorithme de parcours en largueur (BFS - Breadth-First Search).
+     * Resolves the maze using the breadth-first search (BFS) algorithm.
      * <p>
-     * Cet algorithme garantit de trouver le plus court chemin (en nombre de cases) entre l'entrée {@code start}
-     * et la sortie {@code end} dans le labyrinthe non pondéré.
+     * This algorithm guarantees to find the shortest path (in terms of number of cells)
+     * between the entry {@code start} and the exit {@code end} in the unweighted maze.
      * <p>
-     * Le parcours est réalisé en explorant les voisins accessibles de chaque case de manière itérative,
-     * en enregistrant le parent de chaque case visitée pour permettre la reconstruction du chemin une fois l’arrivée atteinte.
-     * @return Une liste ordonnée de {@code Case} représentant le chemin solution de l’entrée à la sortie.
-     *         Si aucun chemin n'existe, retourne une liste vide.
+     * The route is performed by exploring the accessible neighbors of each cell iteratively,
+     * recording the parent of each visited cell to allow path reconstruction once the destination is reached.
+     * @return A list of {@code Case} representing the solution path from the entry to the exit.
+     *        If no path exists, returns an empty list.
      */
     public List<Case> BFS() {
         resetCounts();
-        Queue<Case> queue = new LinkedList<>();
-        Map<Case, Case> parentMap = new HashMap<>();
-        Set<Case> visited = new HashSet<>();
+        Queue<Case> queue = new LinkedList<>(); // Queue for BFS
+        Map<Case, Case> parentMap = new HashMap<>(); // Map to keep track of the parent of each cell
+        Set<Case> visited = new HashSet<>(); // Set to keep track of visited cells
 
         queue.add(start);
         visited.add(start);
@@ -289,12 +297,16 @@ public class Resolve {
         while (!queue.isEmpty()) {
             Case current = queue.poll();
 
-            // Si le serpent arrive à la fin
+            // If we reach the end, we reconstruct the path
+            // using the parent map
             if (current == end) {
                 return reconstructPath(parentMap, end);
             }
 
-            // On explore tous les voisins accessibles
+            // We explore the accessible neighbors of the current cell
+            // and add them to the queue if they haven't been visited yet
+            // We also mark them as visited and set their parent
+            // to the current cell
             for (Case neighbor : getAccessibleNeighbors(current)) {
                 if (!visited.contains(neighbor)) {
                     visited.add(neighbor);
@@ -304,20 +316,19 @@ public class Resolve {
             }
         }
 
-        return Collections.emptyList(); // Aucun chemin trouvé
+        return Collections.emptyList(); // No path found
     }
 
-    // On reconstruis le chemin à partir des parents
+    // We reconstruct the path from the parents
     /**
-     * Reconstitue le chemin depuis l'entrée jusqu'à la sortie en utilisant la carte des parents.
+     * Reconstructs the path from the entry to the exit using the parent map.
      * <p>
-     * Cette méthode retrace le chemin en partant de la case de fin {@code end} jusqu'à l'entrée
-     * en suivant les références contenues dans {@code parentMap}, puis inverse la liste
-     * pour obtenir l'ordre correct (de l'entrée vers la sortie).
-     *
-     * @param parentMap Une map contenant, pour chaque case visitée, la case dont elle provient.
-     * @param end La case de destination (fin du labyrinthe).
-     * @return Une liste ordonnée de {@code Case} représentant le chemin de la solution.
+     * This method traces the path from the end cell {@code end} back to the entry
+     * by following the references contained in {@code parentMap}, then reverses the list
+     * to obtain the correct order (from entry to exit).
+     * @param parentMap A map containing, for each visited cell, the cell from which it came.
+     * @param end The destination cell (end of the maze).
+     * @return An ordered list of {@code Case} representing the solution path.
      */
     private List<Case> reconstructPath(Map<Case, Case> parentMap, Case end) {
         List<Case> path = new ArrayList<>();
@@ -332,17 +343,15 @@ public class Resolve {
         return path;
     }
 
-    // Voisins accessibles d'une case
+    // Neighbors accessible from a cell
     /**
-     * Retourne la liste des voisins accessibles depuis une case donnée.
+     * Returns the list of accessible neighbors from a given cell.
      * <p>
-     * Cette méthode examine les murs de la case actuelle pour déterminer
-     * les directions dans lesquelles un déplacement est possible (c'est-à-dire
-     * où il n'y a pas de mur). Elle retourne toutes les cases voisines
-     * qui peuvent être atteintes directement depuis la case courante.
-     *
-     * @param current La case courante dont on souhaite connaître les voisins accessibles.
-     * @return Une liste de {@code Case} représentant les cases voisines accessibles.
+     * This method examines the walls of the current cell to determine
+     * the directions in which a move is possible (i.e., where there are no walls).
+     * It returns all the neighboring cells that can be reached directly from the current cell.
+     * @param current The current cell from which we want to know the accessible neighbors.
+     * @return A list of {@code Case} representing the accessible neighboring cells.
      */
 
     private List<Case> getAccessibleNeighbors(Case current) {
@@ -350,19 +359,19 @@ public class Resolve {
         int x = current.getX();
         int y = current.getY();
 
-        // Voisin du haut
+        // Neighborg of the top
         if (!current.getNorth() && x > 0) {
             neighbors.add(Labyrinthe[x-1][y]);
         }
-        // Voisin du bas
+        // Neighborg of the bottom
         if (!current.getSouth() && x < height - 1) {
             neighbors.add(Labyrinthe[x+1][y]);
         }
-        // Voisin de gauche
+        // Neighborg of the left
         if (!current.getWest() && y > 0) {
             neighbors.add(Labyrinthe[x][y-1]);
         }
-        // Voisin de droite
+        // Neighborg of the right
         if (!current.getEast() && y < width - 1) {
             neighbors.add(Labyrinthe[x][y+1]);
         }
@@ -372,39 +381,39 @@ public class Resolve {
 
 
     /**
-     * Retourne le nombre de cases visitées lors de la résolution du labyrinthe.
-     *
-     * @return Le nombre de cases visitées.
+     * Return the number of visited cells during the maze resolution.
+     * 
+     * @return The number of visited cells.
      */
     public int getNbCase() { return nbCase; }
 
 
     /**
-     * Retourne la durée de la résolution du labyrinthe en nanosecondes.
-     *
-     * @return La durée en nanosecondes.
+     * Return the duration of the maze resolution in nanoseconds.
+     * 
+     * @return The duration in nanoseconds.
      */
     public long getDuration() { return duration; }
 
 
     /**
-     * Incrémente de 1 le compteur de cases visitées.
+     * Increments the number of visited cells by 1.
      */
     public void addNbCase(){ this.nbCase++; }
 
 
     /**
-     * Définit le nombre de cases visitées.
-     *
-     * @param nbCase Le nouveau nombre de cases visitées.
+     * Define the number of visited cells.
+     * 
+     * @param nbCase The new number of visited cells.
      */
     public void setNbCase(int nbCase) { this.nbCase = nbCase; }
 
 
     /**
-     * Définit la durée de la résolution du labyrinthe.
-     *
-     * @param duration La durée en nanosecondes.
+     * Define the duration of the maze resolution.
+     * 
+     * @param duration The duration in nanoseconds.
      */
     public void setDuration(long duration) { this.duration = duration; }
 
