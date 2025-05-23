@@ -121,18 +121,18 @@ javac --module-path "PATH;src\lib\sqlite-jdbc-3.49.1.0.jar" --add-modules javafx
 xcopy src\main\resources\* out\ /E /Y
 ```
 
-Pour lancer l'application :
+Pour lancer l'application (Windows):
 ```bash
 java --module-path "PATH;src\lib\sqlite-jdbc-3.49.1.0.jar" --add-modules javafx.controls,javafx.fxml -d out src\main\java\com\example\nouveau\Main
 ```
 
 Pour compiler sur Ubuntu :
-``bash
+```bash
 javac --module-path PATH:src/lib/sqlite-jdbc-3.49.1.0.jar --add-modules javafx.controls,javafx.fxml -d out src/main/java/com/example/nouveau/*.java
 ```
 
-Pour lancer l'application
-``bash
+Pour lancer l'application (Ubuntu) :
+```bash
 java --module-path PATH:src/lib/sqlite-jdbc-3.49.1.0.jar --add-modules javafx.controls,javafx.fxml -cp out com.example.nouveau.Main
 ```
 
