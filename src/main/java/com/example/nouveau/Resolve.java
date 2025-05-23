@@ -5,16 +5,17 @@ public class Resolve {
     private Case[][] Labyrinthe;
     private int width, height;
     private int nbCase =0;
+    private long duration =0;
     private Case start;
     private Case end;
 
-    public Resolve(Maze labyrinth) {
-        this(labyrinth, null, null); // Appelle le constructeur principal avec entry et exit null
+    public Resolve(Maze Labyrinthe) {
+        this(Labyrinthe, null, null); // Appelle le constructeur principal avec entry et exit null
     }
 
 
-    public Resolve(Maze labyrinth, Case entry, Case exit) {
-        this.Labyrinthe = labyrinth.getMaze();
+    public Resolve(Maze Labyrinthe, Case entry, Case exit) {
+        this.Labyrinthe = Labyrinthe.getMaze();
         this.height = this.Labyrinthe.length;
         this.width = this.Labyrinthe[0].length;
         this.start = entry;
@@ -48,11 +49,14 @@ public class Resolve {
 
     //Trémaux resolution
     public List<Case> Tremaux(){
+        long startTIme = System.nanoTime();
         resetCounts();
         List<Case> path = new ArrayList<>();
         boolean found = explore(start.getX(), start.getY(), path);
         if (!found) return null;
         path.removeIf(c ->(c.getCount()==2));
+        long endTime = System.nanoTime();
+        setDuration(endTime-startTIme);
         return path;
     }
 
@@ -60,8 +64,8 @@ public class Resolve {
         Case current = Labyrinthe[x][y];
         current.incrementCount();
         path.add(current);
-        nbCase++;
-        System.out.println("Exploration de la case : " + current);
+        addNbCase();
+
 
         if (Labyrinthe[x][y] == end){
             System.out.println("Nb Case visité:" + nbCase);
@@ -89,7 +93,6 @@ public class Resolve {
             }
         }
         current.incrementCount();
-        System.out.println("Backtrack à la case : " + current);
         return false;
     }
 
@@ -97,25 +100,18 @@ public class Resolve {
     //Main Gauche sur le mur
     public List<Case> HandOnWall() {
         resetCounts();
+        long startTime = System.nanoTime();
         int x = start.getX();
         int y = start.getY();
         Case current = Labyrinthe[x][y];
 
-        // Position de départ (0, 0)
-        Direction dir = Direction.EAST; // Direction initiale (peut être ajustée)
+        Direction dir = Direction.EAST;
         List<Case> path = new ArrayList<>();
-        current.setVisited(true);  // Marquer la première case comme visitée
+        current.setVisited(true);
         path.add(current);
-
-        System.out.println("Début de l'exploration"); // Debug
-        System.out.println("[0, 0]"); // Debug
-
-        /* System.out.println("Position actuelle: (" + x + ", " + y + ")");
-        System.out.println("Direction: " + dir);
-        System.out.println("Mur à droite : " + grid[x][y].getEast());
-        System.out.println("Mur à gauche : " + grid[x][y].getWest()); */
         int steps = 0;
         int maxSteps = width * height * 4;
+
 
         // Condition pour sortir du labyrinthe
         while (Labyrinthe[x][y] != end) {
@@ -124,6 +120,7 @@ public class Resolve {
                 return null;
             }
 
+            addNbCase();
             Direction left = dir.turnLeft();
 
             if (canMove(x, y, left)) {
@@ -157,8 +154,8 @@ public class Resolve {
                 path.add(Labyrinthe[x][y]);
             }
         }
-
-        System.out.println("Fin de l'exploration"); // Debug
+        long endTime = System.nanoTime();
+        setDuration(endTime - startTime);
         return path;
     }
 
@@ -177,13 +174,13 @@ public class Resolve {
     public int[] move(int x, int y, Direction dir){
         return switch (dir) {
             case NORTH -> new int[] {x - 1, y};
-            case EAST  -> new int[] {x, y + 1};  // ← corrigé
+            case EAST  -> new int[] {x, y + 1};
             case SOUTH -> new int[] {x + 1, y};
             case WEST  -> new int[] {x, y - 1};
         };
     }
 
-    // Résolution avec le parcours en largeur : BFS
+    //BFS resolution
     public List<Case> BFS() {
         resetCounts();
         Queue<Case> queue = new LinkedList<>();
@@ -255,15 +252,12 @@ public class Resolve {
         return neighbors;
     }
 
+    public int getNbCase() { return nbCase; }
+    public long getDuration() { return duration; }
 
+    public void addNbCase(){ this.nbCase++; }
 
+    public void setNbCase(int nbCase) { this.nbCase = nbCase; }
+
+    public void setDuration(long duration) { this.duration = duration; }
 }
-
-
-
-
-
-
-
-
-
