@@ -5,36 +5,15 @@ public class Resolve {
     private Case[][] Labyrinthe;
     private int width, height;
     private int nbCase =0;
-    private long duration =0;
     private Case start;
     private Case end;
 
     public Resolve(Maze Labyrinthe) {
-        this(Labyrinthe, null, null); // Appelle le constructeur principal avec entry et exit null
-    }
-
-
-    public Resolve(Maze Labyrinthe, Case entry, Case exit) {
         this.Labyrinthe = Labyrinthe.getMaze();
         this.height = this.Labyrinthe.length;
         this.width = this.Labyrinthe[0].length;
-        this.start = entry;
-        this.end = exit;
-
-        // Forcer l'ouverture des murs pour les entrées/sorties
-        if (start != null) {
-            if (start.getX() == 0) start.setNorth(false);
-            else if (start.getX() == height - 1) start.setSouth(false);
-            else if (start.getY() == 0) start.setWest(false);
-            else if (start.getY() == width - 1) start.setEast(false);
-        }
-
-        if (end != null) {
-            if (end.getX() == 0) end.setNorth(false);
-            else if (end.getX() == height - 1) end.setSouth(false);
-            else if (end.getY() == 0) end.setWest(false);
-            else if (end.getY() == width - 1) end.setEast(false);
-        }
+        this.start = Labyrinthe.getMaze()[0][0];
+        this.end = Labyrinthe.getMaze()[height-1][width-1];
     }
 
 
@@ -49,14 +28,11 @@ public class Resolve {
 
     //Trémaux resolution
     public List<Case> Tremaux(){
-        long startTIme = System.nanoTime();
         resetCounts();
         List<Case> path = new ArrayList<>();
         boolean found = explore(start.getX(), start.getY(), path);
         if (!found) return null;
         path.removeIf(c ->(c.getCount()==2));
-        long endTime = System.nanoTime();
-        setDuration(endTime-startTIme);
         return path;
     }
 
@@ -64,10 +40,10 @@ public class Resolve {
         Case current = Labyrinthe[x][y];
         current.incrementCount();
         path.add(current);
-        addNbCase();
+        nbCase++;
+        System.out.println("Exploration de la case : " + current);
 
-
-        if (Labyrinthe[x][y] == end){
+        if (x == height - 1 && y == width - 1){
             System.out.println("Nb Case visité:" + nbCase);
             return true;
         }
@@ -93,34 +69,47 @@ public class Resolve {
             }
         }
         current.incrementCount();
+        System.out.println("Backtrack à la case : " + current);
         return false;
     }
 
 
     //Main Gauche sur le mur
+    /**
+     * Algorithme de résolution de labyrinthe : "Hand on Wall"
+     * Cette méthode consiste à suivre en permanence le mur situé à gauche jusqu'à atteindre la sortie.
+     *
+     * @return un tableau de cases représentant le chemin de résolution du labyrinthe
+     */
     public List<Case> HandOnWall() {
         resetCounts();
-        long startTime = System.nanoTime();
         int x = start.getX();
         int y = start.getY();
         Case current = Labyrinthe[x][y];
 
-        Direction dir = Direction.EAST;
+        // Position de départ (0, 0)
+        Direction dir = Direction.EAST; // Direction initiale (peut être ajustée)
         List<Case> path = new ArrayList<>();
-        current.setVisited(true);
+        current.setVisited(true);  // Marquer la première case comme visitée
         path.add(current);
+
+        System.out.println("Début de l'exploration"); // Debug
+        System.out.println("[0, 0]"); // Debug
+
+        /* System.out.println("Position actuelle: (" + x + ", " + y + ")");
+        System.out.println("Direction: " + dir);
+        System.out.println("Mur à droite : " + grid[x][y].getEast());
+        System.out.println("Mur à gauche : " + grid[x][y].getWest()); */
         int steps = 0;
         int maxSteps = width * height * 4;
 
-
         // Condition pour sortir du labyrinthe
-        while (Labyrinthe[x][y] != end) {
+        while (!(x == height - 1 && y == width - 1)) {
             if (steps++ > maxSteps) {
                 System.out.println("Labyrinthe insoluble (boucle infinie détectée)");
                 return null;
             }
 
-            addNbCase();
             Direction left = dir.turnLeft();
 
             if (canMove(x, y, left)) {
@@ -154,12 +143,19 @@ public class Resolve {
                 path.add(Labyrinthe[x][y]);
             }
         }
-        long endTime = System.nanoTime();
-        setDuration(endTime - startTime);
+
+        System.out.println("Fin de l'exploration"); // Debug
         return path;
     }
 
-
+    /**
+     * Vérifie si un déplacement est possible depuis une case donnée dans une direction spécifique.
+     *
+     * @param x La coordonnée verticale (ligne) de la case actuelle dans le labyrinthe.
+     * @param y La coordonnée horizontale (colonne) de la case actuelle dans le labyrinthe.
+     * @param dir La direction vers laquelle on souhaite se déplacer (NORTH, EAST, SOUTH ou WEST).
+     * @return true si le déplacement est possible, s'il n'y a pas de mur et que la case cible est dans les limites du labyrinthe, false sinon.
+     */
     public boolean canMove(int x, int y, Direction dir){
         Case c = Labyrinthe[x][y];
         return switch (dir) {
@@ -171,6 +167,14 @@ public class Resolve {
     }
 
 
+    /**
+     * Calcule la nouvelle position après un déplacement depuis une position donnée dans une direction spécifiée.
+     *
+     * @param x La coordonnée verticale (ligne) actuelle.
+     * @param y La coordonnée horizontale (colonne) actuelle.
+     * @param dir La direction dans laquelle effectuer le déplacement (NORTH, EAST, SOUTH, WEST).
+     * @return Un tableau d'entiers de taille 2 contenant la nouvelle position après déplacement : [nouveauX, nouveauY].
+     */
     public int[] move(int x, int y, Direction dir){
         return switch (dir) {
             case NORTH -> new int[] {x - 1, y};
@@ -180,7 +184,7 @@ public class Resolve {
         };
     }
 
-    //BFS resolution
+    // Résolution avec le parcours en largeur : BFS
     public List<Case> BFS() {
         resetCounts();
         Queue<Case> queue = new LinkedList<>();
@@ -252,12 +256,15 @@ public class Resolve {
         return neighbors;
     }
 
-    public int getNbCase() { return nbCase; }
-    public long getDuration() { return duration; }
 
-    public void addNbCase(){ this.nbCase++; }
 
-    public void setNbCase(int nbCase) { this.nbCase = nbCase; }
-
-    public void setDuration(long duration) { this.duration = duration; }
 }
+
+
+
+
+
+
+
+
+

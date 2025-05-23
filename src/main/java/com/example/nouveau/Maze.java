@@ -18,6 +18,8 @@ public class Maze {
             }
         }
         Case.resetNumber();
+        this.maze[0][0].setWest(false);
+        this.maze[height-1][width-1].setEast(false);
     }
 
 
@@ -146,11 +148,5 @@ public class Maze {
 
     public Case[][] getMaze(){
         return maze;
-    }
-    public Case getCase(int x, int y){
-        if(x>=0 && x<height && y>=0 && y<width){
-            return maze[x][y];
-        }
-        return null;
     }
 }
