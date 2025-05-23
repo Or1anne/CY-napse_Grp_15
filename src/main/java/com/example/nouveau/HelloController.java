@@ -30,6 +30,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+
+/**
+ * Contrôleur principal gérant les interactions de l'interface utilisateur.
+ */
 public class HelloController {
 
     private double zoomFactor = 1.0;
@@ -1361,6 +1365,12 @@ public class HelloController {
         }
     }
 
+
+    /**
+     * Charge et affiche la page d'accueil lors d'un clic souris.
+     *
+     * @param event l'événement souris déclenchant le retour à la page d'accueil
+     */
     @FXML
     public void ReturnHomepage(MouseEvent event) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Homepage.fxml"));
@@ -1377,6 +1387,12 @@ public class HelloController {
         stage.show();
     }
 
+
+    /**
+     * Active le mode plein écran avec la touche F11 et ajuste la taille du labyrinthe.
+     *
+     * @param scene la scène sur laquelle écouter l'appui sur la touche F11
+     */
     private void FullScreen(Scene scene){
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F11) {

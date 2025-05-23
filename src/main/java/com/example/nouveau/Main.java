@@ -3,6 +3,16 @@ package com.example.nouveau;
 import javax.swing.text.Style;
 import java.util.*;
 
+
+
+/**
+ * Classe principale de l'application de labyrinthe.
+ * <p>
+ * Cette classe gère le lancement de l'application, soit en interface graphique, soit en mode console.
+ * Elle offre des fonctionnalités telles que la génération, la résolution, la modification et la sauvegarde
+ * de labyrinthes, ainsi que l'affichage de statistiques.
+ * </p>
+ */
 public class Main {
     private static Maze currentMaze;
     private static final Scanner sc = new Scanner(System.in);
@@ -17,6 +27,18 @@ public class Main {
     private static final  LinkedList<String> color = new LinkedList<>(Arrays.asList(ANSI_RED, ANSI_BLUE, ANSI_PURPLE, ANSI_GREEN));
     private static final String blade = "==============================";
 
+
+
+    /**
+     * Point d'entrée principal de l'application.
+     * <p>
+     * Affiche une bannière de bienvenue, demande à l'utilisateur s'il souhaite
+     * utiliser l'interface graphique, sinon lance le mode console.
+     * </p>
+     *
+     * @param args arguments de la ligne de commande (non utilisés)
+     * @throws InterruptedException si le thread est interrompu lors des pauses d'affichage
+     */
     public static void main(String[] args) throws InterruptedException {
         Collections.shuffle(color, new Random());
         String [] lines={
@@ -55,12 +77,29 @@ public class Main {
         }
     }
 
+
+    /**
+     * Affiche les statistiques de résolution d'un labyrinthe.
+     *
+     * @param solver instance de la classe Resolve contenant les résultats
+     */
     public static void Show_Stat(Resolve solver){
         double durationsMs= solver.getDuration()/1_000_000.0;
         System.out.println("Nombre de cases visitées: " +ANSI_YELLOW+ solver.getNbCase()+ANSI_RESET);
         System.out.println(("Durée " +ANSI_YELLOW+durationsMs+" ms"+ANSI_RESET));
     }
 
+
+
+    /**
+     * Gère l'interface de génération d'un labyrinthe en mode terminal.
+     * <p>
+     * Demande les dimensions, la méthode de génération et la seed,
+     * puis génère et affiche le labyrinthe correspondant.
+     * </p>
+     *
+     * @throws InterruptedException si le thread est interrompu lors des pauses d'affichage
+     */
     public static void generateTerminal() throws InterruptedException {
         int width = 30;
         int height = 30;
@@ -118,6 +157,14 @@ public class Main {
         HelloController.printTerminal(currentMaze);
     }
 
+
+    /**
+     * Affiche un menu donné sous forme de tableau de chaînes, puis récupère le choix de l'utilisateur.
+     *
+     * @param Menu tableau de chaînes représentant les options du menu à afficher
+     * @return la chaîne saisie par l'utilisateur correspondant à son choix
+     * @throws InterruptedException si le thread est interrompu lors de l'affichage
+     */
     public static String MenuTerminal(String [] Menu) throws InterruptedException{
         for(String menu : Menu){
             Thread.sleep(200);
@@ -129,6 +176,13 @@ public class Main {
 
     }
 
+
+    /**
+     * Affiche la liste des labyrinthes sauvegardés, permet à l'utilisateur d'en choisir un à charger,
+     * puis charge et affiche ce labyrinthe.
+     *
+     * @throws InterruptedException si le thread est interrompu lors des pauses d'affichage
+     */
     public static void MenuSave() throws InterruptedException{
         Database db = new Database();
         List<String> mazeList = db.getMazeList();
@@ -160,6 +214,17 @@ public class Main {
         }
     }
 
+
+    /**
+     * Permet de modifier un mur d'une case du labyrinthe.
+     * <p>
+     * L'utilisateur saisit les coordonnées de la case, choisit quel mur modifier,
+     * puis décide d'ajouter ou d'enlever ce mur. La modification est répercutée
+     * sur la case voisine pour conserver la cohérence du labyrinthe.
+     * </p>
+     *
+     * @param maze le labyrinthe à modifier
+     */
     public static void editCase(Maze maze) {
         System.out.println("Modifier une case du labyrinthe");
         System.out.print("Entrez la coordonnée X (0 à " + (maze.getWidth() - 1) + ", ou r pour retour) : ");
@@ -264,7 +329,15 @@ public class Main {
 
 
 
-
+    /**
+     * Lance le mode console de l'application.
+     * <p>
+     * Propose un menu interactif permettant de générer, charger, résoudre,
+     * sauvegarder, modifier un labyrinthe ou quitter l'application.
+     * </p>
+     *
+     * @throws InterruptedException si le thread est interrompu lors des pauses d'affichage
+     */
     public static void startConsoleMode() throws InterruptedException {
         Database db = new Database();
         String choose;
