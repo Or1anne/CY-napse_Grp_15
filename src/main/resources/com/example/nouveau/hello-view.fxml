@@ -258,7 +258,7 @@
          </ChoiceBox>
          <HBox prefHeight="100.0" prefWidth="200.0">
             <children>
-               <Button id="generateLab" mnemonicParsing="false" text="Charger">
+               <Button id="generateLab" mnemonicParsing="false" onAction="#loadMaze" text="Charger">
                   <font>
                      <Font size="9.0" />
                   </font>
@@ -266,7 +266,7 @@
                      <Insets left="5.0" />
                   </HBox.margin>
                </Button>
-               <Button id="generateLab" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" text="Supprimer">
+               <Button id="generateLab" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#deleteMaze" text="Supprimer">
                   <font>
                      <Font size="9.0" />
                   </font>

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -94,7 +93,10 @@ public class HelloController {
         SpeedInputResolve.setVisible(false);
         SpeedInputResolve.setManaged(false);
         editModeButton.setDisable(true);
-        SaveButton.setDisable(true);
+    }
+
+    private void setupWithDatabase() {
+        SaveList.setItems(db.getMazeList());
     }
 
     @FXML
@@ -963,7 +965,25 @@ public class HelloController {
         }
         else{
             db.SaveMaze(currentMaze, MazeName.getText());
+            SaveList.setItems(db.getMazeList());
+            showMessage("Sauvegarde", "Labyrinthe Sauvegardé avec succès !");
         }
+    }
+
+    @FXML
+    public void loadMaze() {
+        if(!SaveList.getItems().isEmpty() && SaveList.getValue() != null){
+            ChargeMaze(SaveList.getValue());
+        }
+        else{
+            showError("Erreur de restauration", "Aucun labyrinthe à charger");
+        }
+    }
+
+    @FXML
+    public void deleteMaze() {
+        db.DeleteMaze(SaveList.getValue());
+        SaveList.setItems(db.getMazeList());
     }
 
     public void ChargeMaze(String name) {
@@ -1002,9 +1022,17 @@ public class HelloController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    private void showMessage(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
     public void setDatabase(Database db) {
         this.db = db;
+        setupWithDatabase();
     }
 
     private void setControlsDisabled(boolean disabled) {
