@@ -154,37 +154,37 @@ public class Maze {
         return null;
     }
 
-    public boolean isPerfect() {
+
+    public boolean isPerfect() {  //Returns true if the maze is perfect
+        //Initializing variables
         int height = this.getHeight();
         int width = this.getWidth();
         Case[][] maze = this.getMaze();
 
-        boolean[][] visited = new boolean[height][width];
-        int totalCells = height * width;
-        int visitedCount = 0;
+        boolean[][] visited = new boolean[height][width]; // Create a matrice to track visited cells
+        int totalCells = height * width; // Total number of cells in the maze
+        int visitedCount = 0; // Counter of visited cells
 
-        Stack<Case> stack = new Stack<>();
-        stack.push(maze[0][0]); // Démarre depuis la première case
-        visited[0][0] = true;
-        visitedCount++;
+        Stack<Case> stack = new Stack<>(); // Stack for DFS
+        stack.push(maze[0][0]); // Start from the cell (0,0)
+        visited[0][0] = true; // Mark the starting cell as visited
+        visitedCount++; // Increment the visited count
 
-        // Pour stocker le parent de chaque cellule (éviter cycles)
-        Map<Case, Case> parentMap = new HashMap<>();
+        Map<Case, Case> parentMap = new HashMap<>(); // Map to track parent cells
 
-        while (!stack.isEmpty()) {
-            Case current = stack.pop();
+        while (!stack.isEmpty()) { // While there are cells to explore
+            Case current = stack.pop(); //Get the cell on top of the stack
             int x = current.getX();
-            int y = current.getY();
+            int y = current.getY(); // Get the coordinates of the current cell
 
             for (int[] dir : new int[][]{{-1,0},{1,0},{0,-1},{0,1}}) {
                 int nx = x + dir[0];
-                int ny = y + dir[1];
+                int ny = y + dir[1]; // Calculate the neighbor's coordinates
 
-                if (nx < 0 || ny < 0 || nx >= height || ny >= width) continue;
+                if (nx < 0 || ny < 0 || nx >= height || ny >= width) continue; // Check if the neighbor is out of bounds
 
-                Case neighbor = maze[nx][ny];
-
-                // Vérifie si un mur bloque le passage
+                Case neighbor = maze[nx][ny]; // Get the neighbor cell
+                // Check if there is a wall between the current cell and the neighbor
                 if ((nx == x - 1 && current.getNorth()) ||
                     (nx == x + 1 && current.getSouth()) ||
                     (ny == y - 1 && current.getWest()) ||
@@ -192,23 +192,19 @@ public class Maze {
                     continue;
                 }
 
-                // Déjà visité ?
-                if (!visited[nx][ny]) {
-                    visited[nx][ny] = true;
-                    visitedCount++;
-                    parentMap.put(neighbor, current);
-                    stack.push(neighbor);
+                if (!visited[nx][ny]) { // Check if the neighboring cell has not been visited yet
+                    visited[nx][ny] = true; // Mark it as visited
+                    visitedCount++; // Increment the visited count
+                    parentMap.put(neighbor, current); // Set the current cell as the parent of the neighbor
+                    stack.push(neighbor); // Add the neighbor cell onto the stack
                 } else {
-                    // Si déjà visité et pas le parent => cycle détecté
-                    if (parentMap.get(current) != neighbor) {
-                        return false; // Il y a un cycle, donc pas parfait
+                    if (parentMap.get(current) != neighbor) { // Check if the neighbor is not the parent of the current cell
+                        return false; //Then we have found a cycle and the maze is not perfect
                     }
                 }
             }
         }
-
-        // Vérifie que toutes les cases ont été visitées (connexité)
-        return visitedCount == totalCells;
+        return visitedCount == totalCells; // Return true if all cells have been visited and no cycles were found
     }
 
 }
