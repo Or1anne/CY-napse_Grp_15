@@ -2,9 +2,12 @@ package com.example.nouveau;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -20,8 +23,10 @@ import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
+import java.sql.*;
 import java.util.*;
 
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -67,7 +72,7 @@ public class HelloController {
     @FXML private Label time;
     @FXML private Label NbCaseExplore;
     @FXML private Label NbCaseFinal;
-    @FXML private Button ModeEdition;
+    @FXML private ChoiceBox<String> SaveList;
     @FXML private Button selectEntryExitButton;
 
 
@@ -731,15 +736,17 @@ public class HelloController {
                 return;
         }
 
-        long duration = solver.getDuration();
-        time.setText("Temps de résolution : " + duration + " ms");
-        NbCaseExplore.setText("Nombre de cases parcourues : " + solver.getNbCase());
-        NbCaseFinal.setText("Nombre de cases du chemin final : " + path.size());
 
         if (path == null || path.isEmpty()) {
             showError("Labyrinthe insoluble", "Aucun chemin n’a été trouvé.\nVérifie que l’entrée et la sortie sont accessibles.");
             return;
         }
+
+        long duration = solver.getDuration();
+        time.setText("Temps de résolution : " + duration + " ms");
+        NbCaseExplore.setText("Nombre de cases parcourues : " + solver.getNbCase());
+        NbCaseFinal.setText("Nombre de cases du chemin final : " + path.size());
+
         if (toggleSwitchResolve.isSelected()) {
             showPathStepByStep(path);
         } else {
@@ -947,13 +954,16 @@ public class HelloController {
 
     @FXML
     public void SaveMaze() {
-        String Name;
-        try {
-            Name = MazeName.getText();
-        } catch (NumberFormatException e) {
-            Name = "Labyrinthe";
+        ObservableList<String> ListMaze = db.getMazeList();
+        if(MazeName.getText().isEmpty()){
+            showError("Erreur de Sauvegarde", "Veuillez entrer un nom pour le labyrinthe.");
         }
-        db.SaveMaze(currentMaze, Name);
+        else if(ListMaze.contains(MazeName.getText())){
+            showError("Erreur de Sauvegarde", "Ce labyrinthe existe déjà, veuillez entrer un nouveau nom");
+        }
+        else{
+            db.SaveMaze(currentMaze, MazeName.getText());
+        }
     }
 
     public void ChargeMaze(String name) {
@@ -971,11 +981,7 @@ public class HelloController {
         for (int i = 0; i < currentMaze.getHeight(); i++) {
             for (int j = 0; j < currentMaze.getWidth(); j++) {
                 Case cell = currentMaze.getMaze()[i][j];
-                if ((i == 0 && !cell.getNorth()) ||
-                        (i == currentMaze.getHeight() - 1 && !cell.getSouth()) ||
-                        (j == 0 && !cell.getWest()) ||
-                        (j == currentMaze.getWidth() - 1 && !cell.getEast())) {
-
+                if ((i == 0 && !cell.getNorth()) || (i == currentMaze.getHeight() - 1 && !cell.getSouth()) || (j == 0 && !cell.getWest()) || (j == currentMaze.getWidth() - 1 && !cell.getEast())) {
                     if (entryCell == null) {
                         entryCell = cell;
                     } else if (exitCell == null) {
@@ -1019,7 +1025,6 @@ public class HelloController {
         //if (SpeedInputResolve != null) SpeedInputResolve.setDisable(disabled);
         if (MazeName != null) MazeName.setDisable(disabled);
         if (SaveButton != null) SaveButton.setDisable(disabled);
-        if (ModeEdition != null) ModeEdition.setDisable(disabled);
         if (editModeButton != null) editModeButton.setDisable(disabled);
         if (toggleSwitch != null) toggleSwitch.setDisable(disabled);
         //if (toggleSwitchResolve != null) toggleSwitchResolve.setDisable(disabled);
@@ -1061,6 +1066,7 @@ public class HelloController {
             }
         });
     }
+
 }
 
 

@@ -18,8 +18,6 @@ public class Maze {
             }
         }
         Case.resetNumber();
-        this.maze[0][0].setWest(false);
-        this.maze[height-1][width-1].setEast(false);
     }
 
 
