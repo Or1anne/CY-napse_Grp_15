@@ -130,6 +130,9 @@ Pour compiler sur Ubuntu :
 ```bash
 javac --module-path PATH:src/lib/sqlite-jdbc-3.49.1.0.jar --add-modules javafx.controls,javafx.fxml -d out src/main/java/com/example/nouveau/*.java
 ```
+```bash
+cp -r src/main/resources/* out/
+```
 
 Pour lancer l'application (Ubuntu) :
 ```bash
