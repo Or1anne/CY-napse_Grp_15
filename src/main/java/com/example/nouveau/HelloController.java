@@ -193,7 +193,7 @@ public class HelloController {
         try {
             width = Integer.parseInt(widthInput.getText());
             // Limites de génération 100 * 100
-            if (width < 1 || width > 100) {
+            if (width < 3 || width > 50) {
                 showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
                 return;
             }
@@ -203,7 +203,7 @@ public class HelloController {
         try {
             height = Integer.parseInt(heightInput.getText());
             // Limites de génération 100 * 100
-            if (height < 1 || height > 100) {
+            if (height < 3 || height > 50) {
                 showError("Taille invalide", "La taille doit être entre 1x1 et 100x100");
                 return;
             }
@@ -244,9 +244,9 @@ public class HelloController {
             progressBar.prefHeight(50);
             MazeStackPane.getChildren().add(progressBar);
             double totalSteps = steps.size();
-            int speed = (SpeedInputGeneration.getText() == null || SpeedInputGeneration.getText().isEmpty()) ? 10 : Integer.parseInt(SpeedInputGeneration.getText());
-            if (speed < 10 || speed > 101) {
-                showError("Vitesse invalide", "La vitesse doit être entre 10 et 100");
+            int speed = (SpeedInputGeneration.getText() == null || SpeedInputGeneration.getText().isEmpty()) ? 30 : Integer.parseInt(SpeedInputGeneration.getText());
+            if (speed < 10 || speed > 501) {
+                showError("Vitesse invalide", "La vitesse doit être entre 10 et 500");
                 return;
             }
             generationTimeline = new Timeline();
@@ -309,6 +309,9 @@ public class HelloController {
      */
     @FXML
     public void resetMaze() {
+        if (currentMaze == null) {
+            return;
+        }
         // on stoppe l'animation du serpent
         if (pathTimeline != null) {
             pathTimeline.stop();
@@ -536,6 +539,9 @@ public class HelloController {
      * @param cell La cellule dont le mur de bordure doit être restauré.
      */
     private void restoreBorderWall(Case cell) {
+        if (currentMaze == null) {
+            return;
+        }
         if (cell.getX() == 0) cell.setNorth(true);
         else if (cell.getX() == currentMaze.getHeight()-1) cell.setSouth(true);
         else if (cell.getY() == 0) cell.setWest(true);
@@ -972,8 +978,13 @@ public class HelloController {
         }
 
         pathTimeline = new Timeline();
+
         int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty())
                 ? 100 : Integer.parseInt(SpeedInputResolve.getText());
+        if (speed < 1) {
+            showError("Vitesse invalide", "La vitesse doit être supérieur à 0");
+            return;
+        }
 
             // 1. Affiche l'exploration progressive
             for (int i = 0; i < exploredCells.size(); i++) {

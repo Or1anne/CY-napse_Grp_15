@@ -24,7 +24,7 @@ public class Database {
     /**
      * Creates the SQLite database if it does not exist.
      * If the database already exists, it does nothing.
-     * Prints a message to the console indicating success or failure.
+     * Print a message to the console indicating success or failure.
      */
     public void createDatabase() {
         try (Connection conn = connectDatabase()) {
