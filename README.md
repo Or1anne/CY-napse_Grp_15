@@ -147,6 +147,7 @@ java --module-path PATH:src/lib/sqlite-jdbc-3.49.1.0.jar --add-modules javafx.co
 #### Si vous utilisez **IntelliJ IDEA** :
 Allez dans la classe `Main` et lancez l’application directement.
 
+#### Vous pouvez appuyer sur F11 ou F pour mettre l'application en plein écran
 
 # CY_Tech
 ![CYTECH](CY_Tech_logo.jpg)
