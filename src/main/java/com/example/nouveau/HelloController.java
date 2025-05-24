@@ -849,15 +849,15 @@ public class HelloController {
 
 
     /**
-     * Retourne le noeud graphique présent dans une cellule spécifique d'un GridPane.
+     * Return the graphical node present in a specific cell of a GridPane.
      * <p>
-     * Cette méthode parcourt les enfants du {@code gridPane} pour trouver un noeud
-     * situé à la colonne {@code col} et la ligne {@code row} spécifiées.
-     *
-     * @param gridPane Le GridPane dans lequel chercher.
-     * @param col La colonne recherchée.
-     * @param row La ligne recherchée.
-     * @return Le Node à la position ({@code col}, {@code row}) ou {@code null} s'il n'existe pas.
+     * This method iterates through the children of the {@code gridPane} to find a node
+     * located at the specified column {@code col} and row {@code row}.
+     * 
+     * @param gridPane The GridPane to search in.
+     * @param col The column to search for.
+     * @param row The row to search for.
+     * @return The Node at the position ({@code col}, {@code row}) or {@code null} if it does not exist.
      */
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
@@ -872,15 +872,15 @@ public class HelloController {
 
 
     /**
-     * Gère l'événement de zoom sur la grille du labyrinthe via la molette de la souris.
+     * Handles the mouse wheel event to zoom in or out of the maze grid.
      * <p>
-     * Augmente ou diminue le facteur de zoom selon la direction de la molette.
-     * Un zoom positif (vers l'avant) augmente le facteur de zoom de 10%,
-     * un zoom négatif (vers l'arrière) le réduit de 10%.
+     * Increases or decreases the zoom factor based on the scroll direction.
+     * A positive zoom (forward) increases the zoom factor by 10%,
+     * a negative zoom (backward) decreases it by 10%.
      * <p>
-     * Appelle ensuite la méthode {@code applyZoom()} pour appliquer l'effet visuel.
-     *
-     * @param event L'événement de défilement de la molette de souris déclenchant le zoom.
+     * Calls the {@code applyZoom()} method to apply the visual effect.
+     * 
+     * @param event The mouse wheel scroll event triggering the zoom.
      */
     @FXML
     void MazeZoom(ScrollEvent event) {
@@ -898,9 +898,9 @@ public class HelloController {
 
 
     /**
-     * Change le curseur de la souris en une main fermée lorsque la souris est pressée.
+     * Changes the mouse cursor to a closed hand when the mouse is pressed.
      * <p>
-     * Utilisé généralement pour indiquer que l'utilisateur peut glisser ou déplacer une zone.
+     * Used generally to indicate that the user can drag or move an area.
      */
     @FXML
     public void MousePressed() {
@@ -909,20 +909,20 @@ public class HelloController {
 
 
     /**
-     * Lance la résolution du labyrinthe sélectionné selon la méthode choisie.
+     * Starts the maze resolution process based on the selected method.
      * <p>
-     * Cette méthode :
+     * This method:
      * <ul>
-     *   <li> vérifie que le mode édition est désactivé (sinon elle bloque la résolution),</li>
-     *   <li> arrête toute animation en cours (chemin ou génération),</li>
-     *   <li> nettoie la barre de progression, </li>
-     *   <li> redessine le labyrinthe, </li>
-     *   <li> instancie un objet Resolve pour résoudre le labyrinthe, </li>
-     *   <li> récupère la méthode de résolution choisie (Tremaux, BFS, Hand on Wall), </li>
-     *   <li> exécute la méthode correspondante, </li>
-     *   <li> affiche une erreur si aucun chemin n’a été trouvé, </li>
-     *   <li> affiche le temps, le nombre de cases explorées et la longueur du chemin final, </li>
-     *   <li> enfin affiche le chemin soit d’un coup, soit étape par étape selon le toggle. </li>
+     *  <li> checks that the edit mode is disabled (otherwise it blocks the resolution),</li>
+     *  <li> stops any ongoing animation (path or generation),</li>
+     *  <li> clears the progress bar, </li>
+     *  <li> redraws the maze, </li>
+     *  <li> instantiates a Resolve object to solve the maze, </li>
+     *  <li> retrieves the chosen resolution method (Tremaux, BFS, Hand on Wall), </li>
+     *  <li> executes the corresponding method, </li>
+     *  <li> displays an error if no path was found, </li>
+     *  <li> displays the time, the number of explored cells, and the length of the final path, </li>
+     *  <li> finally displays the path either all at once or step by step depending on the toggle. </li>
      * </ul>
      */
     @FXML
@@ -934,6 +934,7 @@ public class HelloController {
 
         if (currentMaze == null) return;
         if (pathTimeline != null) {
+            // Stop the path animation if it exists
             pathTimeline.stop();
             pathTimeline = null;
         }
@@ -947,18 +948,20 @@ public class HelloController {
         }
 
 
-        redrawMaze();
-        Resolve solver = new Resolve(currentMaze, entryCell, exitCell);
+        redrawMaze(); // Redraw the maze to clear any previous path
+        Resolve solver = new Resolve(currentMaze, entryCell, exitCell); 
 
+        // Check if the maze is solvable
         if (!solver.isSolvable()) {
             showError("Labyrinthe insoluble", "Aucun chemin n'existe entre l'entrée et la sortie.\nVérifiez que les murs ne bloquent pas complètement le passage.");
             return;
         }
 
+        // Get the selected method
         RadioButton SolveMethod = (RadioButton) MethodSolve.getSelectedToggle();
-            // Mode normal pour tous les algorithmes
             List<Case> path = null;
             List<Case> finalPath = null;
+            // Choose the method
             switch (SolveMethod.getText()) {
                 case "Tremaux":
                     finalPath = solver.Tremaux();
@@ -973,6 +976,7 @@ public class HelloController {
                     break;
             }
 
+            // Check if the path is empty
             if (finalPath == null || finalPath.isEmpty()) {
                 showError("Labyrinthe insoluble", "Aucun chemin n'a été trouvé.\nVérifie que l'entrée et la sortie sont accessibles.");
                 return;
@@ -987,7 +991,7 @@ public class HelloController {
             } else {
                 drawPath(finalPath);
             }
-        // Mise à jour des statistiques
+        // Update the labels with the maze information
         time.setText("Temps de résolution : " + solver.getDuration()/1000.0 + " µs");
         NbCaseExplore.setText("Nombre de cases parcourues : " + solver.getNbCase());
         if (solver.getFinalPath() != null) {
@@ -996,21 +1000,31 @@ public class HelloController {
 
     }
 
+    /**
+     * Displays the path step by step for the BFS method.
+     * <p>
+     * This method uses a Timeline to animate the display of the path.
+     * It highlights the explored cells in orange and the final path in red.
+     * 
+     * @param exploredCells The list of cells explored during the BFS.
+     * @param finalPath The final path to be displayed.
+     */
     private void showBFSSteps(List<Case> exploredCells, List<Case> finalPath) {
         if (pathTimeline != null) {
+            // Stop the path animation if it exists
             pathTimeline.stop();
         }
 
         pathTimeline = new Timeline();
 
         int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty())
-                ? 100 : Integer.parseInt(SpeedInputResolve.getText());
+                ? 100 : Integer.parseInt(SpeedInputResolve.getText()); // Get the speed from the text field
         if (speed < 1) {
             showError("Vitesse invalide", "La vitesse doit être supérieur à 0");
             return;
         }
 
-            // 1. Affiche l'exploration progressive
+            // 1. Display the explored cells progressively
             for (int i = 0; i < exploredCells.size(); i++) {
                 final int stepIndex = i;
                 KeyFrame keyFrame = new KeyFrame(Duration.millis(i * speed), event -> {
@@ -1023,10 +1037,10 @@ public class HelloController {
                 pathTimeline.getKeyFrames().add(keyFrame);
             }
 
-        // 2. Récupère le chemin final
+        // 2. Retrieve the final path
         int startFinalPathTime = exploredCells.size() * speed;
 
-        // 3. Affiche le chemin final progressivement
+        // 3. Display the final path progressively
         for (int i = 0; i < finalPath.size(); i++) {
             final int pathIndex = i;
             KeyFrame pathFrame = new KeyFrame(Duration.millis(startFinalPathTime + (i * speed)), event -> {
@@ -1036,7 +1050,7 @@ public class HelloController {
                     redrawCell(finalPath.get(pathIndex));
                     pathPane.setStyle(pathPane.getStyle() + "; -fx-background-color: #ff0000;");
 
-                    // Ajoute un label pour la dernière case (sortie)
+                    // Add a label for le last cell (exit)
                     if (pathIndex == finalPath.size() - 1) {
                         Label label = new Label("S");
                         label.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
@@ -1052,10 +1066,18 @@ public class HelloController {
         pathTimeline.play();
     }
 
+    /**
+     * Redraws a specific cell in the maze grid.
+     * <p>
+     * This method updates the visual representation of a cell in the maze grid
+     * based on its current state (walls, entry/exit).
+     * 
+     * @param cell The cell to redraw.
+     */
     private void redrawCell(Case cell) {
         Pane pane = getPaneFromGrid(cell.getY(), cell.getX());
         if (pane != null) {
-            pane.getChildren().clear(); // Efface les anciens labels
+            pane.getChildren().clear(); // Erase the old labels
 
             String style = "-fx-background-color: " +
                     (cell == entryCell ? "#00ff00" :
@@ -1068,7 +1090,7 @@ public class HelloController {
 
             pane.setStyle(style);
 
-            // Réajoute les labels pour entrée/sortie si nécessaire
+            // Add the labels for entry and exit if needed
             if (cell == entryCell) {
                 Label label = new Label("E");
                 label.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
@@ -1087,11 +1109,11 @@ public class HelloController {
 
 
     /**
-     * Colore en orange (#ff6a00) le fond des cellules représentant le chemin donné dans la grille.
-     * Chaque cellule du chemin est mise en évidence visuellement.
-     *
-     * @param path Liste ordonnée des cellules (Cases) formant le chemin à dessiner.
-     *             Si la liste est nulle ou vide, la méthode ne fait rien.
+     * Colorates in orange (#ff6a00) the background of the cells representing the given path in the grid.
+     * Each cell of the path is visually highlighted.
+     * 
+     * @param path Ordered list of cells (Cases) forming the path to be drawn.
+     *            If the list is null or empty, the method does nothing.
      */
     private void drawPath(List<Case> path) {
         if (path == null || path.isEmpty()) return;
@@ -1106,11 +1128,11 @@ public class HelloController {
 
 
     /**
-     * Recherche et retourne le noeud (Pane) contenu dans la GridPane à la position spécifiée.
-     *
-     * @param col numéro de colonne (axe horizontal) dans la grille.
-     * @param row numéro de ligne (axe vertical) dans la grille.
-     * @return Le Node correspondant à cette position dans la GridPane, ou null si aucun nœud n'est trouvé.
+     * Searches and returns the node (Pane) contained in the GridPane at the specified position.
+     * 
+     * @param col Column number (horizontal axis) in the grid.
+     * @param row Row number (vertical axis) in the grid.
+     * @return The Node corresponding to this position in the GridPane, or null if no node is found.
      */
     private Pane getPaneFromGrid(int col, int row) {
         for (Node node : gridPane.getChildren()) {
@@ -1126,19 +1148,20 @@ public class HelloController {
 
 
     /**
-     * Affiche le chemin donné dans la grille en le colorant étape par étape avec une animation.
-     * Chaque cellule du chemin est mise en surbrillance en rouge selon la vitesse spécifiée.
+     * Displays the current path in the maze grid by coloring each cell step by step.
+     * Each cell of the path is highlighted in red according to the specified speed.
      * <p>
-     * Si le mode édition est activé, l'animation en cours est arrêtée et réinitialisée.
-     * La vitesse d'animation est récupérée depuis l'entrée utilisateur, avec une valeur par défaut de 100 ms.
-     * La vitesse doit être comprise entre 10 et 100 ms, sinon un message d'erreur est affiché.
-     *
-     * @param path Liste ordonnée des cellules (Cases) formant le chemin à animer.
-     *             Si la liste est vide ou nulle, la méthode n'affiche rien.
+     * If the edit mode is enabled, the ongoing animation is stopped and reset.
+     * The animation speed is retrieved from the user input, with a default value of 100 ms.
+     * The speed must be between 10 and 100 ms, otherwise an error message is displayed.
+     * 
+     * @param path Ordered list of cells (Cases) forming the path to animate.
+     *             If the list is empty or null, the method does nothing.
      */
-    public void showPathStepByStep(List<Case> path) {
+    public void showPathStepByStep(List<Case> path) { // Public method to display the path step by step
 
         if (editMode) {
+            // Stop the ongoing generation if it exists
             if (pathTimeline != null) {
                 pathTimeline.stop();
                 pathTimeline = null;
@@ -1146,18 +1169,21 @@ public class HelloController {
         }
 
         if (pathTimeline != null) {
+            // Stop the path animation if it exists
             pathTimeline.stop();
         }
 
 
         int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty()) ? 100 : Integer.parseInt(SpeedInputResolve.getText());
-        if (speed < 10 || speed > 101) {
+        if (speed < 10 || speed > 101) { // Check if the speed is between 10 and 100
             showError("Vitesse invalide", "La vitesse doit être entre 10 et 100");
             return;
         }
-        pathTimeline = new Timeline();
+        pathTimeline = new Timeline(); // Create a new Timeline for the path animation
 
         for (int i = 0; i < path.size(); i++) {
+            // Create a KeyFrame for each step of the path
+            // The event handler will color the cell at index i in red
             final int index = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(i * speed), event -> {
                 Case c = path.get(index);
@@ -1166,35 +1192,35 @@ public class HelloController {
                     cellPane.setStyle(cellPane.getStyle() + "-fx-background-color: red;");
                 }
             });
-            pathTimeline.getKeyFrames().add(keyFrame);
+            pathTimeline.getKeyFrames().add(keyFrame); // Add the KeyFrame to the Timeline
         }
-        pathTimeline.play();
+        pathTimeline.play(); // Start the animation
     }
 
 
     /**
-     * Génère un labyrinthe selon la méthode spécifiée, avec une taille donnée et un seed optionnel.
-     *
-     * @param width   La largeur (nombre de colonnes) du labyrinthe à générer.
-     * @param height  La hauteur (nombre de lignes) du labyrinthe à générer.
-     * @param method  La méthode de génération du labyrinthe :
-     *                "Parfait" pour un labyrinthe parfait (sans cycles),
-     *                toute autre valeur pour un labyrinthe imparfait.
-     * @param seedOpt Un entier optionnel utilisé comme seed pour la génération aléatoire.
-     *                S'il est null, un seed aléatoire sera généré.
-     * @return        Un objet Maze représentant le labyrinthe généré.
+     * Generates a maze using the specified method with given dimensions and an optional seed.
+     * 
+     * @param width  The width (number of columns) of the maze to generate.
+     * @param height The height (number of rows) of the maze to generate.
+     * @param method The maze generation method:
+     *               "Parfait" for a perfect maze (no cycles),
+     *               any other value for an imperfect maze.
+     * @param seedOpt An optional integer used as a seed for random generation.
+     *                If null, a random seed will be generated.
+     * @return       A Maze object representing the generated maze.
      */
-    public static Maze generateMaze(int width, int height, String method, Integer seedOpt) {
-        int seed = (seedOpt != null) ? seedOpt : new Random().nextInt();
+    public static Maze generateMaze(int width, int height, String method, Integer seedOpt) { // Static method to generate a maze
+        int seed = (seedOpt != null) ? seedOpt : new Random().nextInt(); // Generate a random seed if none is provided
         Maze maze = new Maze(width, height);
-        LinkedList<int[]> steps;
+        LinkedList<int[]> steps; // List of walls to be removed
         if ("Parfait".equalsIgnoreCase(method)) {
-            steps = maze.KruskalGeneration(seed);
+            steps = maze.KruskalGeneration(seed); // Generate a perfect maze
         } else {
-            steps = maze.KruskalImperfectGeneration(seed);
+            steps = maze.KruskalImperfectGeneration(seed); // Generate an imperfect maze
         }
-        while (!steps.isEmpty()) {
-            int[] wall = steps.poll();
+        while (!steps.isEmpty()) { // While there are walls to remove
+            int[] wall = steps.poll(); // Get the next wall to remove
             if ("Parfait".equalsIgnoreCase(method)) {
                 maze.setWallsPerfect(wall, maze.getMaze()[wall[0]][wall[1]], maze.getMaze()[wall[2]][wall[3]]);
             } else {
@@ -1206,17 +1232,17 @@ public class HelloController {
 
 
     /**
-     * Affiche une représentation textuelle du labyrinthe dans le terminal.
-     *
-     * Cette méthode utilise des caractères Unicode pour dessiner les murs du labyrinthe
-     * selon les informations contenues dans l'objet {@code Maze} passé en paramètre.
-     *
-     * La bordure supérieure et inférieure ainsi que les jonctions entre les murs sont également dessinées
-     * pour former un cadre cohérent autour du labyrinthe.
-     *
-     * @param maze L'objet {@code Maze} représentant le labyrinthe à afficher.
-     *             Il doit fournir la largeur, la hauteur et la grille des cases via
-     *             les méthodes {@code getWidth()}, {@code getHeight()} et {@code getMaze()}.
+     * Displays a textual representation of the maze in the terminal.
+     * 
+     * This method uses Unicode characters to draw the walls of the maze
+     * according to the information contained in the {@code Maze} object passed as a parameter.
+     * 
+     * The top and bottom borders as well as the junctions between walls are also drawn
+     * to form a coherent frame around the maze.
+     * 
+     * @param maze The {@code Maze} object representing the maze to display.
+     *            It must provide the width, height, and grid of cells via
+     *           the {@code getWidth()}, {@code getHeight()}, and {@code getMaze()} methods.
      */
     public static void printTerminal(Maze maze) {
         int width = maze.getWidth();
@@ -1267,19 +1293,19 @@ public class HelloController {
 
 
     /**
-     * Affiche une représentation textuelle du labyrinthe dans le terminal,
-     * en mettant en évidence un chemin solution.
+     * Displays a textual representation of the maze in the terminal,
+     * highlighting a solution path.
      * <p>
-     * Cette méthode dessine le labyrinthe avec des caractères Unicode pour représenter
-     * les murs, et affiche le chemin solution fourni en rouge sous forme de points "•".
+     * This method draws the maze with Unicode characters to represent
+     * the walls, and displays the provided solution path in red as "•" points.
      * <p>
-     * Le labyrinthe est représenté case par case, avec des murs à l'ouest et au sud selon
-     * les informations fournies par les méthodes {@code getWest()} et {@code getSouth()} de chaque case.
+     * The maze is represented cell by cell, with walls to the west and south according to
+     * the information provided by the {@code getWest()} and {@code getSouth()} methods of each cell.
      * <p>
-     * Le chemin solution est indiqué par des points rouges dans les cases correspondantes.
-     *
-     * @param maze Le labyrinthe à afficher, contenant la largeur, la hauteur et la grille des cases.
-     * @param solutionPath La liste ordonnée des cases formant le chemin solution à mettre en évidence.
+     * The solution path is indicated by red points in the corresponding cells.
+     * 
+     * @param maze The maze to display, containing the width, height, and grid of cells.
+     * @param solutionPath The ordered list of cells forming the solution path to highlight.
      */
     public static void printTerminal(Maze maze, List<Case> solutionPath) {
         int width = maze.getWidth();
@@ -1329,17 +1355,17 @@ public class HelloController {
 
 
     /**
-     * Sauvegarde un labyrinthe dans la base de données avec un nom unique fourni par l'utilisateur.
+     * Saves a maze in the database with a unique name provided by the user.
      * <p>
-     * Cette méthode demande à l'utilisateur, via la console, de saisir un nom unique pour enregistrer
-     * le labyrinthe. Si l'utilisateur ne fournit pas de nom (entrée vide), un nom par défaut est généré
-     * automatiquement en s'assurant qu'il soit unique parmi les noms existants dans la base.
+     * This method prompts the user via the console to enter a unique name to save
+     * the maze. If the user does not provide a name (empty input), a default name is generated
+     * automatically, ensuring it is unique among the existing names in the database.
      * <p>
-     * Si le nom saisi existe déjà, l'utilisateur est invité à en saisir un autre jusqu'à obtenir un nom unique.
-     *
-     * @param currentMaze Le labyrinthe à sauvegarder.
-     * @param db L'objet Database utilisé pour la gestion des sauvegardes.
-     * @param sc Le Scanner utilisé pour lire l'entrée utilisateur depuis la console.
+     * If the entered name already exists, the user is prompted to enter another name until a unique name is obtained.
+     * 
+     * @param currentMaze The maze to save.
+     * @param db The Database object used for saving.
+     * @param sc The Scanner used to read user input from the console.
      */
     public static void saveMazeTerminal(Maze currentMaze, Database db, Scanner sc) {
         List<String> existingNames = db.getMazeList();
@@ -1350,7 +1376,7 @@ public class HelloController {
             name = sc.nextLine().trim();
 
             if (name.isEmpty()) {
-                // Générer un nom par défaut unique
+                // Generate an unique default name
                 int index = 1;
                 name = "Labyrinthe";
                 while (existingNames.contains(name)) {
@@ -1361,7 +1387,7 @@ public class HelloController {
             } else if (existingNames.contains(name)) {
                 System.out.println("Ce nom est déjà utilisé. Veuillez en choisir un autre.");
             } else {
-                break; // nom unique et non vide
+                break; // Valid unique name
             }
         }
 
@@ -1371,15 +1397,15 @@ public class HelloController {
 
 
     /**
-     * Sauvegarde le labyrinthe courant dans la base de données avec le nom spécifié par l'utilisateur.
+     * Saves the current maze in the database with the name specified by the user.
      * <p>
-     * Cette méthode vérifie que le champ de texte contenant le nom du labyrinthe n'est pas vide,
-     * et que ce nom n'existe pas déjà dans la liste des labyrinthes enregistrés.
-     * Si une de ces conditions n'est pas respectée, un message d'erreur est affiché.
-     * Sinon, le labyrinthe est sauvegardé dans la base via l'objet `db`.
+     * This method checks that the text field containing the maze name is not empty,
+     * and that this name does not already exist in the list of saved mazes.
+     * If either of these conditions is not met, an error message is displayed.
+     * Otherwise, the maze is saved in the database via the `db` object.
      * <p>
-     * La méthode dépend d'un champ texte `MazeName` pour récupérer le nom du labyrinthe,
-     * et d'une instance `currentMaze` représentant le labyrinthe courant.
+     * The method depends on a text field `MazeName` to retrieve the maze name,
+     * and on an instance `currentMaze` representing the current maze.
      */
     @FXML
     public void SaveMaze() {
@@ -1397,11 +1423,20 @@ public class HelloController {
         }
     }
 
+    /**
+     * Loads a maze from the database and updates the display.
+     * <p>
+     * This method retrieves the selected maze name from the `SaveList` ComboBox,
+     * loads the corresponding maze from the database, and updates the graphical grid
+     * to display the loaded maze. It also updates the labels with information about
+     * the maze (size, seed, etc.).
+     */
     @FXML
     public void loadMaze() {
-        if(!SaveList.getItems().isEmpty() && SaveList.getValue() != null){
-            ChargeMaze(SaveList.getValue());
+        if(!SaveList.getItems().isEmpty() && SaveList.getValue() != null){ // Check if the list is not empty and if a maze is selected
+            ChargeMaze(SaveList.getValue()); // Load the maze from the database
             isPerfect = currentMaze.isPerfect();
+            // Update the labels with maze information
             mazeSizeLabel.setText("Taille : " + currentMaze.getHeight() + " x " + currentMaze.getWidth());
             mazeSeedLabel.setText("Seed : Labyrinthe Personnalisé");
             mazePerfectLabel.setText("Parfait : " + (isPerfect ? "Oui" : "Non"));
@@ -1414,17 +1449,24 @@ public class HelloController {
         }
     }
 
+    /**
+     * Deletes a maze from the database and updates the list of saved mazes.
+     * <p>
+     * This method retrieves the selected maze name from the `SaveList` ComboBox,
+     * deletes the corresponding maze from the database, and updates the ComboBox
+     * to reflect the changes.
+     */
     @FXML
     public void deleteMaze() {
-        db.DeleteMaze(SaveList.getValue());
-        SaveList.setItems(db.getMazeList());
+        db.DeleteMaze(SaveList.getValue()); // Delete the selected maze from the database
+        SaveList.setItems(db.getMazeList()); // Update the ComboBox with the new list of mazes
     }
 
     /**
-     * Charge un labyrinthe depuis la base de données et met à jour l'affichage.
-     * Calcule la taille des cellules, initialise la grille et détecte l'entrée et la sortie.
-     *
-     * @param name Le nom du labyrinthe à charger.
+     * Charges a maze from the database and updates the display.
+     * Calculates the size of the cells, initializes the grid, and detects the entry and exit.
+     * 
+     * @param name The name of the maze to load.
      */
     public void ChargeMaze(String name) {
         currentMaze = db.DataChargeMaze(name);
@@ -1435,7 +1477,7 @@ public class HelloController {
 
         gridPane.setPrefSize(currentMaze.getWidth() * cellSize, currentMaze.getHeight() * cellSize);
 
-        // Trouver l'entrée et la sortie dans le labyrinthe chargé
+        // Find the entry and exit cells in the charged maze
         entryCell = null;
         exitCell = null;
         for (int i = 0; i < currentMaze.getHeight(); i++) {
@@ -1458,10 +1500,13 @@ public class HelloController {
 
 
     /**
-     * Affiche une boîte de dialogue d'erreur avec un titre et un message.
-     *
-     * @param title   Le titre de la fenêtre d'erreur.
-     * @param message Le message d'erreur à afficher.
+     * Displays an error message in a dialog box.
+     * 
+     * This method creates an Alert of type ERROR and sets the title and message
+     * to be displayed in the dialog box.
+     * 
+     * @param title   The title of the error dialog.
+     * @param message The error message to display.
      */
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -1480,9 +1525,11 @@ public class HelloController {
 
 
     /**
-     * Définit la base de données utilisée par le contrôleur.
-     *
-     * @param db L'objet Database à utiliser.
+     * Defines the database used by the controller.
+     * 
+     * This method sets the database object to be used for saving and loading mazes.
+     * 
+     * @param db The Database object to use.
      */
     public void setDatabase(Database db) {
         this.db = db;
@@ -1491,9 +1538,9 @@ public class HelloController {
 
 
     /**
-     * Active ou désactive les contrôles de l'interface utilisateur.
-     *
-     * @param disabled true pour désactiver les contrôles, false pour les activer.
+     * Activates or deactivates the controls of the user interface.
+     * 
+     * @param disabled true to disable the controls, false to enable them.
      */
     private void setControlsDisabled(boolean disabled) {
         widthInput.setDisable(disabled);
@@ -1501,14 +1548,14 @@ public class HelloController {
         seedInput.setDisable(disabled);
         MethodGeneration.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
         MethodSolve.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
-        selectEntryExitButton.setDisable(disabled && !selectingEntryExit); // Permet d'annuler la sélection
+        selectEntryExitButton.setDisable(disabled && !selectingEntryExit); // Allow us to disable the selection
     }
 
 
     /**
-     * Active ou désactive tous les contrôles de l'interface, s'ils sont initialisés.
-     *
-     * @param disabled true pour désactiver les contrôles, false pour les activer.
+     * Activates or deactivates all controls of the interface, if they are initialized.
+     * 
+     * @param disabled true to disable the controls, false to enable them.
      */
     private void setAllControlsDisabled(boolean disabled) {
         // Désactive tous les contrôles
@@ -1529,6 +1576,13 @@ public class HelloController {
         }
     }
 
+    /**
+     * Returns to the homepage of the application.
+     * <p>
+     * This method loads the "Homepage.fxml" file and sets it as the current scene.
+     * 
+     * @param event The mouse event triggering the action.
+     */
     @FXML
     public void ReturnHomepage(MouseEvent event) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Homepage.fxml"));
@@ -1545,6 +1599,14 @@ public class HelloController {
         stage.show();
     }
 
+    /**
+     * Sets the scene to full screen mode when the F11 key is pressed.
+     * <p>
+     * This method listens for key events on the given scene and toggles
+     * the full screen mode when the F11 key is pressed.
+     * 
+     * @param scene The scene to set to full screen.
+     */
     private void FullScreen(Scene scene){
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F11 || event.getCode() == KeyCode.F) {
