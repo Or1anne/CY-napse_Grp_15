@@ -68,6 +68,10 @@ public class HelloController {
     @FXML private Label NbCaseFinal;
     @FXML private ChoiceBox<String> SaveList;
     @FXML private Button selectEntryExitButton;
+    @FXML private Button GenerateButton;
+    @FXML private Button ResolveButton;
+    @FXML private Button resetButton;
+    @FXML private Button LoadMazeButton;
 
 
     /**
@@ -101,6 +105,8 @@ public class HelloController {
         SpeedInputResolve.setVisible(false);
         SpeedInputResolve.setManaged(false);
         editModeButton.setDisable(true);
+        SaveButton.setDisable(true);
+        selectEntryExitButton.setDisable(true);
     }
 
     private void setupWithDatabase() {
@@ -191,6 +197,8 @@ public class HelloController {
         SaveButton.setDisable(true);
         // ModeEdition.setDisable(true);
         editModeButton.setDisable(true);
+        selectEntryExitButton.setDisable(true);
+
         
         // Reset the zoom factor and clear the grid
         zoomFactor = 1.0;
@@ -289,6 +297,7 @@ public class HelloController {
                 MazeStackPane.getChildren().remove(progressBar);
                 SaveButton.setDisable(false);
                 editModeButton.setDisable(false);
+                selectEntryExitButton.setDisable(false);
                 initializeEntryExit();
 
 
@@ -305,6 +314,7 @@ public class HelloController {
             redrawMaze();
             SaveButton.setDisable(false);
             editModeButton.setDisable(false);
+            selectEntryExitButton.setDisable(false);
             initializeEntryExit();
 
 
@@ -379,6 +389,7 @@ public class HelloController {
         if (editMode) {
             editModeButton.setText("Mode édition : ON");
             setControlsDisabled(true);
+            editModeButton.setDisable(false);
 
             // Stop the ongoing generation if it exists
             if (pathTimeline != null) {
@@ -421,6 +432,8 @@ public class HelloController {
             selectEntryExitButton.setText("Choisir Entrée/Sortie");
             setAllControlsDisabled(false); // Reactivate all controls
         } else {
+            // Desactivate all controles
+            setControlsDisabled(true);
             selectingEntryExit = true;
             selectionStep = 1;
             selectEntryExitButton.setText("Sélectionnez l'ENTRÉE (bord)");
@@ -429,8 +442,6 @@ public class HelloController {
             if (pathTimeline != null) pathTimeline.stop();
             if (generationTimeline != null) generationTimeline.stop();
 
-            // Desactivate all controles
-            setControlsDisabled(true);
 
             // Reset old entry/exit cells
             resetEntryExit();
@@ -981,7 +992,6 @@ public class HelloController {
                 showError("Labyrinthe insoluble", "Aucun chemin n'a été trouvé.\nVérifie que l'entrée et la sortie sont accessibles.");
                 return;
             }
-
             if (toggleSwitchResolve.isSelected()) {
                 if(SolveMethod.getText().equals("Hand on Wall")) {
                     showPathStepByStep(finalPath);
@@ -1174,8 +1184,8 @@ public class HelloController {
         }
 
 
-        int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty()) ? 100 : Integer.parseInt(SpeedInputResolve.getText());
-        if (speed < 10 || speed > 101) { // Check if the speed is between 10 and 100
+        int speed = (SpeedInputResolve.getText() == null || SpeedInputResolve.getText().isEmpty()) ? 50 : Integer.parseInt(SpeedInputResolve.getText());
+        if (speed < 1) { // Check if the speed is between 10 and 100
             showError("Vitesse invalide", "La vitesse doit être entre 10 et 100");
             return;
         }
@@ -1496,6 +1506,8 @@ public class HelloController {
             }
         }
         editModeButton.setDisable(false);
+        SaveButton.setDisable(false);
+        selectEntryExitButton.setDisable(false);
     }
 
 
@@ -1546,8 +1558,14 @@ public class HelloController {
         widthInput.setDisable(disabled);
         heightInput.setDisable(disabled);
         seedInput.setDisable(disabled);
+        resetButton.setDisable(disabled);
         MethodGeneration.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
         MethodSolve.getToggles().forEach(toggle -> ((RadioButton) toggle).setDisable(disabled));
+        GenerateButton.setDisable(disabled);
+        ResolveButton.setDisable(disabled);
+        editModeButton.setDisable(disabled);
+        LoadMazeButton.setDisable(disabled);
+        SaveButton.setDisable(disabled);
         selectEntryExitButton.setDisable(disabled && !selectingEntryExit); // Allow us to disable the selection
     }
 
@@ -1559,15 +1577,19 @@ public class HelloController {
      */
     private void setAllControlsDisabled(boolean disabled) {
         // Désactive tous les contrôles
-        if (widthInput != null) widthInput.setDisable(disabled);
-        if (heightInput != null) heightInput.setDisable(disabled);
-        if (seedInput != null) seedInput.setDisable(disabled);
-        if (SpeedInputGeneration != null) SpeedInputGeneration.setDisable(disabled);
+        widthInput.setDisable(disabled);
+        heightInput.setDisable(disabled);
+        seedInput.setDisable(disabled);
+        SpeedInputGeneration.setDisable(disabled);
         //if (SpeedInputResolve != null) SpeedInputResolve.setDisable(disabled);
-        if (MazeName != null) MazeName.setDisable(disabled);
-        if (SaveButton != null) SaveButton.setDisable(disabled);
-        if (editModeButton != null) editModeButton.setDisable(disabled);
-        if (toggleSwitch != null) toggleSwitch.setDisable(disabled);
+        MazeName.setDisable(disabled);
+        LoadMazeButton.setDisable(disabled);
+        resetButton.setDisable(disabled);
+        SaveButton.setDisable(disabled);
+        editModeButton.setDisable(disabled);
+        toggleSwitch.setDisable(disabled);
+        GenerateButton.setDisable(disabled);
+        ResolveButton.setDisable(disabled);
         //if (toggleSwitchResolve != null) toggleSwitchResolve.setDisable(disabled);
 
         // RadioButtons
